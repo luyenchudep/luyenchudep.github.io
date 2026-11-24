@@ -1,91 +1,107 @@
-# ✍️ Tập viết S Pen · Rèn chữ Việt thanh đậm và nét đều
+# ✍️ Tập viết S Pen
 
-Ứng dụng miễn phí để rèn chữ viết tay tiếng Việt trên điện thoại và máy tính bảng, viết bằng **S Pen** hoặc bút cảm ứng. Ứng dụng còn xuất được vở luyện chữ PDF để in giấy A4, A5 hoặc dùng trên máy reMarkable.
+Luyện chữ đẹp tiếng Việt, kiểu thanh đậm và kiểu nét đều, ngay trên điện thoại hay máy tính bảng.
 
-**Chỉ một tệp HTML · Chạy không cần mạng · Không quảng cáo · Không cần đăng nhập · Không gửi dữ liệu của bạn đi đâu.**
+Bạn viết bằng S Pen hoặc bút cảm ứng lên màn hình. Ứng dụng chỉ cho bạn từng nét: đặt bút ở đâu, kéo theo hướng nào, nét nào viết trước, nét nào viết sau. Muốn tập trên giấy thì in vở ra khổ A4, A5, hoặc chép vào máy reMarkable.
 
-👉 **[Mở ứng dụng và tập ngay](https://luyenchudep.github.io/tap-viet-spen/)**
+Ứng dụng miễn phí, không quảng cáo, không cần tạo tài khoản. Toàn bộ chỉ gói trong một tệp HTML, không có mạng vẫn mở được, và không gửi bất cứ thứ gì của bạn ra ngoài.
 
-Nên mở bằng Chrome hoặc Samsung Internet, rồi chọn **Thêm vào màn hình chính** để dùng như một ứng dụng riêng.
+👉 **[Mở ứng dụng để tập](https://luyenchudep.github.io/tap-viet-spen/)**
 
-> **Phiên bản 0.9.0 · bản thử nghiệm công khai.** Ứng dụng đã qua bộ kiểm thử tự động trên trình duyệt Chrome nhưng chưa được thử rộng rãi trên máy thật. Mức chấm điểm và độ nhạy của chế độ "Tự tô từng nét" có thể còn cần chỉnh. Rất mong bạn góp ý.
+Nên mở bằng Chrome hoặc Samsung Internet, rồi chọn **Thêm vào màn hình chính** để lần sau mở như một ứng dụng bình thường.
+
+<p align="center">
+  <img src="anh/1-trang-to.png" width="260" alt="Trang tập đang ở bước Tô: dòng trên chữ rõ, dòng dưới chữ mờ dần">
+  &nbsp;
+  <img src="anh/2-trang-chep.png" width="260" alt="Bước Chép: nhìn chữ mẫu đầu dòng rồi viết tiếp">
+</p>
+<p align="center">
+  <img src="anh/3-but-viet-cham.png" width="260" alt="Bút viết chậm chạy đúng thứ tự nét, bên cạnh là chữ mẫu">
+  &nbsp;
+  <img src="anh/4-tu-to-tung-net.png" width="260" alt="Tự tô từng nét: ứng dụng báo nét vừa tô đã đúng và chỉ hướng nét tiếp theo">
+</p>
+<p align="center"><sub>Tô theo mẫu · Chép lại · Xem bút viết chậm · Tự tô từng nét</sub></p>
+
+> **Bản 0.10.0, đang thử nghiệm.** Ứng dụng đã chạy qua các bài kiểm tra tự động trên Chrome nhưng chưa được nhiều người dùng thử trên máy thật. Cách chấm điểm và độ nhạy khi tự tô từng nét có thể còn phải chỉnh. Bạn dùng thấy chỗ nào chưa ổn, rất mong bạn góp ý.
 
 ---
 
-## Tính năng
+## Ứng dụng có gì
 
-### 1. Hai giáo trình: 82 bài, 404 bộ dữ liệu đường đi nét
-- **Chữ thanh đậm** (nghiêng 28°): 10 phần, 45 bài. Đi từ nét cơ bản, chữ thường, cách nối chữ, chữ hoa, dấu tiếng Việt (kể cả dấu chồng như ẫ, Ở, Ữ), từ và câu, Truyện Kiều, tới chữ viết nhanh và trang ghi chép ba ô.
-- **Chữ nét đều** (nghiêng 10°): 10 phần, 37 bài. Chữ in rõ ràng, chữ số, ký hiệu, câu song ngữ Việt – Anh và ghi chép hằng ngày.
+### Hai bộ bài tập, tổng cộng 82 bài
 
-### 2. Lộ trình tập: Xem → Tự tô từng nét → Tô mờ dần → Chép → Ôn theo trí nhớ
+- **Chữ thanh đậm**, nghiêng 28 độ: 45 bài, chia làm 10 phần. Bắt đầu từ các nét cơ bản, rồi tới chữ thường, cách nối chữ, chữ hoa và chữ có dấu, kể cả những chữ mang hai dấu chồng lên nhau như ẫ, Ở, Ữ. Tiếp đó là viết từ, viết câu, chép Truyện Kiều, và cuối cùng là viết nhanh, ghi chép trên trang chia ba ô.
+- **Chữ nét đều**, nghiêng 10 độ: 37 bài, chia làm 10 phần. Gồm chữ in dễ đọc, chữ số, ký hiệu, câu Việt – Anh và ghi chép hằng ngày.
+
+Chữ cái nào, nét nào cũng có hướng dẫn thứ tự nét, tổng cộng 404 chữ và nét.
+
+### Tập từ dễ đến khó
+
+Mỗi bài đi qua từng bước: xem mẫu, tự tô từng nét, tô theo chữ mờ dần, chép lại, rồi ôn lại khi không còn nhìn mẫu.
+
 - **① Xem**
-  - **Bút viết chậm:** bút chạy đúng thứ tự nét, tốc độ đều, có bóng chữ mờ để thấy tỉ lệ.
-  - **Tự tô từng nét:** tô bằng S Pen lên ô chữ lớn. Ứng dụng kiểm tra chỗ đặt bút, báo khi kéo ngược chiều (thường gặp ở o, a, c, d, g) và tự chạy gợi ý khi tô sai.
-  - **Xem nhanh trên trang tập:** chạm ngón tay vào chữ mẫu đầu dòng để xem ngay cách viết chữ đó.
-- **② Tô:** tô rõ → tô mờ → chỉ còn chấm xanh đặt bút, để tay tự làm chủ dần.
-- **③ Chép:** nhìn chữ mẫu đầu dòng rồi chép tiếp. Chạm **So sánh** để chồng chữ mẫu màu đỏ lên nét của bạn, rồi tự chấm **Đạt** hoặc **Luyện thêm**.
-- **Bài ôn:** ẩn hẳn chữ mẫu để viết theo trí nhớ. Chữ đã đạt sẽ quay lại sau 1, 3, 7, 14 và 30 ngày.
+  - *Bút viết chậm:* bút chạy đúng thứ tự nét với tốc độ đều, phía sau có bóng chữ mờ để bạn thấy tỉ lệ.
+  - *Tự tô từng nét:* bạn tô bằng S Pen lên một ô chữ lớn. Ứng dụng xem bạn đặt bút có đúng chỗ không, báo ngay khi bạn kéo ngược chiều (hay gặp ở o, a, c, d, g), và vẽ lại nét mẫu khi bạn tô sai.
+  - Đang ở trang tập mà quên cách viết, chỉ cần chạm ngón tay vào chữ mẫu đầu dòng là xem lại được ngay.
+- **② Tô:** lúc đầu tô lên chữ rõ, sau đó chữ mờ dần, cuối cùng chỉ còn chấm xanh đánh dấu chỗ đặt bút. Tay quen dần, không cần dựa vào mẫu nữa.
+- **③ Chép:** nhìn chữ mẫu đầu dòng rồi viết tiếp cả dòng. Chạm **So sánh** để đặt chữ mẫu màu đỏ đè lên chữ bạn viết, rồi tự chấm **Đạt** hay **Luyện thêm**.
+- **Bài ôn:** chữ mẫu được giấu đi, bạn viết theo trí nhớ. Chữ nào đã đạt sẽ được nhắc ôn lại sau 1, 3, 7, 14 và 30 ngày.
 
-### 3. Tối ưu cho viết bằng S Pen
-- **6 loại bút:** bút máy (theo lực nhấn, có sẵn kiểu ngòi lá tre), ngòi vát, bút bi nước, bút lông, bút chì, bút dạ quang.
-- **12 màu mực** và màu tự chọn, **4 bút yêu thích** (giữ lâu nút Bút để đổi nhanh), làm mượt nét khi run tay.
-- **Chỉ nhận S Pen:** tì bàn tay lên màn hình không để lại nét. Nút trên thân bút đặt được thành Tẩy, Hoàn tác hoặc Đổi bút.
-- **Hộp viết phóng to:** viết chữ to ở nửa dưới màn hình. Hộp tự trượt sang phải khi viết tới mép, và chờ đủ lâu để bạn quay lại bỏ dấu.
-- **Bố cục linh hoạt:**
-  - Tách đôi màn hình trên máy tính bảng.
-  - Chế độ tay trái.
-  - Lưới xiên kiểu Pháp hoặc 4 ô ly Việt Nam.
-  - 4 màu giấy: Ấm, Sáng, Tối, Đen trắng (cho máy đọc sách).
-- **Phân tích nét viết ngay trên máy:** độ nghiêng, độ đều góc nghiêng, độ trơn tay và độ khớp hình chữ mẫu.
+### Viết bằng S Pen như viết trên giấy
 
-### 4. Vở PDF và theo dõi tiến bộ
-- **Xuất vở PDF không cần mạng:** đúng khổ cho reMarkable 2, reMarkable Paper Pro, giấy A4 và sổ A5. Có trang mục lục chạm để chuyển trang.
-- **Các tiện ích khác:**
-  - Buổi tập 15 phút mỗi ngày.
-  - Luyện tên riêng và chữ ký.
-  - Bài tự do.
-  - Nhật ký luyện chữ.
-  - Kiểm tra trên giấy hai tuần một lần.
+- Có 6 loại bút: bút máy (nét to nhỏ theo lực tay, có sẵn ngòi lá tre), ngòi vát, bút bi nước, bút lông, bút chì và bút dạ quang.
+- Có 12 màu mực, muốn thì tự pha thêm. Lưu được 4 cây bút hay dùng, giữ lâu nút Bút để đổi cho nhanh. Nét được làm mượt khi tay hơi run.
+- Bật **Chỉ nhận S Pen** thì tì cả bàn tay lên màn hình cũng không vẽ bậy. Nút trên thân bút đặt được làm tẩy, hoàn tác hoặc đổi bút.
+- **Hộp viết phóng to:** viết chữ to ở nửa dưới màn hình cho dễ. Viết tới mép thì hộp tự dịch sang phải, và chờ đủ lâu để bạn quay lại bỏ dấu.
+- Chia đôi màn hình trên máy tính bảng. Có chế độ dành cho người thuận tay trái.
+- Chọn lưới kẻ xiên kiểu Pháp hoặc vở 4 ô ly như ở trường.
+- Có 4 màu giấy: Ấm, Sáng, Tối và Đen trắng (hợp với máy đọc sách).
+- Ứng dụng đo được chữ bạn nghiêng bao nhiêu độ, nghiêng có đều không, nét có trơn tay không và giống chữ mẫu đến đâu. Mọi phép đo đều làm ngay trên máy.
+
+### In vở và theo dõi việc tập
+
+- Xuất vở PDF mà không cần mạng, đúng khổ giấy A4, sổ A5, máy reMarkable 2 và reMarkable Paper Pro. Trang đầu là mục lục, chạm vào tên bài là tới trang đó.
+- Vở xuất ra là PDF dạng vectơ, có nhúng phông chữ. In ra hay phóng to cỡ nào nét cũng sắc, tệp lại nhẹ, và tìm được chữ trong vở.
+- Ngoài ra còn có buổi tập 15 phút mỗi ngày, luyện viết tên và chữ ký, bài tự soạn, nhật ký luyện chữ, và lời nhắc tự kiểm tra chữ viết trên giấy hai tuần một lần.
 
 ---
 
-## Thiết bị phù hợp
+## Dùng được trên máy nào
 
-| Thiết bị | Mức hỗ trợ |
+| Máy | Dùng thế nào |
 |---|---|
-| Điện thoại và máy tính bảng Samsung Galaxy có S Pen (Chrome, Samsung Internet) | Thiết bị chính, đầy đủ tính năng |
-| Máy tính bảng Android khác, máy tính dùng chuột hoặc bút | Dùng được. Nếu bút không được nhận, tắt "Chỉ nhận S Pen" |
-| Máy đọc sách Boox | Dùng được nhưng nét hiện chậm hơn |
+| Điện thoại, máy tính bảng Samsung Galaxy có S Pen (mở bằng Chrome hoặc Samsung Internet) | Máy chính, dùng được mọi tính năng |
+| Máy tính bảng Android khác, máy tính dùng chuột hoặc bút | Dùng được. Nếu bút không viết được, hãy tắt **Chỉ nhận S Pen** |
+| Máy đọc sách Boox | Dùng được, nhưng nét hiện ra hơi chậm |
 | reMarkable, Kindle Scribe | Dùng vở PDF xuất từ ứng dụng |
 
 ---
 
-## Cách dùng
+## Bắt đầu
 
-1. **Dùng trên trang web (nên dùng):** mở [đường dẫn ứng dụng](https://luyenchudep.github.io/tap-viet-spen/) trên điện thoại, máy tính bảng hoặc máy tính. Sau đó chọn **Thêm vào màn hình chính**.
-2. **Dùng tệp trên máy:** tải tệp `index.html` về rồi mở bằng trình duyệt. Một số trình duyệt trên điện thoại giới hạn việc lưu bài khi mở tệp trực tiếp, nên cách 1 ổn định hơn.
+1. **Mở trên web (nên chọn cách này):** vào [luyenchudep.github.io/tap-viet-spen](https://luyenchudep.github.io/tap-viet-spen/) trên điện thoại, máy tính bảng hay máy tính, rồi chọn **Thêm vào màn hình chính**.
+2. **Mở tệp trên máy:** tải tệp `index.html` về rồi mở bằng trình duyệt. Có trình duyệt trên điện thoại không cho lưu bài khi mở tệp theo cách này, nên cách 1 chắc ăn hơn.
 
-## Dữ liệu của bạn
+## Bài viết của bạn được lưu ở đâu
 
-- Bài viết, tiến độ và cài đặt **chỉ lưu trong trình duyệt trên máy bạn**, không gửi lên đâu cả.
-- Nếu xóa dữ liệu trình duyệt hoặc đổi máy, bài viết sẽ mất.
-- Hãy sao lưu định kỳ: mở **☰ Danh mục → Cài đặt → Dữ liệu → Sao lưu bài viết ra tệp**. Khi cần, dùng **Khôi phục từ tệp sao lưu**.
+- Bài viết, tiến độ và cài đặt chỉ nằm trong trình duyệt trên máy bạn, không gửi đi đâu cả.
+- Vì thế, nếu xóa dữ liệu trình duyệt hoặc đổi sang máy khác, bài viết sẽ mất.
+- Thỉnh thoảng bạn nên sao lưu: vào **☰ Danh mục → Cài đặt → Dữ liệu → Sao lưu bài viết ra tệp**. Khi cần lấy lại, chọn **Khôi phục từ tệp sao lưu**.
 
 ---
 
 ## Giấy phép
 
-- **Mã nguồn:** giấy phép MIT. Bạn được tự do dùng, chia sẻ và sửa đổi. Xem tệp [`LICENSE`](LICENSE).
-- **Phông chữ:** ứng dụng nhúng sẵn ba phông chữ mã nguồn mở theo giấy phép SIL Open Font License 1.1:
-  - **Pinyon Script:** chữ thanh đậm.
-  - **Allura:** chữ viết nhanh.
-  - **Quicksand:** chữ nét đều và giao diện. Phông này được cắt gọn và đổi tên thành **TV Sans** theo đúng điều khoản về tên dành riêng của giấy phép.
+- **Mã nguồn** theo giấy phép MIT: bạn được tự do dùng, chia sẻ và sửa. Xem tệp [`LICENSE`](LICENSE).
+- **Phông chữ:** ứng dụng nhúng ba phông chữ mở, cùng theo giấy phép SIL Open Font License 1.1:
+  - Pinyon Script cho chữ thanh đậm.
+  - Allura cho chữ viết nhanh.
+  - Quicksand cho chữ nét đều và giao diện. Vì đã được cắt bớt nên phông này phải đổi tên thành TV Sans, theo đúng quy định của giấy phép.
 
-  Chi tiết ở tệp [`LICENSE-FONTS.md`](LICENSE-FONTS.md) và thư mục [`licenses/`](licenses/).
+  Xem thêm ở tệp [`LICENSE-FONTS.md`](LICENSE-FONTS.md) và thư mục [`licenses/`](licenses/).
 
 ## Góp ý
 
-Nếu bạn gặp lỗi hiển thị, thấy thứ tự nét của một chữ tiếng Việt chưa đúng, hoặc muốn đề xuất bài tập mới, hãy mở một mục trong thẻ **[Issues](https://github.com/luyenchudep/tap-viet-spen/issues)** của kho này. Góp ý từ người dùng S Pen và người tự luyện chữ đều rất quý.
+Bạn gặp lỗi hiển thị, thấy chữ nào sai thứ tự nét, hay muốn có thêm bài tập nào, cứ mở một mục mới ở thẻ [Issues](https://github.com/luyenchudep/tap-viet-spen/issues). Góp ý của người dùng S Pen hay của người đang tự luyện chữ đều rất quý.
 
-Lịch sử thay đổi: xem [`CHANGELOG.md`](CHANGELOG.md).
+Những thay đổi qua từng bản: xem tệp [`CHANGELOG.md`](CHANGELOG.md).
