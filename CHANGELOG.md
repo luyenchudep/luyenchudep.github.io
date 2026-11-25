@@ -1,6 +1,6 @@
 # Những thay đổi qua từng bản
 
-## Bản 0.10.4 (26/11/2026): nhấn vừa tay là ra nét đậm, nói giọng Sài Gòn
+## Bản 0.10.4 (26/11/2026): nhấn vừa tay là ra nét đậm, học liền mạch hơn
 
 ### Viết nhẹ tay hơn, đỡ mòn ngòi S Pen
 
@@ -19,11 +19,10 @@
 - Nút **Tô phần này** và **Chép** nằm ngay dưới khung chạy chữ mẫu.
 - Mở lại một bài chưa xong từ Danh mục thì vào đúng chỗ đang tập dở.
 
-### Từ ngữ giọng Sài Gòn
+### Từ ngữ gần gũi hơn
 
-- Mọi chỗ trong ứng dụng thống nhất dùng chữ **viết** thay cho "bút": viết máy, viết gel, viết lông, viết chì, viết yêu thích, đặt viết, cầm viết. Tên S Pen giữ nguyên.
-- **Gôm** thay cho "tẩy" (thao tác là **Xóa từng đoạn**), **file** thay cho "tệp", **tập viết PDF** thay cho "vở PDF", **nhấn giữ** thay cho "giữ lâu", **4 ô li** theo sách giáo khoa.
-- Lời trong bài và trong các thông báo dùng cách nói quen của người Sài Gòn: tới, lớn, qua phải, canh giữa, trắng đen, chụp hình, mền.
+- Cách gọi được thống nhất trong toàn ứng dụng, ví dụ các loại viết nay là viết máy, viết gel, viết lông, viết chì; công cụ xóa là **Gôm**; file xuất ra là **tập viết PDF**.
+- Lời trong bài và trong các thông báo được viết lại cho tự nhiên, dễ đọc hơn.
 - Tên các bước học thống nhất là **Xem, Tô, Chép, Bài ôn**; phần chạy chữ mẫu gọi là **Xem viết chậm**.
 - Truyện Kiều, tục ngữ và các câu tiếng Pháp giữ nguyên.
 
