@@ -1,5 +1,32 @@
 # Những thay đổi qua từng bản
 
+## Bản 0.10.4 (26/11/2026): nhấn vừa tay là ra nét đậm, nói giọng Sài Gòn
+
+### Viết nhẹ tay hơn, đỡ mòn ngòi S Pen
+
+- Trước đây muốn có nét đậm phải đè S Pen gần hết lực, khác hẳn Samsung Notes. Viết lâu dễ mỏi tay, và Samsung cũng khuyên không nên ấn mạnh vì ngòi bút có thể bị biến dạng. Nay chỉ cần nhấn vừa tay là nét đã đậm đủ, còn nét đưa lên nhẹ tay vẫn mảnh như sợi chỉ.
+- Phần chỉnh viết có thêm **Độ nhạy lực nhấn**: Nhẹ tay, Vừa (mặc định) và Mạnh tay.
+- Nút mới **Đo lực tay của tôi**: bạn viết vài chữ bằng lực tay thoải mái, ứng dụng tự canh để lực đó ra vừa đủ nét đậm.
+- Trang đã viết từ các bản trước vẫn giữ nguyên dáng nét.
+- Sửa thêm vài lỗi nhỏ về lực nhấn: điểm S Pen báo lực bằng 0 không còn thành chấm mực đậm; rê viết chậm không còn làm mất chỗ chuyển từ nét mảnh sang nét đậm; nét vẽ trước khi bút tới (để đỡ trễ) nay đúng dáng ngòi vát; ô viết thử nhận lực giống hệt trang tập; góc nghiêng viết được tính đúng hơn khi cầm viết chéo.
+- Bảng phân tích nét chỉ báo "gồng tay" khi bạn nhấn mạnh hơn mức cần để ra nét đậm.
+
+### Học liền mạch hơn
+
+- Xem mẫu một phần rồi bấm Tô hoặc Chép, ứng dụng đưa bạn tới đúng trang của phần vừa xem. Trước đây ứng dụng vẫn để bạn ở trang cũ, phải bấm Sau nhiều lần mới tới.
+- Mở Xem khi đang tập giữa bài, bảng tự chạy đúng nét hoặc chữ của trang đang tập.
+- Đổi qua lại giữa Tô và Chép vẫn ở đúng phần đang tập.
+- Nút **Tô phần này** và **Chép** nằm ngay dưới khung chạy chữ mẫu.
+- Mở lại một bài chưa xong từ Danh mục thì vào đúng chỗ đang tập dở.
+
+### Từ ngữ giọng Sài Gòn
+
+- Mọi chỗ trong ứng dụng thống nhất dùng chữ **viết** thay cho "bút": viết máy, viết gel, viết lông, viết chì, viết yêu thích, đặt viết, cầm viết. Tên S Pen giữ nguyên.
+- **Gôm** thay cho "tẩy" (thao tác là **Xóa từng đoạn**), **file** thay cho "tệp", **tập viết PDF** thay cho "vở PDF", **nhấn giữ** thay cho "giữ lâu", **4 ô li** theo sách giáo khoa.
+- Lời trong bài và trong các thông báo dùng cách nói quen của người Sài Gòn: tới, lớn, qua phải, canh giữa, trắng đen, chụp hình, mền.
+- Tên các bước học thống nhất là **Xem, Tô, Chép, Bài ôn**; phần chạy chữ mẫu gọi là **Xem viết chậm**.
+- Truyện Kiều, tục ngữ và các câu tiếng Pháp giữ nguyên.
+
 ## Bản 0.10.3 (25/11/2026): viết êm tay hơn, bút viết chậm tô đủ nét
 
 Bản này gộp luôn hai bản 0.10.1 và 0.10.2, vốn chưa đưa lên GitHub.
