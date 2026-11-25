@@ -105,3 +105,5 @@ Mỗi bài đi qua từng bước: xem mẫu, tự tô từng nét, tô theo ch�
 Bạn gặp lỗi hiển thị, thấy chữ nào sai thứ tự nét, hay muốn có thêm bài tập nào, cứ mở một mục mới ở thẻ [Issues](https://github.com/luyenchudep/tap-viet-spen/issues). Góp ý của người dùng S Pen hay của người đang tự luyện chữ đều rất quý.
 
 Những thay đổi qua từng bản: xem tệp [`CHANGELOG.md`](CHANGELOG.md).
+
+Kiến trúc ứng dụng và kế hoạch cho các bản sắp tới: xem tệp [`docs/KIEN_TRUC.md`](docs/KIEN_TRUC.md).
