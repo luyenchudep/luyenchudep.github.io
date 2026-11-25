@@ -22,7 +22,7 @@ Nên mở bằng Chrome hoặc Samsung Internet, rồi chọn **Thêm vào màn 
 </p>
 <p align="center"><sub>Tô theo mẫu · Chép lại · Xem bút viết chậm · Tự tô từng nét</sub></p>
 
-> **Bản 0.10.0, đang thử nghiệm.** Ứng dụng đã chạy qua các bài kiểm tra tự động trên Chrome nhưng chưa được nhiều người dùng thử trên máy thật. Cách chấm điểm và độ nhạy khi tự tô từng nét có thể còn phải chỉnh. Bạn dùng thấy chỗ nào chưa ổn, rất mong bạn góp ý.
+> **Bản 0.10.3, đang thử nghiệm.** Ứng dụng đã chạy qua các bài kiểm tra tự động trên Chrome nhưng chưa được nhiều người dùng thử trên máy thật. Cách chấm điểm và độ nhạy khi tự tô từng nét có thể còn phải chỉnh. Bạn dùng thấy chỗ nào chưa ổn, rất mong bạn góp ý.
 
 ---
 
