@@ -6,7 +6,9 @@ Bạn viết bằng S Pen hoặc bút cảm ứng lên màn hình. Ứng dụng 
 
 Ứng dụng miễn phí, không quảng cáo, không cần tạo tài khoản. Toàn bộ chỉ gói trong một tệp HTML, không có mạng vẫn mở được, và không gửi bất cứ thứ gì của bạn ra ngoài.
 
-👉 **[Mở ứng dụng để tập](https://luyenchudep.github.io/tap-viet-spen/)**
+👉 **[Mở ứng dụng để tập](https://luyenchudep.github.io/)**
+
+Địa chỉ cũ luyenchudep.github.io/tap-viet-spen vẫn tự chuyển sang địa chỉ mới, bài viết đã lưu trên máy không bị mất.
 
 Nên mở bằng Chrome hoặc Samsung Internet, rồi chọn **Thêm vào màn hình chính** để lần sau mở như một ứng dụng bình thường.
 
@@ -79,7 +81,7 @@ Mỗi bài đi qua từng bước: xem mẫu, tự tô từng nét, tô theo ch�
 
 ## Bắt đầu
 
-1. **Mở trên web (nên chọn cách này):** vào [luyenchudep.github.io/tap-viet-spen](https://luyenchudep.github.io/tap-viet-spen/) trên điện thoại, máy tính bảng hay máy tính, rồi chọn **Thêm vào màn hình chính**.
+1. **Mở trên web (nên chọn cách này):** vào [luyenchudep.github.io](https://luyenchudep.github.io/) trên điện thoại, máy tính bảng hay máy tính, rồi chọn **Thêm vào màn hình chính**.
 2. **Mở tệp trên máy:** tải tệp `index.html` về rồi mở bằng trình duyệt. Có trình duyệt trên điện thoại không cho lưu bài khi mở tệp theo cách này, nên cách 1 chắc ăn hơn.
 
 ## Bài viết của bạn được lưu ở đâu
@@ -102,7 +104,7 @@ Mỗi bài đi qua từng bước: xem mẫu, tự tô từng nét, tô theo ch�
 
 ## Góp ý
 
-Bạn gặp lỗi hiển thị, thấy chữ nào sai thứ tự nét, hay muốn có thêm bài tập nào, cứ mở một mục mới ở thẻ [Issues](https://github.com/luyenchudep/tap-viet-spen/issues). Góp ý của người dùng S Pen hay của người đang tự luyện chữ đều rất quý.
+Bạn gặp lỗi hiển thị, thấy chữ nào sai thứ tự nét, hay muốn có thêm bài tập nào, cứ mở một mục mới ở thẻ [Issues](https://github.com/luyenchudep/luyenchudep.github.io/issues). Góp ý của người dùng S Pen hay của người đang tự luyện chữ đều rất quý.
 
 Những thay đổi qua từng bản: xem tệp [`CHANGELOG.md`](CHANGELOG.md).
 
