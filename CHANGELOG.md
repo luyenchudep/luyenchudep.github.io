@@ -1,5 +1,57 @@
 # Những thay đổi qua từng bản
 
+## Bản 0.10.3 (25/11/2026): viết êm tay hơn, bút viết chậm tô đủ nét
+
+Bản này gộp luôn hai bản 0.10.1 và 0.10.2, vốn chưa đưa lên GitHub.
+
+### Sửa các lỗi quan trọng
+
+- Đang viết bằng S Pen mà lòng bàn tay tì xuống màn hình thì trước đây có thể xuất hiện một vạch lạ kéo vào nét, hoặc nét bị đứt khi nhấc tay. Lỗi này xảy ra cả khi đã bật **Chỉ nhận S Pen**. Giờ ứng dụng chỉ theo đúng cây bút đang viết, ở trang tập, hộp viết phóng to lẫn ô Tự tô từng nét.
+- Hộp viết phóng to trước đây chỉ dùng được một góc nhỏ của khung. Nay hộp giãn hết khung và tự chỉnh lại khi xoay máy hay chia đôi màn hình.
+- Tập cùng một bài trong cùng một ngày ở cả chữ thanh đậm lẫn chữ nét đều thì trang nhật ký của bên này đè lên bên kia. Nay mỗi kiểu chữ có trang nhật ký riêng.
+- Đặt bút viết ngay lúc trang vừa mở có thể làm mất nét đã viết ở các trang khác của cùng bài. Nay nét viết trong lúc đó được giữ lại và gộp vào.
+- Khôi phục từ tệp sao lưu xong, bài đang mở trên máy không còn ghi đè ngược lên dữ liệu vừa khôi phục.
+
+### Bút viết chậm và thứ tự nét
+
+- Bút viết chậm nay tô đủ cả chữ, phần nào hiện ra đúng lúc bút đi qua. Trước đây các nét mảnh của b, f, C, G, J, N, Q, S, Y… chỉ hiện ra khi đã viết xong.
+- Nét móc được tách thành nét riêng, có số riêng: h, n, m, r, u ở chữ nét đều; m, n ở chữ thanh đậm. Ví dụ chữ h nét đều nay có 2 nét: nét sổ và nét móc.
+- Chữ nét đều k, K, R có thêm nét riêng ở chỗ phải nhấc bút.
+- Chữ nét đều E, F: viết nét sổ trước, rồi các nét ngang từ trái sang phải.
+- Chữ thanh đậm I, J: vòng phía trên viết liền một nét, trước thân chữ. Chữ N hoa viết nét lượn trước tiên.
+- Dấu râu của ơ, ư, Ơ, Ư (kể cả khi có thêm dấu thanh) nay viết từ trên xuống.
+- Chấm i, chấm j, gạch t, gạch f, mũ và dấu sắc của ấ nay được nhận đúng là dấu phụ, nên không còn hiện chấm dừng bút thừa.
+
+### Bài học
+
+- Bài 10 của chữ thanh đậm đổi tên thành **Thân cao l h k, khuyết trên b f**. Lý do: chữ mẫu viết l, h, k bằng thân thẳng, chỉ b và f mới có khuyết. Tiến độ đã tập của bài này vẫn giữ nguyên.
+- Lời trong giáo trình được sửa cho tự nhiên hơn, ví dụ: "Vị trí dấu" thành **Chỗ đặt dấu**, "Địa danh" thành **Tên đất**, "Chữ giản lược nét" thành **Chữ bớt nét**, "Câu ngắn song ngữ" thành **Câu ngắn Việt – Anh**, "giao nhau" thành **cắt nhau**.
+- Sổ tay của ba bài ghi chép (Chia mục và nhấn ý, Viết tắt và ngày tháng, Biên bản và việc cần làm) được viết riêng cho từng bài, không còn chép lại sổ tay của bài trước.
+- "200k" trong bài Số liệu đổi thành "200.000đ".
+
+### Các sửa lỗi khác
+
+- Bấm **Đạt** nhiều lần liền trên cùng một trang không còn đẩy lịch ôn lên tận 14–30 ngày.
+- Chạm vào ô điểm hoặc tẩy vào chỗ trống không còn làm mất nút Làm lại.
+- Xuất vở PDF: trong lúc đang tạo vở, các nút tùy chọn bị khóa, nên vở không còn bị lẫn hai kiểu. Mục Luyện thêm không còn bị lặp lại nhiều vòng trong vở.
+- Lưu ảnh Kiểm tra trên giấy: nếu không lưu được thì ứng dụng báo rõ, thay vì vẫn báo đã lưu.
+- Xoay máy khi bút còn đang chạm màn hình: nét được chốt lại, không còn bị lệch dòng.
+- Bấm Xem hai lần liền không còn làm chồng hai hoạt hình lên nhau. Xoay máy khi đang Tự tô từng nét thì ô tô được vẽ lại cho khớp.
+- Khi đang Tự tô từng nét mà để yên, ứng dụng không còn vẽ lại liên tục nữa, đỡ tốn pin. Nhật ký chỉ tải ảnh khi bạn cuộn tới.
+- Màu giấy Đen trắng (dùng cho máy đọc sách): mũi tên, chấm đặt bút, đầu bút, khung hộp phóng to và phần chú giải đều chuyển sang màu đen cho dễ nhìn.
+- Trên màu giấy Sáng, viền quanh số thứ tự nét không còn bị màu vàng kem.
+- Ở các bài viết nhanh, chấm xanh đặt bút không còn lệch khỏi chữ mẫu, và Bài ôn không còn lẫn chữ của các bài này.
+- Ở trang đầu của Bài ôn và Luyện thêm, nút Trước được làm mờ đúng như các bài khác.
+- Buổi tập bỏ dở từ hôm trước tự kết thúc, không còn hiện kiểu "1440/15 phút".
+- Tiếng giấy không còn kêu mãi sau khi chụm hai ngón để phóng to.
+- Ô thử bút ở mục Kiểm tra cảm biến S Pen không còn hiện vạch nối lạ khi kéo bút ra ngoài ô.
+- Sửa chữ trong giao diện: "đường cơ sở" thành **đường chân**, "Độ mượt vận động" thành **Độ mượt nét viết**, "Tách đôi màn hình" thành **Chia đôi màn hình**, và lời nhắc kiểm tra chữ trên giấy nay chỉ đúng đường vào **☰ → Công cụ → Kiểm tra trên giấy**.
+
+### Còn hạn chế
+
+- Bản này mới được kiểm tra tự động trên Chrome. Rất cần người thử trên máy thật, nhất là việc tì tay khi viết trên Galaxy S23, S24 Ultra và máy tính bảng.
+- Vở PDF chưa có khổ cho Samsung Notes và reMarkable Paper Pro Move. Phần này dự kiến có ở bản 0.11.
+
 ## Bản 0.10.0 (24/11/2026): vở PDF sắc nét
 
 ### Có gì mới
