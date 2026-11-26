@@ -61,7 +61,7 @@ Nguyên tắc nền: **một bộ máy vẽ, nhiều đầu ra.** Màn hình và
 | Khổ trang | `PDF_PRESETS`: rm2, rmpp, a4, a5 | Thiếu Samsung Notes và máy đọc sách tỷ lệ 9:16; số đo đang tính bằng pt |
 | Tùy chọn xuất vở | `pdfOpt` | Đã có, nhưng chưa lưu được vào đường link |
 | Bài tự do | bài `free`, nội dung `custom` | Đã có ở mức cơ bản |
-| Hàm xuất vở | `generateWorkbookPdf()` | Chạy được, nhưng phải tạm đổi nhiều biến chung của ứng dụng rồi khôi phục. Đây là điểm yếu chính cần sửa ở bản 0.11 |
+| Hàm xuất vở | `exportPdf(cfg)` (từ bản 0.11; trước đó là `generateWorkbookPdf()`) | Nhận một gói `cfg`, không đọc bài đang mở hay giao diện. Bên trong vẫn tạm đổi vài biến chung của bộ vẽ rồi khôi phục (xem mục 5.3) |
 | Bút viết chậm | `revealGlyphLayer`, `revealOwnerMap` | Viết lại ở bản 0.10.2: tô theo vùng, luôn đủ 100% chữ |
 
 ## 4. Kiến trúc bốn lớp
@@ -166,7 +166,7 @@ cfg = {
   v: 1,                         // phiên bản cấu trúc cfg
   script: "td" | "qs" | "th",   // kiểu chữ
   font: "PS" | "AL" | "QS" | "PW" | "user:<tên>",
-  scope: "bai" | "phan" | "tatca" | "tugo" | "ghichep",
+  scope: "bai" | "phan" | "tatca" | "luyenthem" | "tudo" | "tugo" | "ghichep",
   lessons: ["n1", "n2"],        // khi chọn bài hoặc phần
   text: "…",                    // khi tự gõ nội dung
   mode: "to" | "nho",           // tô mờ dần / chép theo mẫu
@@ -180,6 +180,18 @@ cfg = {
   a5x2: true | false            // in 2 trang A5 trên 1 tờ A4
 }
 ```
+
+**Đã làm (bản 0.11):** hàm `exportPdf(cfg)` ở `src/engine/export-pdf.js`, trả về `{ blob, soTrang, tieuDe, cfg }`. Đang đọc các trường `v`, `script`, `scope`, `lessons`, `mode`, `grid` (`french`, `oly4`), `arrows`, `preset` (`rm2`, `rmpp`, `a4`, `a5`), `barSide`; trường nào thiếu thì lấy mặc định, trường nào sai thì báo lỗi bằng lời dễ hiểu.
+
+| `scope` | Xuất gì |
+|---|---|
+| `bai` | Các bài ghi trong `lessons` (một bài thì không có mục lục, nhiều bài thì có) |
+| `phan` | Cả phần chứa bài `lessons[0]` |
+| `tatca` | Cả giáo trình |
+| `luyenthem` | Các chữ Luyện thêm; nếu chưa có thì lấy Bài ôn |
+| `tudo` | Bài tự do |
+
+Chưa làm: `tugo`, `ghichep`, `font`, `z`, `gray`, `links`, `a5x2`, khổ `tunhap`. `cfg.script` phải trùng kiểu chữ app đang mở, vì dữ liệu kiểu chữ chỉ nạp một lần lúc khởi động. Bên trong, hàm vẫn tạm đổi vài biến chung của bộ vẽ (khổ trang, giao diện) rồi khôi phục; gỡ hẳn khi viết lại bộ vẽ theo mm. Nút "Tạo và tải file PDF" nay chỉ dựng `cfg` từ màn Xuất PDF rồi gọi `exportPdf(cfg)`.
 
 **Đường link:** `…/index.html#cfg=<JSON nén, mã base64url>`. Phần nằm sau dấu `#` không được trình duyệt gửi lên máy chủ, nên nội dung người dùng tự gõ không lọt ra ngoài.
 
@@ -238,7 +250,8 @@ src/
   engine/audio.js          // âm thanh giấy
   engine/measure.js        // đo nét viết
   engine/pdf-export.js     // xuất vở PDF
-  engine/pdf-writer.js     // ghi PDF vectơ, nhúng phông
+  engine/pdf-writer.js     // ghi PDF vectơ, nhúng phông; nút "Tạo và tải file PDF"
+  engine/export-pdf.js     // exportPdf(cfg): xuất vở PDF từ một gói cấu hình
   ui/zoom-box.js           // hộp viết phóng to
   ui/split-view.js         // chia đôi màn hình máy tính bảng
   ui/name-lab.js           // luyện tên riêng, chữ ký
