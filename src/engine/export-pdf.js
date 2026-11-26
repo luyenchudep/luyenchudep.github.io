@@ -10,6 +10,7 @@
      const r = await exportPdf({ script: SCRIPT, scope: "bai", lessons: ["n1"], preset: "a4" });
      r.blob, r.soTrang, r.tieuDe
 */
+const TU_GO_TOI_DA = 2000;   // số ký tự tối đa của nội dung tự gõ (để đường link không quá dài)
 const PDF_CFG_MAC_DINH = { v: 1, scope: "bai", lessons: [], mode: "to", grid: "french", arrows: true, preset: "rm2", barSide: "left" };
 
 /* Kiểm và điền giá trị mặc định. Sai thì báo lỗi bằng lời dễ hiểu. */
@@ -23,8 +24,13 @@ function chuanHoaPdfCfg(cfg) {
   if (!["to", "nho"].includes(c.mode)) throw new Error(`Cách tập không hợp lệ: "${c.mode}"`);
   if (!["french", "oly4"].includes(c.grid)) throw new Error(`Kiểu dòng kẻ không hợp lệ: "${c.grid}"`);
   if (!["left", "right"].includes(c.barSide)) throw new Error(`Lề thanh công cụ không hợp lệ: "${c.barSide}"`);
-  if (!["bai", "phan", "tatca", "luyenthem", "tudo"].includes(c.scope))
-    throw new Error(`Chưa hỗ trợ phạm vi "${c.scope}" (có: bai, phan, tatca, luyenthem, tudo)`);
+  if (!["bai", "phan", "tatca", "luyenthem", "tudo", "tugo"].includes(c.scope))
+    throw new Error(`Chưa hỗ trợ phạm vi "${c.scope}" (có: bai, phan, tatca, luyenthem, tudo, tugo)`);
+  if (c.scope === "tugo") {
+    c.text = typeof c.text === "string" ? c.text : "";
+    if (!c.text.trim()) throw new Error("Chưa gõ nội dung để tập");
+    if (c.text.length > TU_GO_TOI_DA) throw new Error(`Nội dung tự gõ dài quá ${TU_GO_TOI_DA} ký tự`);
+  }
   c.arrows = c.arrows !== false;
   return c;
 }
@@ -38,11 +44,11 @@ function chonBaiPdf(c) {
     return l;
   };
   if (c.scope === "bai") {
-    if (!c.lessons.length) throw new Error("Chưa chọn bài nào (cfg.lessons trống)");
+    if (!c.lessons.length) throw new Error("Chưa chọn bài nào");
     return c.lessons.map(timBai);
   }
   if (c.scope === "phan") {
-    if (!c.lessons.length) throw new Error("Chưa chọn phần nào (cfg.lessons trống)");
+    if (!c.lessons.length) throw new Error("Chưa chọn phần nào");
     const tenPhan = timBai(c.lessons[0]).part, p = COURSE.find(x => x.part === tenPhan);
     return p ? p.lessons.slice() : [timBai(c.lessons[0])];
   }
@@ -50,6 +56,12 @@ function chonBaiPdf(c) {
   if (c.scope === "luyenthem") {
     if (WEAK.length) { luyenRounds = 1; buildLuyen(true); return [LUYEN]; }
     buildReview(true); return [REVIEW];
+  }
+  if (c.scope === "tugo") {
+    /* Bài tạm từ nội dung tự gõ: mỗi dòng một dòng tập, dùng cỡ chữ và khoảng dòng của Bài tự do */
+    const mau = LESSONS.find(l => l.id === "free") || {};
+    const rows = c.text.split("\n").map(s => s.trim()).filter(Boolean).map(s => ["pair", s]);
+    return [{ id: "tugo", t: "Nội dung tự gõ", part: "Tự gõ", z: mau.z || "M", up: mau.up, dn: mau.dn, note: "", rows }];
   }
   return [LESSONS.find(l => l.id === "free") || LESSONS[0]];   // "tudo"
 }
