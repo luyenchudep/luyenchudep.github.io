@@ -209,186 +209,38 @@ async function assembleVectorPdf(doc,pages,ptW,ptH,W,H,title){
   return new Blob(chunks,{type:"application/pdf"});
 }
 
+/* Nút "Tạo và tải file PDF": dựng cfg từ màn Xuất PDF (pdfOpt) và bài đang mở, gọi exportPdf(cfg) rồi tải file về */
+function pdfCfgTuManHinh(){
+  const l=LESSONS[cur.li];
+  const scope={cur:"bai",part:"phan",weak:"luyenthem",free:"tudo"}[pdfOpt.scope];
+  return {v:1,script:SCRIPT,scope,lessons:[l.id],mode:pdfOpt.mode,grid:pdfOpt.grid||S.gridStyle||"french",arrows:pdfOpt.arrows,preset:pdfOpt.preset,barSide:pdfOpt.barSide};
+}
 async function generateWorkbookPdf(){
   if(pdfOpt.busy)return;
-  pdfOpt.busy=true;pdfBusyFlag=true;flushSave();exporting=true;const opt=Object.assign({},pdfOpt);let doneOk=false;
+  pdfOpt.busy=true;flushSave();let doneOk=false;
   document.querySelectorAll("#genBox button").forEach(b=>b.disabled=true);
   const btn=document.getElementById("pdfGoBtn"),prog=document.getElementById("pdfProg");
   if(btn)btn.disabled=true;
   if(prog){prog.style.display="block";prog.textContent="Đang sắp xếp trang…"}
-
-  /* Lưu trạng thái toàn cục để khôi phục nguyên vẹn sau khi render offscreen */
-  const saveLR=luyenRounds,saveFL=frozenLuyen,saveFR=frozenReview,saveLRows=LUYEN.rows,saveRRows=REVIEW.rows;
-  const saveTheme=S.theme,saveW=W,saveH=H,saveLayout=layout,saveT=T,saveSGrid=S.gridStyle,saveSArrows=S.rowArrows,saveSXBand=S.xBand,saveScale=S.scale,saveSTrace=S.trace;
   try{
-    const pr=PDF_PRESETS[opt.preset];
-    let targetLessons=[];
-    if(opt.scope==="cur"){targetLessons=[LESSONS[cur.li]]}
-    else if(opt.scope==="part"){
-      const curPart=LESSONS[cur.li].part;
-      const pObj=COURSE.find(p=>p.part===curPart);
-      targetLessons=pObj?pObj.lessons.slice():[LESSONS[cur.li]];
-    }else if(opt.scope==="weak"){
-      if(WEAK.length){luyenRounds=1;buildLuyen(true);targetLessons=[LUYEN]}
-      else{buildReview(true);targetLessons=[REVIEW]}
-    }else{
-      targetLessons=[LESSONS.find(l=>l.id==="free")||LESSONS[cur.li]];
-    }
-
-    const mctx=document.createElement("canvas").getContext("2d"),doc=new PdfDoc();let ctx=null;
-    const pdfTheme=pr.mono?THEMES.eink:THEMES.light;
-
-    /* Tạm gán thông số trang in */
-    W=pr.pxW;H=pr.pxH;T=pdfTheme;S.theme=pr.mono?"eink":"light";
-    S.gridStyle=opt.grid;S.rowArrows=opt.arrows;S.xBand=!pr.mono;S.trace="dark";
-    S.scale=pr.pxW>=1500?2.15:1.85;
-
-    const padL=opt.barSide==="left"?pr.bar:68;
-    const padR=opt.barSide==="right"?pr.bar:68;
-    const padT=138,padB=86;
-
-    /* Tạo trước danh sách trang cho từng bài học */
-    const lessonJobs=[];
-    let totalContentPages=0;
-    for(const l of targetLessons){
-      const m=sizeFor(l),F=m.F;
-      const up=Math.max(l.up||F.asc+.25,F.asc+.05),dn=Math.max(l.dn||F.desc+.1,F.desc+.03);
-      const unit=(up+dn)*m.fs+m.xh*(SCRIPT==="qs"?.72:.48);
-      const perPage=Math.max(1,Math.floor((H-padT-padB)/unit));
-      const avail=Math.max(200,W-padL-padR-12);
-      const rLayout={m,padL,padR,padT,unit,perPage,up,safeSide:Math.min(padL,padR)};
-      layout=rLayout;
-      const lMode=l.id==="review"?"nho":opt.mode;
-      const groups=[];for(const r of lessonRows(l))groups.push(...groupsFor(r,m,avail,lMode));
-      if(l.id==="review")groups.forEach(g=>g.forEach(row=>{if(row.k==="hint")row.hide=1}));
-      const lPages=[];let pg=[];
-      for(const g of groups){
-        if(g.length>perPage){if(pg.length){lPages.push(pg);pg=[]}for(let k=0;k<g.length;k+=perPage)lPages.push(g.slice(k,k+perPage));continue}
-        if(pg.length+g.length>perPage&&pg.length){lPages.push(pg);pg=[]}
-        pg.push(...g);
-      }
-      if(pg.length)lPages.push(pg);
-      if(!lPages.length)lPages.push([]);
-      for(const pgx of lPages)while(pgx.length<perPage)pgx.push({k:"blank"});
-      lessonJobs.push({lesson:l,layout:rLayout,pages:lPages,startPageIdx:0});
-      totalContentPages+=lPages.length;
-    }
-
-    const needToc=lessonJobs.length>1;
-    const tocOffset=needToc?1:0;
-    let runningIdx=tocOffset;
-    for(const job of lessonJobs){job.startPageIdx=runningIdx;runningIdx+=job.pages.length}
-
-    const pdfPages=[];
-    /* Trang 1: Mục lục có link bấm nhảy trang (cho reMarkable & Tablet) */
-    if(needToc){
-      if(prog)prog.textContent="Đang vẽ trang mục lục…";
-      await new Promise(r=>setTimeout(r,10));
-      ctx=new PdfCtx(doc,mctx);
-      ctx.fillStyle="#FFFFFF";ctx.fillRect(0,0,W,H);
-      ctx.fillStyle="#000000";ctx.textBaseline="alphabetic";ctx.textAlign="left";
-      ctx.font="700 46px 'QS',sans-serif";
-      ctx.fillText(`TẬP VIẾT · ${SC.name.toUpperCase()}`,padL,130);
-      ctx.font="500 28px 'QS',sans-serif";ctx.fillStyle="#444444";
-      ctx.fillText(`${lessonJobs[0].lesson.part}  ·  ${pr.name}  ·  Chạm vào bài để chuyển tới trang đó`,padL,176);
-      ctx.strokeStyle="#000000";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(padL,202);ctx.lineTo(W-padR,202);ctx.stroke();
-
-      const links=[];
-      const rowH=Math.min(82,Math.floor((H-300)/Math.max(1,lessonJobs.length)));
-      lessonJobs.forEach((job,idx)=>{
-        const yTop=230+idx*rowH,yBase=yTop+rowH*0.66;
-        ctx.fillStyle=idx%2===0?"#F7F7F7":"#FFFFFF";
-        ctx.fillRect(padL,yTop,W-padL-padR,rowH-8);
-        ctx.strokeStyle="#CCCCCC";ctx.lineWidth=1.5;ctx.strokeRect(padL,yTop,W-padL-padR,rowH-8);
-        ctx.fillStyle="#000000";ctx.font="700 28px 'QS',sans-serif";ctx.textAlign="left";
-        ctx.fillText(`${idx+1}. ${job.lesson.t}`,padL+24,yBase);
-        ctx.fillStyle="#444444";ctx.font="600 24px 'QS',sans-serif";ctx.textAlign="right";
-        ctx.fillText(`Trang ${job.startPageIdx+1}  →`,W-padR-24,yBase);
-        /* Chuyển tọa độ sang PDF (gốc dưới trái) cho Annotation Link */
-        const x1=(padL/W)*pr.ptW,x2=((W-padR)/W)*pr.ptW;
-        const y2=pr.ptH-(yTop/H)*pr.ptH,y1=pr.ptH-((yTop+rowH-8)/H)*pr.ptH;
-        links.push({rect:[x1,y1,x2,y2],targetPage:job.startPageIdx});
-      });
-      ctx.textAlign="center";ctx.fillStyle="#666666";ctx.font="500 22px 'QS',sans-serif";
-      ctx.fillText(`Làm bằng ứng dụng Tập viết S Pen, bản ${APP_VER} · ${today()}`,W/2,H-42);
-      ctx.textAlign="left";
-      pdfPages.push({content:ctx.out.join("\n"),links});
-    }
-
-    let donePages=0;
-    for(const job of lessonJobs){
-      layout=job.layout;
-      const {m,unit,up}=layout;
-      for(let pi=0;pi<job.pages.length;pi++){
-        donePages++;
-        if(prog)prog.textContent=`Đang vẽ trang ${donePages}/${totalContentPages} (${job.lesson.t})…`;
-        await new Promise(r=>setTimeout(r,8));
-        ctx=new PdfCtx(doc,mctx);
-        ctx.fillStyle=T.paper;ctx.fillRect(0,0,W,H);
-        /* Tiêu đề trang vở */
-        ctx.fillStyle="#000000";ctx.textBaseline="alphabetic";ctx.textAlign="left";
-        ctx.font="700 32px 'QS',sans-serif";
-        const liIdx=LESSONS.indexOf(job.lesson);
-        const hTitle=liIdx>=0&&liIdx<NREAL?`Bài ${liIdx+1} · ${job.lesson.t}`:job.lesson.t;
-        ctx.fillText(hTitle,padL,66);
-        ctx.font="500 22px 'QS',sans-serif";ctx.fillStyle="#444444";
-        ctx.fillText(`${SC.name} · ${job.lesson.id==="review"?"Bài ôn":opt.mode==="to"?"Tô":"Chép"} · ${opt.grid==="oly4"?"4 ô li Việt Nam":"Lưới xiên Pháp"}`,padL,100);
-        ctx.textAlign="right";
-        ctx.fillText(`Trang ${donePages+tocOffset}/${totalContentPages+tocOffset}${needToc?"  ·  ↑ Mục lục":""}`,W-padR,66);
-        ctx.textAlign="left";
-        ctx.strokeStyle="#CCCCCC";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(padL,116);ctx.lineTo(W-padR,116);ctx.stroke();
-
-        /* Vẽ dòng kẻ + chữ mẫu / tô / dấu chấm */
-        const rows=job.pages[pi];
-        rows.forEach((row,ri)=>{
-          const b=padT+ri*unit+up*m.fs;
-          guides(ctx,b,m,padL-10,W-padR+10);
-          drawRow(ctx,row,b,m,job.lesson.id==="review"?"nho":opt.mode);
-        });
-        if(job.lesson.cornell){ /* khung 3 ô: câu hỏi | ghi chép, tóm tắt ở dưới */
-          const xL=padL+(W-padL-padR)*.28,yT=padT-6,yS=padT+Math.floor(rows.length*.72)*unit,yB=padT+rows.length*unit;
-          ctx.strokeStyle="#555555";ctx.lineWidth=2.4;ctx.beginPath();
-          ctx.moveTo(xL,yT);ctx.lineTo(xL,yS);ctx.moveTo(padL-10,yS);ctx.lineTo(W-padR+10,yS);ctx.stroke();
-          ctx.fillStyle="#666666";ctx.font="600 20px 'QS',sans-serif";ctx.textAlign="left";
-          ctx.fillText("Câu hỏi",padL,yT-6);ctx.fillText("Ghi chép",xL+12,yT-6);ctx.fillText("Tóm tắt",padL,yS+26);
-          ctx.strokeStyle="#BBBBBB";ctx.lineWidth=1.5;ctx.strokeRect(padL-10,yT,W-padL-padR+20,yB-yT);
-        }
-        /* Ghi chú chân trang */
-        if(job.lesson.note){
-          ctx.fillStyle="#555555";ctx.font="500 20px 'QS',sans-serif";ctx.textAlign="left";
-          ctx.fillText("Gợi ý: "+job.lesson.note,padL,H-36);
-        }
-        /* Nút bấm góc trên phải để quay về Trang 1 Mục lục trên reMarkable */
-        const backLinks=needToc?[{rect:[((W-padR-220)/W)*pr.ptW,pr.ptH-(95/H)*pr.ptH,((W-padR)/W)*pr.ptW,pr.ptH-(25/H)*pr.ptH],targetPage:0}]:[];
-        pdfPages.push({content:ctx.out.join("\n"),links:backLinks});
-      }
-    }
-
-    if(prog)prog.textContent="Đang tạo file PDF…";
-    await new Promise(r=>setTimeout(r,10));
-    const pdfTitle=`Tập viết · ${SC.name} · ${lessonJobs.length>1?lessonJobs[0].lesson.part:lessonJobs[0].lesson.t}`;
-    const blob=await assembleVectorPdf(doc,pdfPages,pr.ptW,pr.ptH,W,H,pdfTitle);
+    const r=await exportPdf(pdfCfgTuManHinh(),{onProgress:s=>{if(prog)prog.textContent=s}});
     const a=document.createElement("a");
-    a.href=URL.createObjectURL(blob);
-    a.download=`Vo-luyen-chu-${SCRIPT}-${opt.preset}-${opt.scope}-${today()}.pdf`;
+    a.href=URL.createObjectURL(r.blob);
+    a.download=`Vo-luyen-chu-${SCRIPT}-${pdfOpt.preset}-${pdfOpt.scope}-${today()}.pdf`;
     a.click();
     setTimeout(()=>URL.revokeObjectURL(a.href),6000);
-    toast(`Đã xuất xong tập viết PDF (${pdfPages.length} trang) chuẩn ${pr.name}!`);
+    toast(`Đã xuất xong tập viết PDF (${r.soTrang} trang) chuẩn ${PDF_PRESETS[pdfOpt.preset].name}!`);
     doneOk=true;
   }catch(err){
     console.error(err);
     toast("Có lỗi khi xuất PDF: "+(err&&err.message?err.message:err));
   }finally{
-    S.theme=saveTheme;W=saveW;H=saveH;layout=saveLayout;T=saveT;S.gridStyle=saveSGrid;S.rowArrows=saveSArrows;S.xBand=saveSXBand;S.scale=saveScale;S.trace=saveSTrace;
-    luyenRounds=saveLR;frozenLuyen=saveFL;frozenReview=saveFR;LUYEN.rows=saveLRows;REVIEW.rows=saveRRows;
-    pdfOpt.busy=false;pdfBusyFlag=false;exporting=false;
+    pdfOpt.busy=false;
     document.querySelectorAll("#genBox button").forEach(b=>b.disabled=false);
     if(btn)btn.disabled=false;
-    pendingResize=false;resize();
     if(doneOk)closeSheets();
   }
 }
-
 function savePng(){const a=document.createElement("a");a.download=`tap-viet-${SCRIPT}-${LESSONS[cur.li].id}-trang${cur.page+1}.png`;a.href=renderFullExport().toDataURL("image/png");a.click()}
 function applyTheme(){
   const tn=themeName();
