@@ -18,7 +18,8 @@ function chuanHoaPdfCfg(cfg) {
   if (c.v !== 1) throw new Error(`Không đọc được cấu hình phiên bản ${c.v}`);
   if (!c.script) c.script = SCRIPT;
   if (c.script !== SCRIPT) throw new Error(`Cấu hình dùng kiểu chữ "${c.script}" nhưng app đang mở kiểu "${SCRIPT}". Hãy đổi kiểu chữ rồi xuất lại.`);
-  if (!PDF_PRESETS[c.preset]) throw new Error(`Chưa có khổ giấy "${c.preset}"`);
+  if (c.preset === "tunhap") khoTuNhap(c.wMm, c.hMm);   // báo lỗi nếu khổ tự nhập sai
+  else if (!PDF_PRESETS[c.preset]) throw new Error(`Chưa có khổ giấy "${c.preset}"`);
   if (!["to", "nho"].includes(c.mode)) throw new Error(`Cách tập không hợp lệ: "${c.mode}"`);
   if (!["french", "oly4"].includes(c.grid)) throw new Error(`Kiểu dòng kẻ không hợp lệ: "${c.grid}"`);
   if (!["left", "right"].includes(c.barSide)) throw new Error(`Lề thanh công cụ không hợp lệ: "${c.barSide}"`);
@@ -62,7 +63,9 @@ async function exportPdf(cfg, tuyChon = {}) {
   const saveLR = luyenRounds, saveFL = frozenLuyen, saveFR = frozenReview, saveLRows = LUYEN.rows, saveRRows = REVIEW.rows;
   const saveTheme = S.theme, saveW = W, saveH = H, saveLayout = layout, saveT = T, saveSGrid = S.gridStyle, saveSArrows = S.rowArrows, saveSXBand = S.xBand, saveScale = S.scale, saveSTrace = S.trace;
   try {
-    const pr = PDF_PRESETS[c.preset];
+    const pr = c.preset === "tunhap" ? khoTuNhap(c.wMm, c.hMm) : PDF_PRESETS[c.preset];
+    /* Trang nhỏ hơn A5 (dưới 1240 điểm ảnh ngang): thu nhỏ chữ tiêu đề và lề theo tỷ lệ; các khổ cũ giữ nguyên (k = 1) */
+    const k = Math.min(1, pr.pxW / 1240), px = v => v * k;
     const targetLessons = chonBaiPdf(c);
 
     const mctx = document.createElement("canvas").getContext("2d"), doc = new PdfDoc(); let ctx = null;
@@ -73,9 +76,9 @@ async function exportPdf(cfg, tuyChon = {}) {
     S.gridStyle = c.grid; S.rowArrows = c.arrows; S.xBand = !pr.mono; S.trace = "dark";
     S.scale = pr.pxW >= 1500 ? 2.15 : 1.85;
 
-    const padL = c.barSide === "left" ? pr.bar : 68;
-    const padR = c.barSide === "right" ? pr.bar : 68;
-    const padT = 138, padB = 86;
+    const padL = c.barSide === "left" ? pr.bar : px(68);
+    const padR = c.barSide === "right" ? pr.bar : px(68);
+    const padT = px(138), padB = px(86);
 
     /* Tạo trước danh sách trang cho từng bài học */
     const lessonJobs = [];
@@ -121,30 +124,30 @@ async function exportPdf(cfg, tuyChon = {}) {
       ctx = new PdfCtx(doc, mctx);
       ctx.fillStyle = "#FFFFFF"; ctx.fillRect(0, 0, W, H);
       ctx.fillStyle = "#000000"; ctx.textBaseline = "alphabetic"; ctx.textAlign = "left";
-      ctx.font = "700 46px 'QS',sans-serif";
-      ctx.fillText(`TẬP VIẾT · ${SC.name.toUpperCase()}`, padL, 130);
-      ctx.font = "500 28px 'QS',sans-serif"; ctx.fillStyle = "#444444";
-      ctx.fillText(`${tenNhom}  ·  ${pr.name}  ·  Chạm vào bài để chuyển tới trang đó`, padL, 176);
-      ctx.strokeStyle = "#000000"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(padL, 202); ctx.lineTo(W - padR, 202); ctx.stroke();
+      ctx.font = `700 ${px(46)}px 'QS',sans-serif`;
+      ctx.fillText(`TẬP VIẾT · ${SC.name.toUpperCase()}`, padL, px(130));
+      ctx.font = `500 ${px(28)}px 'QS',sans-serif`; ctx.fillStyle = "#444444";
+      ctx.fillText(`${tenNhom}  ·  ${pr.name}${pr.links ? "  ·  Chạm vào bài để chuyển tới trang đó" : ""}`, padL, px(176));
+      ctx.strokeStyle = "#000000"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(padL, px(202)); ctx.lineTo(W - padR, px(202)); ctx.stroke();
 
       const links = [];
-      const rowH = Math.min(82, Math.floor((H - 300) / Math.max(1, lessonJobs.length)));
+      const rowH = Math.min(px(82), Math.floor((H - px(300)) / Math.max(1, lessonJobs.length)));
       lessonJobs.forEach((job, idx) => {
-        const yTop = 230 + idx * rowH, yBase = yTop + rowH * 0.66;
+        const yTop = px(230) + idx * rowH, yBase = yTop + rowH * 0.66;
         ctx.fillStyle = idx % 2 === 0 ? "#F7F7F7" : "#FFFFFF";
         ctx.fillRect(padL, yTop, W - padL - padR, rowH - 8);
         ctx.strokeStyle = "#CCCCCC"; ctx.lineWidth = 1.5; ctx.strokeRect(padL, yTop, W - padL - padR, rowH - 8);
-        ctx.fillStyle = "#000000"; ctx.font = "700 28px 'QS',sans-serif"; ctx.textAlign = "left";
-        ctx.fillText(`${idx + 1}. ${job.lesson.t}`, padL + 24, yBase);
-        ctx.fillStyle = "#444444"; ctx.font = "600 24px 'QS',sans-serif"; ctx.textAlign = "right";
-        ctx.fillText(`Trang ${job.startPageIdx + 1}  →`, W - padR - 24, yBase);
+        ctx.fillStyle = "#000000"; ctx.font = `700 ${px(28)}px 'QS',sans-serif`; ctx.textAlign = "left";
+        ctx.fillText(`${idx + 1}. ${job.lesson.t}`, padL + px(24), yBase);
+        ctx.fillStyle = "#444444"; ctx.font = `600 ${px(24)}px 'QS',sans-serif`; ctx.textAlign = "right";
+        ctx.fillText(`Trang ${job.startPageIdx + 1}${pr.links ? "  →" : ""}`, W - padR - px(24), yBase);
         /* Chuyển tọa độ sang PDF (gốc dưới trái) cho Annotation Link */
         const x1 = (padL / W) * pr.ptW, x2 = ((W - padR) / W) * pr.ptW;
         const y2 = pr.ptH - (yTop / H) * pr.ptH, y1 = pr.ptH - ((yTop + rowH - 8) / H) * pr.ptH;
-        links.push({ rect: [x1, y1, x2, y2], targetPage: job.startPageIdx });
+        if (pr.links) links.push({ rect: [x1, y1, x2, y2], targetPage: job.startPageIdx });
       });
-      ctx.textAlign = "center"; ctx.fillStyle = "#666666"; ctx.font = "500 22px 'QS',sans-serif";
-      ctx.fillText(`Làm bằng ứng dụng Tập viết S Pen, bản ${APP_VER} · ${today()}`, W / 2, H - 42);
+      ctx.textAlign = "center"; ctx.fillStyle = "#666666"; ctx.font = `500 ${px(22)}px 'QS',sans-serif`;
+      ctx.fillText(`Làm bằng ứng dụng Tập viết S Pen, bản ${APP_VER} · ${today()}`, W / 2, H - px(42));
       ctx.textAlign = "left";
       pdfPages.push({ content: ctx.out.join("\n"), links });
     }
@@ -161,16 +164,16 @@ async function exportPdf(cfg, tuyChon = {}) {
         ctx.fillStyle = T.paper; ctx.fillRect(0, 0, W, H);
         /* Tiêu đề trang vở */
         ctx.fillStyle = "#000000"; ctx.textBaseline = "alphabetic"; ctx.textAlign = "left";
-        ctx.font = "700 32px 'QS',sans-serif";
+        ctx.font = `700 ${px(32)}px 'QS',sans-serif`;
         const liIdx = LESSONS.indexOf(job.lesson);
         const hTitle = liIdx >= 0 && liIdx < NREAL ? `Bài ${liIdx + 1} · ${job.lesson.t}` : job.lesson.t;
-        ctx.fillText(hTitle, padL, 66);
-        ctx.font = "500 22px 'QS',sans-serif"; ctx.fillStyle = "#444444";
-        ctx.fillText(`${SC.name} · ${job.lesson.id === "review" ? "Bài ôn" : c.mode === "to" ? "Tô" : "Chép"} · ${c.grid === "oly4" ? "4 ô li Việt Nam" : "Lưới xiên Pháp"}`, padL, 100);
+        ctx.fillText(hTitle, padL, px(66));
+        ctx.font = `500 ${px(22)}px 'QS',sans-serif`; ctx.fillStyle = "#444444";
+        ctx.fillText(`${SC.name} · ${job.lesson.id === "review" ? "Bài ôn" : c.mode === "to" ? "Tô" : "Chép"} · ${c.grid === "oly4" ? "4 ô li Việt Nam" : "Lưới xiên Pháp"}`, padL, px(100));
         ctx.textAlign = "right";
-        ctx.fillText(`Trang ${donePages + tocOffset}/${totalContentPages + tocOffset}${needToc ? "  ·  ↑ Mục lục" : ""}`, W - padR, 66);
+        ctx.fillText(`Trang ${donePages + tocOffset}/${totalContentPages + tocOffset}${needToc && pr.links ? "  ·  ↑ Mục lục" : ""}`, W - padR, px(66));
         ctx.textAlign = "left";
-        ctx.strokeStyle = "#CCCCCC"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(padL, 116); ctx.lineTo(W - padR, 116); ctx.stroke();
+        ctx.strokeStyle = "#CCCCCC"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(padL, px(116)); ctx.lineTo(W - padR, px(116)); ctx.stroke();
 
         /* Vẽ dòng kẻ + chữ mẫu / tô / dấu chấm */
         const rows = job.pages[pi];
@@ -189,11 +192,11 @@ async function exportPdf(cfg, tuyChon = {}) {
         }
         /* Ghi chú chân trang */
         if (job.lesson.note) {
-          ctx.fillStyle = "#555555"; ctx.font = "500 20px 'QS',sans-serif"; ctx.textAlign = "left";
-          ctx.fillText("Gợi ý: " + job.lesson.note, padL, H - 36);
+          ctx.fillStyle = "#555555"; ctx.font = `500 ${px(20)}px 'QS',sans-serif`; ctx.textAlign = "left";
+          ctx.fillText("Gợi ý: " + job.lesson.note, padL, H - px(36));
         }
         /* Nút bấm góc trên phải để quay về Trang 1 Mục lục trên reMarkable */
-        const backLinks = needToc ? [{ rect: [((W - padR - 220) / W) * pr.ptW, pr.ptH - (95 / H) * pr.ptH, ((W - padR) / W) * pr.ptW, pr.ptH - (25 / H) * pr.ptH], targetPage: 0 }] : [];
+        const backLinks = needToc && pr.links ? [{ rect: [((W - padR - 220) / W) * pr.ptW, pr.ptH - (95 / H) * pr.ptH, ((W - padR) / W) * pr.ptW, pr.ptH - (25 / H) * pr.ptH], targetPage: 0 }] : [];
         pdfPages.push({ content: ctx.out.join("\n"), links: backLinks });
       }
     }
