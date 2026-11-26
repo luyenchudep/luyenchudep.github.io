@@ -148,6 +148,12 @@
       padding: 6px 0;
     }
 
+    .nhan-phong-lon {
+      margin: 4px 0 2px;
+      font-size: 13px;
+      color: #555555;
+    }
+
     .luoi-svg {
       display: block;
     }
@@ -266,7 +272,8 @@
     <section id="chu-mau">
       <h2>2. Chữ mẫu</h2>
       <p class="chu-thich">
-        Mỗi chữ vẽ ba lần từ trái qua phải: nét liền, nét đứt để tô, và chỉ dẫn
+        Mỗi chữ vẽ đúng cỡ hai lần (nét liền, nét đứt để tô), bên dưới là chỉ dẫn phóng lớn:
+        số thứ tự nét, mũi tên hướng viết,
         (<span class="cham-mau cham-xanh" aria-hidden="true"></span>điểm đặt viết,
         <span class="cham-mau cham-do" aria-hidden="true"></span>điểm dừng viết).
       </p>
@@ -398,7 +405,7 @@
       if (kieu !== 'chidan') return;
 
       if (hienMuiTen) {
-        const canh = 0.18 * s;
+        const canh = 0.24 * s;
         const cao = canh * Math.sqrt(3) / 2;
         dsNet.forEach((net, i) => {
           if (net.dau === 1) return;
@@ -442,7 +449,7 @@
         const chamDat = document.createElementNS(SVG_NS, 'circle');
         chamDat.setAttribute('cx', lamTron(x0 + dau[1] * s));
         chamDat.setAttribute('cy', lamTron(chan - dau[2] * s));
-        chamDat.setAttribute('r', lamTron(0.07 * s));
+        chamDat.setAttribute('r', lamTron(0.08 * s));
         chamDat.setAttribute('fill', '#2e7d32');
         nhom.appendChild(chamDat);
       }
@@ -459,7 +466,7 @@
         const chamDung = document.createElementNS(SVG_NS, 'circle');
         chamDung.setAttribute('cx', lamTron(x0 + cuoi[cuoi.length - 2] * s));
         chamDung.setAttribute('cy', lamTron(chan - cuoi[cuoi.length - 1] * s));
-        chamDung.setAttribute('r', lamTron(0.07 * s));
+        chamDung.setAttribute('r', lamTron(0.08 * s));
         chamDung.setAttribute('fill', '#c62828');
         chamDung.setAttribute('stroke', '#ffffff');
         chamDung.setAttribute('stroke-width', lamTron(0.025 * s));
@@ -467,13 +474,18 @@
       }
 
       if (hienSoNet) {
+        const daDat = [];   // vị trí các số đã đặt, để hai số không chồng lên nhau
         dsNet.forEach((net, i) => {
           if (!net.d.length) return;
           const dau = net.d[0];
+          let sx = x0 + dau[1] * s - 0.18 * s;
+          const sy = chan - dau[2] * s - 0.18 * s;
+          while (daDat.some(([px, py]) => Math.hypot(px - sx, py - sy) < 0.34 * s)) sx += 0.34 * s;
+          daDat.push([sx, sy]);
           const so = document.createElementNS(SVG_NS, 'text');
-          so.setAttribute('x', lamTron(x0 + dau[1] * s - 0.15 * s));
-          so.setAttribute('y', lamTron(chan - dau[2] * s - 0.15 * s));
-          so.setAttribute('font-size', lamTron(0.28 * s));
+          so.setAttribute('x', lamTron(sx));
+          so.setAttribute('y', lamTron(sy));
+          so.setAttribute('font-size', lamTron(0.32 * s));
           so.setAttribute('font-family', PHONG_GIAO_DIEN);
           so.setAttribute('font-weight', '600');
           so.setAttribute('fill', '#c62828');
@@ -595,7 +607,7 @@
       const s = donVi();
       const { dongTren, soDong } = kichThuocLuoiChuan();
       const chan = dongTren * LUOI.dong;
-      const cacKieu = ['lien', 'dut', 'chidan'];
+      const cacKieu = ['lien', 'dut'];   // phần chỉ dẫn vẽ riêng, phóng lớn (xem dưới)
 
       for (const chu of Object.keys(TIEUHOC.CHU)) {
         const dl = TIEUHOC.CHU[chu];
@@ -623,7 +635,7 @@
         const svg = document.createElementNS(SVG_NS, 'svg');
         svg.classList.add('luoi-svg');
         svg.setAttribute('role', 'img');
-        svg.setAttribute('aria-label', `Chữ ${chu}: nét liền, nét đứt và chỉ dẫn`);
+        svg.setAttribute('aria-label', `Chữ ${chu}: nét liền và nét đứt`);
         khung.appendChild(svg);
         khoi.appendChild(khung);
         vung.appendChild(khoi);
@@ -634,8 +646,31 @@
         cacKieu.forEach((kieu, idx) => {
           veChu(svg, chu, LE_TRAI + idx * buoc, chan, kieu);
         });
+
+        // Chỉ dẫn phóng lớn: vẽ trên một lưới nhỏ rồi cho hiện lớn hơn, để mũi tên, số nét và điểm đặt viết dễ nhìn
+        const khungLon = document.createElement('div');
+        khungLon.className = 'khung-luoi khung-phong-lon';
+        const nhan = document.createElement('p');
+        nhan.className = 'nhan-phong-lon';
+        nhan.textContent = `Chỉ dẫn, phóng lớn ${PHONG_CHI_DAN()} lần`;
+        const svgLon = document.createElementNS(SVG_NS, 'svg');
+        svgLon.classList.add('luoi-svg');
+        svgLon.setAttribute('role', 'img');
+        svgLon.setAttribute('aria-label', `Chữ ${chu}: chỉ dẫn thứ tự nét và hướng viết, phóng lớn`);
+        const rongLon = Math.ceil((dl.rong * s + 2 * LE_TRAI) / LUOI.doc) * LUOI.doc;
+        veLuoi(svgLon, rongLon, soDong);
+        veChu(svgLon, chu, LE_TRAI, chan, 'chidan');
+        const k = PHONG_CHI_DAN();
+        svgLon.style.width = `${rongLon * k}mm`;
+        svgLon.style.height = `${soDong * LUOI.dong * k}mm`;
+        khungLon.appendChild(nhan);
+        khungLon.appendChild(svgLon);
+        khoi.appendChild(khungLon);
       }
     }
+
+    // Hệ số phóng lớn phần chỉ dẫn: cỡ Nhỏ phóng gấp đôi cỡ Thường để chỉ dẫn luôn hiện cùng một độ lớn
+    const PHONG_CHI_DAN = () => (co === 'thuong' ? 4 : 8);
 
     function veDongTo() {
       const vung = document.getElementById('vung-dong-to');
