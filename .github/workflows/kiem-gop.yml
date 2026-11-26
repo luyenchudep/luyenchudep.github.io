@@ -1,0 +1,22 @@
+# Kiểm index.html có đúng là bản gộp từ src/ hay không (tránh quên chạy node tools/build.js
+# hoặc lỡ sửa thẳng index.html). Chỉ kiểm, không sửa gì.
+name: Kiểm bản gộp
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  kiem:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Kiểm index.html khớp với src/
+        run: node tools/build.js --check

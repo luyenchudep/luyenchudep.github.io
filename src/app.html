@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<!-- File tự sinh từ thư mục src/ bằng tools/build.js. Đừng sửa thẳng file này: sửa trong src/ rồi chạy  node tools/build.js -->
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#F7F2E7">
+<title>Tập viết chữ đẹp tiếng Việt bằng S Pen và viết cảm ứng</title>
+<meta name="description" content="Luyện viết chữ đẹp tiếng Việt miễn phí trên điện thoại, máy tính bảng: chữ thanh đậm, nét đều, có thứ tự nét, xuất tập viết PDF in A4, A5. Không cần mạng.">
+<meta name="application-name" content="Tập viết">
+<meta name="apple-mobile-web-app-title" content="Tập viết">
+<link rel="canonical" href="https://luyenchudep.github.io/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tập viết S Pen">
+<meta property="og:locale" content="vi_VN">
+<meta property="og:title" content="Tập viết chữ đẹp tiếng Việt bằng S Pen và viết cảm ứng">
+<meta property="og:description" content="Luyện viết chữ đẹp tiếng Việt miễn phí trên điện thoại, máy tính bảng: chữ thanh đậm, nét đều, có thứ tự nét, xuất tập viết PDF in A4, A5. Không cần mạng.">
+<meta property="og:url" content="https://luyenchudep.github.io/">
+<meta property="og:image" content="https://luyenchudep.github.io/anh/anh-gioi-thieu.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="Tập viết S Pen: trang tập chữ thanh đậm trên điện thoại">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+<!-- @include style/fonts.css -->
+<!-- @include style/app.css -->
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div id="topbar">
+      <button class="ibtn" id="bMenu" onclick="openMenu()" aria-label="Danh mục bài và cài đặt"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
+      <button id="tbox" onclick="openCard()" aria-label="Xem bài học">
+        <div id="tline"><span id="ttext"></span></div>
+        <div id="part"><span id="partTxt"></span><span id="pageinfo"></span></div>
+      </button>
+      <div id="modesRow">
+        <div id="modes">
+          <button id="mXem" onclick="openCard()"><span class="n">1</span>Xem</button>
+          <button id="mTo" onclick="setMode('to')"><span class="n">2</span>Tô</button>
+          <button id="mNho" onclick="setMode('nho')"><span class="n">3</span>Chép</button>
+        </div>
+        <button id="done" onclick="toggleDone()" aria-label="Đánh dấu đã tập"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.4 2.8 2.8L16.2 9.8"/></svg><span class="dl">Đã tập</span></button>
+      </div>
+      <button class="ibtn" id="bZBox" onclick="toggleZBox()" aria-label="Hộp viết phóng to tự trượt"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.3 15.3 20 20M10.5 8v5M8 10.5h5"/></svg></button>
+      <button class="ibtn" id="bAa" onclick="openAa()" aria-label="Cỡ dòng, màu giấy, toàn màn hình"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19 8.4 5h1.2L15 19M5.2 14.2h7.6"/><circle cx="18.4" cy="15.6" r="2.6"/><path d="M21 12.6V19"/></svg></button>
+    </div>
+    <div id="subbar">
+      <div id="note" onclick="this.classList.toggle('open');setTimeout(resize,30)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.2M12 7.8v.1"/></svg><span id="noteTxt"></span></div>
+      <div id="session"><span id="sessTxt"></span><button onclick="sessNext()">Tiếp ›</button><button class="x" onclick="sessEnd()" aria-label="Kết thúc buổi tập">✕</button></div>
+      <div id="warn">Đang mở file trực tiếp nên trình duyệt không lưu được bài viết và tiến độ. Bạn mở bằng link luyenchudep.github.io để ứng dụng tự lưu.</div>
+    </div>
+  </header>
+
+  <div id="workspace">
+    <aside id="sidePane">
+      <div id="sideTabs">
+        <button id="stXem" class="on" onclick="setSideTab('xem')"><span class="n">1</span>Xem</button>
+        <button id="stList" onclick="setSideTab('list')"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg>Mục lục</button>
+      </div>
+      <div id="sideBody" class="card"></div>
+    </aside>
+    <div id="stage">
+      <div id="canvasWrap">
+        <canvas id="bg"></canvas><canvas id="ink"></canvas><canvas id="fx"></canvas>
+        <div id="stageTop">
+          <div id="stageLeft">
+            <div id="favDock"></div>
+            <div id="zoomPill">
+              <button onclick="zoomStep(-0.35)" aria-label="Thu nhỏ trang giấy">−</button>
+              <button class="zreset" id="zoomVal" onclick="resetZoom()" aria-label="Thu về 100%">100%</button>
+              <button onclick="zoomStep(0.35)" aria-label="Phóng to trang giấy">+</button>
+            </div>
+          </div>
+          <button id="redoBtn" onclick="redo()" aria-label="Làm lại nét vừa hoàn tác"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 14 5-5-5-5M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg>Làm lại</button>
+          <div id="grade">
+            <button class="ok" onclick="grade(true)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg> Đạt</button>
+            <button class="no" onclick="grade(false)">Luyện thêm</button>
+          </div>
+          <button id="cmp" onclick="toggleCompare()"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg><span id="cmpTxt">So sánh</span></button>
+        </div>
+        <div id="meas" onclick="openScoreReport()" title="Chạm để xem phân tích chi tiết nét viết"></div>
+      </div>
+      <div id="zboxWrap">
+        <div id="zboxBar">
+          <span class="zbSp" id="zbTitle"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.3 15.3 20 20M10.5 8v5M8 10.5h5"/></svg>Hộp viết tự trượt (2,4×)</span>
+          <button onclick="zboxMove(-1)" aria-label="Lùi trái"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 7.5 12l7 7"/></svg></button>
+          <button onclick="zboxMove(1)" aria-label="Tiến phải"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 5 7 7-7 7"/></svg></button>
+          <button onclick="zboxNextLine()" aria-label="Xuống dòng dưới"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 5v6a3 3 0 0 1-3 3H6M9.5 10.5 6 14l3.5 3.5"/></svg></button>
+          <button onclick="zboxScale(-0.3)" aria-label="Thu nhỏ"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+          <button onclick="zboxScale(0.3)" aria-label="Phóng to"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+          <button class="x" onclick="toggleZBox()" aria-label="Đóng hộp viết"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+        </div>
+        <div id="zboxStage"><canvas id="zboxCv"></canvas><canvas id="zboxFx"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <button class="tb" id="bPrev" onclick="go(-1)"><b><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 7.5 12l7 7"/></svg></b><i>Trước</i></button>
+    <button class="tb on" id="bPen" aria-label="Viết. Nhấn giữ để chọn nhanh viết yêu thích"><b><span id="penIco"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 17 9l-2.5 9h-5L7 9zM12 3v7.2M9.5 21h5"/><circle cx="12" cy="11.6" r="1.3"/></svg></span><span id="penDot"></span></b><i id="penLbl">Viết</i></button>
+    <button class="tb" id="bEraser" onclick="eraserTap()"><b><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 20h12M4.6 14.6l8.8-8.8a2 2 0 0 1 2.8 0l3 3a2 2 0 0 1 0 2.8L12 18.8a2 2 0 0 1-1.4.6H8.4a2 2 0 0 1-1.4-.6l-2.4-2.4a2 2 0 0 1 0-2.8zM9 10.2l5.8 5.8"/></svg></b><i>Gôm</i></button>
+    <button class="tb" id="bUndo" onclick="undo()"><b><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></b><i>Hoàn tác</i></button>
+    <button class="tb" id="bNext" onclick="go(1)"><b><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 5 7 7-7 7"/></svg></b><i>Sau</i></button>
+  </footer>
+</div>
+
+<div class="sheet" id="menu" onclick="if(event.target===this)closeSheets()"><div class="box" id="menuBox"></div></div>
+<div class="sheet" id="pen" onclick="if(event.target===this)closeSheets()"><div class="box" id="penBox"></div></div>
+<div class="sheet" id="eraserSheet" onclick="if(event.target===this)closeSheets()"><div class="box" id="eraserBox"></div></div>
+<div class="sheet" id="card" onclick="if(event.target===this)closeSheets()"><div class="box card" id="cardBox"></div></div>
+<div class="sheet" id="gen" onclick="if(event.target===this)closeSheets()"><div class="box card" id="genBox"></div></div>
+<div class="sheet" id="custom" onclick="if(event.target===this)closeSheets()"><div class="box">
+  <h3>Bài tự do</h3>
+  <div class="prog">Mỗi dòng bạn gõ vào sẽ thành một dòng chữ mẫu đen, hai dòng chữ mờ để tô và một dòng trống để tự viết.</div>
+  <textarea id="customText" placeholder="Dán đoạn văn, câu thơ, ghi chú… cần tập viết"></textarea>
+  <button class="btn ghost" id="customPrevBtn" style="display:none" onclick="restoreCustomPrev()"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>Lấy lại nội dung trước khi luyện tên</button>
+  <button class="btn primary" onclick="saveCustom()">Lưu và tập</button>
+  <button class="btn ghost" onclick="closeSheets()">Hủy</button>
+</div></div>
+<input type="file" id="paperFile" accept="image/*" capture="environment" style="display:none" onchange="savePaper(this)">
+<input type="file" id="restoreFile" accept=".json,application/json" style="display:none" onchange="restoreBackup(this)">
+<div id="toast"></div>
+<div id="popLayer" onpointerdown="if(event.target===this)closePop()"><div id="popBox"></div></div>
+
+<script>
+<!-- @include data/icons.js -->
+"use strict";
+<!-- @include data/scripts-td.js -->
+<!-- @include data/scripts-qs.js -->
+<!-- @include data/fonts.js -->
+<!-- @include version.js -->
+<!-- @include engine/arrows.js -->
+<!-- @include engine/script-select.js -->
+<!-- @include engine/storage.js -->
+<!-- @include engine/layout.js -->
+<!-- @include engine/draw.js -->
+<!-- @include engine/ink.js -->
+<!-- @include engine/audio.js -->
+<!-- @include engine/measure.js -->
+<!-- @include ui/zoom-box.js -->
+<!-- @include ui/split-view.js -->
+<!-- @include ui/name-lab.js -->
+<!-- @include ui/practice.js -->
+<!-- @include ui/nav.js -->
+<!-- @include ui/session.js -->
+<!-- @include ui/menu.js -->
+<!-- @include ui/slow-write.js -->
+<!-- @include ui/trace-quiz.js -->
+<!-- @include ui/pen.js -->
+<!-- @include engine/pdf-export.js -->
+<!-- @include data/pdff.js -->
+<!-- @include engine/pdf-writer.js -->
+<!-- @include ui/float-bar.js -->
+<!-- @include main.js -->
+</script>
+</body>
+</html>

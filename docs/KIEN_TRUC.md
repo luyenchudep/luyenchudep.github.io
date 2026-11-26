@@ -1,6 +1,6 @@
 # Kiến trúc và kế hoạch phát triển ứng dụng Tập viết S Pen
 
-Bản tài liệu 0.4 · Cập nhật 26/11/2026 · Áp dụng cho mã nguồn từ bản 0.10.3
+Bản tài liệu 0.5 · Cập nhật 26/11/2026 · Áp dụng cho mã nguồn từ bản 0.10.3
 
 Tài liệu này mô tả ứng dụng được tổ chức thế nào, dữ liệu nằm ở đâu, và các bản sắp tới sẽ làm gì. Ai muốn góp ý hay góp mã thì đọc tài liệu này trước.
 
@@ -215,20 +215,46 @@ Trang cuối mỗi vở có đường link (kèm mã QR) **Mở cấu hình này
 
 ## 7. Tổ chức mã nguồn (từ bản 0.11)
 
+Đã tách ở bản 0.11. `src/app.html` là khuôn gộp: mỗi dòng `<!-- @include đường/dẫn -->` được thay bằng nguyên nội dung file đó, theo đúng thứ tự trong khuôn. Các file JavaScript vẫn dùng chung biến toàn cục như khi còn một file; sẽ gỡ dần ở các bước sau (trước tiên là `exportPdf(cfg)`).
+
 ```
 src/
-  data/scripts-td.js, scripts-qs.js, scripts-th.js   // giáo trình
-  data/fonts.js, pdff-*.js            // số đo phông, phông nhúng
-  data/presets.js                     // khổ trang (mm)
-  engine/layout.js                    // lớp 2: dàn trang
-  engine/pdf-writer.js                // ghi lệnh vẽ thành PDF
-  ui/practice.js, ui/export.js, ui/notes.js
-  app.html                            // khung giao diện
-tools/build.js                        // gộp tất cả thành một tệp
-index.html                            // tệp phát hành, chạy được không cần mạng
-release/bo-chuan.json                 // danh sách cấu hình bộ vở làm sẵn
-docs/KIEN_TRUC.md                     // tài liệu này
+  app.html                 // khuôn gộp: phần đầu trang, khung giao diện, thứ tự các file
+  version.js               // APP_VER, VERSION
+  main.js                  // khởi động
+  style/fonts.css          // phông nhúng cho màn hình
+  style/app.css            // giao diện
+  data/icons.js            // biểu tượng
+  data/scripts-td.js       // giáo trình Thanh đậm
+  data/scripts-qs.js       // giáo trình Nét đều
+  data/fonts.js            // số đo phông (FONTS)
+  data/pdff.js             // phông nhúng vào PDF (PDFF)
+  engine/arrows.js         // mũi tên hướng viết, chấm đặt viết
+  engine/script-select.js  // chọn kiểu chữ
+  engine/storage.js        // lưu trữ, cài đặt
+  engine/layout.js         // hình học chữ, bài ôn, phân trang
+  engine/draw.js           // vẽ nền, dòng kẻ, chữ mẫu
+  engine/ink.js            // mực, lực nhấn S Pen, Gôm
+  engine/audio.js          // âm thanh giấy
+  engine/measure.js        // đo nét viết
+  engine/pdf-export.js     // xuất vở PDF
+  engine/pdf-writer.js     // ghi PDF vectơ, nhúng phông
+  ui/zoom-box.js           // hộp viết phóng to
+  ui/split-view.js         // chia đôi màn hình máy tính bảng
+  ui/name-lab.js           // luyện tên riêng, chữ ký
+  ui/practice.js           // chế độ tập, phần đang tập
+  ui/nav.js                // điều hướng trang
+  ui/session.js            // buổi tập 15 phút, nhật ký, kiểm tra trên giấy, sao lưu
+  ui/menu.js               // bảng chọn, cài đặt
+  ui/slow-write.js         // sổ tay, Xem viết chậm, nhập môn
+  ui/trace-quiz.js         // tự tô từng nét
+  ui/pen.js                // viết S Pen, viết yêu thích, kiểm tra S Pen
+  ui/float-bar.js          // bảng nổi
+tools/build.js             // gộp src/ thành index.html (--check để kiểm)
+index.html                 // tệp phát hành, chạy được không cần mạng; không sửa tay
 ```
+
+Sắp thêm: `data/scripts-th.js` (giáo trình Tiểu học, hiện ở `thunghiem/`), `data/presets.js` (khổ trang theo mm), `release/bo-chuan.json` (bộ vở làm sẵn).
 
 Người dùng vẫn nhận **một tệp HTML** như hiện nay.
 
