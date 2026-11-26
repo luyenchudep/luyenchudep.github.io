@@ -49,7 +49,7 @@ function openMenu(keepScroll=false){
       tile("sign","Tên và chữ ký","luyện tên riêng","openNameLab()","")+
       tile("edit","Bài tự do","tự soạn nội dung","openCustom()","")+
       tile("journal","Nhật ký luyện chữ","mỗi ngày một trang","openJournal()","")+
-      tile("download","Xuất tập viết PDF","A4, A5, reMarkable","openPdfModal()","")+
+      tile("download","Tạo tập viết PDF","A4, A5, máy đọc sách, tự gõ","openPdfModal()","")+
     `</div>`;
   }else{
     h+=grp("hien","sliders","Hiển thị",

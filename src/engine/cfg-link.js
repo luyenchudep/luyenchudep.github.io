@@ -63,7 +63,8 @@ async function apDungCfgTuLink() {
   if ((c.scope === "bai" || c.scope === "phan") && i >= 0 && i !== cur.li) openLesson(i);
   Object.assign(pdfOpt, {
     preset: c.preset, wMm: c.wMm, hMm: c.hMm, mode: c.mode, grid: c.grid, arrows: c.arrows, barSide: c.barSide,
-    scope: { bai: "cur", phan: "part", tatca: "all", luyenthem: "weak", tudo: "free" }[c.scope],
+    scope: c.scope === "bai" && c.lessons.length > 1 ? "pick" : { bai: "cur", phan: "part", tatca: "all", luyenthem: "weak", tudo: "free", tugo: "type" }[c.scope],
+    lessons: c.lessons.slice(), text: c.text || "",
   });
   openPdfModal();
   toast("Đã mở cấu hình vở từ đường link");

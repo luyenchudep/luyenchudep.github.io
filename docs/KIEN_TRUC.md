@@ -190,8 +190,9 @@ cfg = {
 | `tatca` | Cả giáo trình |
 | `luyenthem` | Các chữ Luyện thêm; nếu chưa có thì lấy Bài ôn |
 | `tudo` | Bài tự do |
+| `tugo` | Nội dung tự gõ trong `text` (tối đa 2.000 ký tự), mỗi dòng một dòng tập |
 
-Chưa làm: `tugo`, `ghichep`, `font`, `z`, `gray`, `a5x2`. Trường `links` chưa đọc từ cfg mà theo khổ trang (Samsung Notes tắt). `cfg.script` phải trùng kiểu chữ app đang mở, vì dữ liệu kiểu chữ chỉ nạp một lần lúc khởi động. Bên trong, hàm vẫn tạm đổi vài biến chung của bộ vẽ (khổ trang, giao diện) rồi khôi phục; gỡ hẳn khi viết lại bộ vẽ theo mm. Nút "Tạo và tải file PDF" nay chỉ dựng `cfg` từ màn Xuất PDF rồi gọi `exportPdf(cfg)`.
+Chưa làm: `ghichep`, `font`, `z`, `gray`, `a5x2`. Trường `links` chưa đọc từ cfg mà theo khổ trang (Samsung Notes tắt). `cfg.script` phải trùng kiểu chữ app đang mở, vì dữ liệu kiểu chữ chỉ nạp một lần lúc khởi động. Bên trong, hàm vẫn tạm đổi vài biến chung của bộ vẽ (khổ trang, giao diện) rồi khôi phục; gỡ hẳn khi viết lại bộ vẽ theo mm. Nút "Tạo và tải file PDF" nay chỉ dựng `cfg` từ màn Xuất PDF rồi gọi `exportPdf(cfg)`.
 
 **Đường link:** `…/index.html#cfg=<JSON nén, mã base64url>`. Phần nằm sau dấu `#` không được trình duyệt gửi lên máy chủ, nên nội dung người dùng tự gõ không lọt ra ngoài.
 
@@ -200,7 +201,7 @@ Chưa làm: `tugo`, `ghichep`, `font`, `z`, `gray`, `a5x2`. Trường `links` ch
 - Mã bắt đầu bằng `z` là JSON nén kiểu deflate-raw; bắt đầu bằng `j` là JSON không nén (dùng khi trình duyệt không có `CompressionStream`). Mã dài quá 8.000 ký tự hoặc có ký tự lạ thì bị từ chối.
 - Màn Xuất PDF có nút **Chép đường link cấu hình này**. Không chép tự động được thì hiện đường link trong ô để người dùng tự chép.
 - Mở link: nếu kiểu chữ trong link khác kiểu đang mở thì đổi kiểu rồi tải lại trang (giữ link); sau đó mở đúng bài, mở màn Xuất PDF đã điền sẵn tùy chọn, rồi xóa phần `#cfg=` khỏi thanh địa chỉ. Link hỏng hoặc cấu hình sai thì báo bằng lời dễ hiểu, app vẫn mở bình thường.
-- Màn Xuất PDF có thêm lựa chọn **Cả giáo trình** (`scope: "tatca"`); khổ tự nhập chỉ hiện khi mở từ link, ô nhập khổ sẽ có ở màn Tạo vở.
+- Màn **Tạo tập viết PDF** (thay màn Xuất PDF cũ, `openPdfModal` trong `src/engine/pdf-export.js`) chọn được: nội dung (Bài này, Chọn bài, Cả phần, Cả giáo trình, Luyện thêm, Bài tự do, Tự gõ), khổ giấy (6 khổ có sẵn và Tự nhập theo mm), Tô hay Chép, kiểu dòng kẻ, lề thanh công cụ, mũi tên. Có nút tạo PDF và nút chép đường link.
 
 ### 5.4. Phông chữ của người dùng (bản 0.12)
 

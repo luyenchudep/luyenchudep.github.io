@@ -212,9 +212,10 @@ async function assembleVectorPdf(doc,pages,ptW,ptH,W,H,title){
 /* Nút "Tạo và tải file PDF": dựng cfg từ màn Xuất PDF (pdfOpt) và bài đang mở, gọi exportPdf(cfg) rồi tải file về */
 function pdfCfgTuManHinh(){
   const l=LESSONS[cur.li];
-  const scope={cur:"bai",part:"phan",all:"tatca",weak:"luyenthem",free:"tudo"}[pdfOpt.scope];
-  const c={v:1,script:SCRIPT,scope,lessons:[l.id],mode:pdfOpt.mode,grid:pdfOpt.grid||S.gridStyle||"french",arrows:pdfOpt.arrows,preset:pdfOpt.preset,barSide:pdfOpt.barSide};
+  const scope={cur:"bai",pick:"bai",part:"phan",all:"tatca",weak:"luyenthem",free:"tudo",type:"tugo"}[pdfOpt.scope];
+  const c={v:1,script:SCRIPT,scope,lessons:pdfOpt.scope==="pick"?pdfOpt.lessons.slice():[l.id],mode:pdfOpt.mode,grid:pdfOpt.grid||S.gridStyle||"french",arrows:pdfOpt.arrows,preset:pdfOpt.preset,barSide:pdfOpt.barSide};
   if(pdfOpt.preset==="tunhap"){c.wMm=pdfOpt.wMm;c.hMm=pdfOpt.hMm}
+  if(pdfOpt.scope==="type")c.text=pdfOpt.text;
   return c;
 }
 async function generateWorkbookPdf(){
