@@ -58,7 +58,7 @@ Nguyên tắc nền: **một bộ máy vẽ, nhiều đầu ra.** Màn hình và
 | Số đo phông chữ | `FONTS` (Pinyon Script, Allura, Quicksand) | Đã có |
 | Phông nhúng vào PDF | `PDFF` | Đã có, nhưng làm sẵn từ trước, chưa nạp được phông mới lúc đang chạy |
 | Bộ xuất PDF vectơ | `assembleVectorPdf`, `PdfDoc` | Đã có: nhúng phông, tìm được chữ, mục lục chạm được |
-| Khổ trang | `PDF_PRESETS`: rm2, rmpp, a4, a5 | Thiếu Samsung Notes và máy đọc sách tỷ lệ 9:16; số đo đang tính bằng pt |
+| Khổ trang | `KHO_TRANG` (`src/data/presets.js`): rm2, rmpp, rmppm, a4, a5, sn, và khổ tự nhập | Tính bằng mm từ bản 0.11; `PDF_PRESETS` dựng tự động từ đây |
 | Tùy chọn xuất vở | `pdfOpt` | Đã có, nhưng chưa lưu được vào đường link |
 | Bài tự do | bài `free`, nội dung `custom` | Đã có ở mức cơ bản |
 | Hàm xuất vở | `exportPdf(cfg)` (từ bản 0.11; trước đó là `generateWorkbookPdf()`) | Nhận một gói `cfg`, không đọc bài đang mở hay giao diện. Bên trong vẫn tạm đổi vài biến chung của bộ vẽ rồi khôi phục (xem mục 5.3) |
@@ -145,7 +145,7 @@ Mỗi nét trong `DUCTUS` có dạng `{ r: [đoạn 1, đoạn 2, …], s: phía
 
 ### 5.2. Khổ trang (thay `PDF_PRESETS` ở bản 0.11)
 
-Mọi số đo tính bằng **mm**. Bộ máy tự đổi sang pt (1 mm = 2,8346 pt).
+Mọi số đo tính bằng **mm**. Bộ máy tự đổi sang pt (1 mm = 2,8346 pt). Đã làm ở bản 0.11: `src/data/presets.js`. Máy có độ phân giải công bố thì vẽ trang đúng số điểm ảnh của máy; khổ giấy, Samsung Notes và khổ tự nhập vẽ ở 8 điểm ảnh mỗi mm. Trang hẹp hơn 1240 điểm ảnh thì chữ tiêu đề và lề thu nhỏ theo tỷ lệ. Khổ tự nhập nhận 40 tới 500 mm mỗi chiều (`cfg.preset = "tunhap"`, `cfg.wMm`, `cfg.hMm`).
 
 | Mã | Tên | Khổ (mm) | Mục lục chạm được | Có trong bộ vở làm sẵn |
 |---|---|---|---|---|
@@ -181,7 +181,7 @@ cfg = {
 }
 ```
 
-**Đã làm (bản 0.11):** hàm `exportPdf(cfg)` ở `src/engine/export-pdf.js`, trả về `{ blob, soTrang, tieuDe, cfg }`. Đang đọc các trường `v`, `script`, `scope`, `lessons`, `mode`, `grid` (`french`, `oly4`), `arrows`, `preset` (`rm2`, `rmpp`, `a4`, `a5`), `barSide`; trường nào thiếu thì lấy mặc định, trường nào sai thì báo lỗi bằng lời dễ hiểu.
+**Đã làm (bản 0.11):** hàm `exportPdf(cfg)` ở `src/engine/export-pdf.js`, trả về `{ blob, soTrang, tieuDe, cfg }`. Đang đọc các trường `v`, `script`, `scope`, `lessons`, `mode`, `grid` (`french`, `oly4`), `arrows`, `preset` (`rm2`, `rmpp`, `rmppm`, `a4`, `a5`, `sn`, `tunhap` kèm `wMm`, `hMm`), `barSide`; trường nào thiếu thì lấy mặc định, trường nào sai thì báo lỗi bằng lời dễ hiểu.
 
 | `scope` | Xuất gì |
 |---|---|
@@ -191,7 +191,7 @@ cfg = {
 | `luyenthem` | Các chữ Luyện thêm; nếu chưa có thì lấy Bài ôn |
 | `tudo` | Bài tự do |
 
-Chưa làm: `tugo`, `ghichep`, `font`, `z`, `gray`, `links`, `a5x2`, khổ `tunhap`. `cfg.script` phải trùng kiểu chữ app đang mở, vì dữ liệu kiểu chữ chỉ nạp một lần lúc khởi động. Bên trong, hàm vẫn tạm đổi vài biến chung của bộ vẽ (khổ trang, giao diện) rồi khôi phục; gỡ hẳn khi viết lại bộ vẽ theo mm. Nút "Tạo và tải file PDF" nay chỉ dựng `cfg` từ màn Xuất PDF rồi gọi `exportPdf(cfg)`.
+Chưa làm: `tugo`, `ghichep`, `font`, `z`, `gray`, `a5x2`. Trường `links` chưa đọc từ cfg mà theo khổ trang (Samsung Notes tắt). `cfg.script` phải trùng kiểu chữ app đang mở, vì dữ liệu kiểu chữ chỉ nạp một lần lúc khởi động. Bên trong, hàm vẫn tạm đổi vài biến chung của bộ vẽ (khổ trang, giao diện) rồi khôi phục; gỡ hẳn khi viết lại bộ vẽ theo mm. Nút "Tạo và tải file PDF" nay chỉ dựng `cfg` từ màn Xuất PDF rồi gọi `exportPdf(cfg)`.
 
 **Đường link:** `…/index.html#cfg=<JSON nén, mã base64url>`. Phần nằm sau dấu `#` không được trình duyệt gửi lên máy chủ, nên nội dung người dùng tự gõ không lọt ra ngoài.
 

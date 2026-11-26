@@ -1,10 +1,16 @@
 /* ================== XUẤT VỞ PDF CHUẨN REMARKABLE & IN A4/A5 (100% OFFLINE) ================== */
-const PDF_PRESETS={
-  rm2:{name:"reMarkable 2",ptW:445,ptH:593,pxW:1404,pxH:1872,bar:126,mono:true,desc:"157×209mm · màn hình mực điện tử đen trắng"},
-  rmpp:{name:"reMarkable Paper Pro",ptW:508,ptH:678,pxW:1620,pxH:2160,bar:138,mono:false,desc:"179×239mm · màn hình mực điện tử màu"},
-  a4:{name:"Giấy A4 (In ấn)",ptW:595.28,ptH:841.89,pxW:1654,pxH:2339,bar:76,mono:false,desc:"210×297mm · in sắc nét"},
-  a5:{name:"Sổ tay A5",ptW:419.53,ptH:595.28,pxW:1240,pxH:1754,bar:64,mono:false,desc:"148×210mm · gọn nhẹ"}
-};
+/* Khổ trang lấy từ src/data/presets.js (tính bằng mm); đổi ra pt cho file PDF: 1 mm = 72/25,4 pt */
+const MM_SANG_PT = 72 / 25.4;
+function khoPdf(k) {
+  return { name: k.ten, ptW: k.wMm * MM_SANG_PT, ptH: k.hMm * MM_SANG_PT, pxW: k.pxW, pxH: k.pxH, bar: k.barPx, mono: k.mono, links: k.links, desc: k.moTa, wMm: k.wMm, hMm: k.hMm };
+}
+const PDF_PRESETS = Object.fromEntries(Object.entries(KHO_TRANG).map(([ma, k]) => [ma, khoPdf(k)]));
+/* Khổ tự nhập: rộng × cao (mm), vẽ theo PX_MOI_MM */
+function khoTuNhap(wMm, hMm) {
+  const w = Number(wMm), h = Number(hMm);
+  if (!(w >= 40 && w <= 500 && h >= 40 && h <= 500)) throw new Error("Khổ tự nhập phải từ 40 tới 500 mm mỗi chiều");
+  return khoPdf({ ten: `Khổ ${w}×${h} mm`, wMm: w, hMm: h, pxW: Math.round(w * PX_MOI_MM), pxH: Math.round(h * PX_MOI_MM), barPx: 68, mono: false, links: true, moTa: `${w}×${h} mm · khổ tự nhập` });
+}
 const pdfOpt={preset:"rm2",scope:"cur",mode:"to",grid:null,barSide:"left",arrows:true,busy:false};
 
 function openPdfModal(keepScroll=false){
@@ -13,7 +19,7 @@ function openPdfModal(keepScroll=false){
   const curL=LESSONS[cur.li],pr=PDF_PRESETS[pdfOpt.preset];
   document.getElementById("genBox").innerHTML=`<h3>${ic("download")} Xuất tập viết PDF</h3>
   <div class="prog">Tạo tập viết PDF sắc nét ngay trên máy, không cần mạng — canh đúng tỉ lệ màn hình reMarkable, chừa lề thanh công cụ và có <b>mục lục chạm để chuyển trang</b>.</div>
-  <div class="row"><span>Khổ giấy hoặc máy</span><div class="seg">${[["rm2","reMarkable 2"],["rmpp","Paper Pro"],["a4","A4"],["a5","A5"]].map(([v,t])=>`<button class="${pdfOpt.preset===v?"on":""}" onclick="pdfOpt.preset='${v}';openPdfModal(true)">${t}</button>`).join("")}</div></div>
+  <div class="row"><span>Khổ giấy hoặc máy</span><div class="seg">${Object.entries(KHO_TRANG).map(([v,k])=>[v,k.ngan]).map(([v,t])=>`<button class="${pdfOpt.preset===v?"on":""}" onclick="pdfOpt.preset='${v}';openPdfModal(true)">${t}</button>`).join("")}</div></div>
   <div class="prog" style="margin:4px 0 8px"><b>${pr.name}:</b> ${pr.desc}</div>
   <div class="row"><span>Nội dung xuất</span><div class="seg">${[["cur","Bài này"],["part","Cả phần"],["weak","Luyện thêm"],["free","Bài tự do"]].map(([v,t])=>`<button class="${pdfOpt.scope===v?"on":""}" onclick="pdfOpt.scope='${v}';openPdfModal(true)">${t}</button>`).join("")}</div></div>
   <div class="prog" style="margin:4px 0 8px">${pdfOpt.scope==="cur"?`Xuất bài đang mở: <b>${curL.t}</b>`:pdfOpt.scope==="part"?`Xuất toàn bộ <b>${curL.part}</b> kèm trang mục lục.`:pdfOpt.scope==="weak"?`Xuất các chữ yếu trong Luyện thêm (${WEAK.length||"tự lấy Bài ôn"}).`:`Xuất nội dung Bài tự do / Tên riêng của bạn.`}</div>
