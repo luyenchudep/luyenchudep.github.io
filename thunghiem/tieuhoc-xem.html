@@ -518,8 +518,8 @@
 
     function tenLoaiNet(loai) {
       if (TIEUHOC.STROKES[loai]) return TIEUHOC.STROKES[loai].ten;
-      if (loai === 'cham') return 'dấu chấm';
-      return loai;
+      const TEN_DAU = { cham: 'dấu chấm', mu: 'dấu mũ', trang: 'dấu á', rau: 'dấu râu' };
+      return TEN_DAU[loai] || loai;
     }
 
     function veNetCoBan() {
