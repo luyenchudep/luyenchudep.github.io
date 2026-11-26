@@ -117,7 +117,7 @@ SCRIPTS.th = {
   STROKES,  // nét cơ bản, cùng dạng với hai kiểu kia: { w, d: [["M",x,y], ["L",x,y], ["C",x1,y1,x2,y2,x,y]] }
   CHU,      // chữ mẫu vẽ từ đường tâm nét (dưới đây)
   DUCTUS,   // không ghi tay: dựng tự động từ CHU (lấy mẫu điểm trên đường cong), để dùng chung phần mũi tên và Xem viết chậm
-  COURSE, SOTAY, NHAPMON, WORDS     // như hai kiểu kia, làm sau
+  COURSE, SOTAY, NHAPMON, WORDS     // như hai kiểu kia
 }
 
 CHU[chữ] = {
@@ -136,6 +136,8 @@ CHU[chữ] = {
 - `dau: 1`: dấu phụ (chấm của i, dấu mũ, dấu râu…).
 - Điểm đặt viết là điểm đầu của nét đầu tiên; điểm dừng viết là điểm cuối của nét cuối cùng. Không ghi riêng.
 - Chiều cao theo mẫu: b g h k l y = 2,5; t = 1,5; r s = 1,25; d đ p q = 2; còn lại = 1; chữ số = 2; dấu thanh nằm trong ô vuông cạnh 0,5.
+- **Dấu thanh** (`dausac`, `dauhuyen`, `dauhoi`, `daunga`, `daunang`) nằm trong `STROKES`, vẽ trong ô vuông cạnh 0,5, gốc tọa độ ở góc dưới bên trái ô. Chữ có dấu thanh không ghi riêng trong `CHU` mà ghép lúc vẽ: chữ gốc + dấu, dấu trên đặt cách đỉnh chữ (hoặc đỉnh dấu mũ) 0,1 và canh giữa âm chính, dấu nặng đặt dưới đường chân 0,15.
+- Trong `COURSE` của kiểu `th`, trường `z` là cỡ chữ: `"thuong"` hoặc `"nho"` (hai kiểu kia dùng `L`, `M`, `S`).
 
 Trong lúc chưa tách mã (trước bản 0.11), dữ liệu này nằm ở `thunghiem/tieuhoc-net.js` và xem thử bằng `thunghiem/tieuhoc-xem.html`. Khi tách mã, chuyển thành `src/data/scripts-th.js`.
 

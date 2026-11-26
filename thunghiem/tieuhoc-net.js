@@ -150,6 +150,48 @@ const TIEUHOC = {
     ["C", 0.42, 1, 0.44, 0.88, 0.36, 0.8],
     ["C", 0.3, 0.74, 0.24, 0.8, 0.3, 0.86],
     ["C", 0.38, 0.92, 0.5, 0.9, 0.6, 0.86]]
+  },
+  "dausac": {
+   "ten": "Dấu sắc",
+   "w": 0.5,
+   "dau": 1,
+   "d": [
+    ["M", 0.36, 0.44],
+    ["L", 0.14, 0.1]]
+  },
+  "dauhuyen": {
+   "ten": "Dấu huyền",
+   "w": 0.5,
+   "dau": 1,
+   "d": [
+    ["M", 0.14, 0.44],
+    ["L", 0.36, 0.1]]
+  },
+  "dauhoi": {
+   "ten": "Dấu hỏi",
+   "w": 0.5,
+   "dau": 1,
+   "d": [
+    ["M", 0.1, 0.36],
+    ["C", 0.14, 0.48, 0.38, 0.48, 0.38, 0.34],
+    ["C", 0.38, 0.24, 0.25, 0.22, 0.25, 0.1]]
+  },
+  "daunga": {
+   "ten": "Dấu ngã",
+   "w": 0.5,
+   "dau": 1,
+   "d": [
+    ["M", 0.04, 0.2],
+    ["C", 0.1, 0.36, 0.2, 0.34, 0.25, 0.26],
+    ["C", 0.3, 0.18, 0.4, 0.16, 0.46, 0.32]]
+  },
+  "daunang": {
+   "ten": "Dấu nặng",
+   "w": 0.5,
+   "dau": 1,
+   "d": [
+    ["M", 0.25, 0.27],
+    ["L", 0.26, 0.25]]
   }
  },
  "CHU": {
@@ -1271,5 +1313,798 @@ const TIEUHOC = {
       }]
     }]
   }
+ },
+ "COURSE": [
+  {
+   "part": "Phần 1 · Làm quen",
+   "lessons": [
+    {
+     "id": "th-lq1",
+     "t": "Ngồi ngay ngắn, làm quen 4 ô li",
+     "z": "thuong",
+     "note": "Ngồi thẳng lưng, cầm viết bằng ba ngón tay. Đặt viết đúng chấm xanh, dừng ở chấm đỏ.",
+     "rows": [
+      [
+       "stroke",
+       "ngang"],
+      [
+       "stroke",
+       "so"],
+      [
+       "blank", 12]]
+    }]
+  },
+  {
+   "part": "Phần 2 · Nét cơ bản",
+   "lessons": [
+    {
+     "id": "th-n1",
+     "t": "Nét ngang, nét sổ thẳng",
+     "z": "thuong",
+     "note": "Nét ngang kéo từ trái qua phải. Nét sổ kéo thẳng từ trên xuống, chạm đường chân.",
+     "rows": [
+      [
+       "stroke",
+       "ngang"],
+      [
+       "stroke",
+       "so"],
+      [
+       "stroke",
+       "ngang"],
+      [
+       "blank", 12]]
+    },
+    {
+     "id": "th-n2",
+     "t": "Nét xiên trái, nét xiên phải, nét hất",
+     "z": "thuong",
+     "note": "Hai nét xiên kéo từ trên xuống. Nét hất đưa nhẹ từ dưới lên, hơi chếch qua phải.",
+     "rows": [
+      [
+       "stroke",
+       "xientrai"],
+      [
+       "stroke",
+       "xienphai"],
+      [
+       "stroke",
+       "hat"],
+      [
+       "blank", 12]]
+    },
+    {
+     "id": "th-n3",
+     "t": "Nét móc xuôi, móc ngược, móc hai đầu",
+     "z": "thuong",
+     "note": "Đầu móc uốn tròn, thân nét kéo thẳng theo đường kẻ dọc.",
+     "rows": [
+      [
+       "stroke",
+       "mocxuoi"],
+      [
+       "stroke",
+       "mocnguoc"],
+      [
+       "stroke",
+       "mochaidau"],
+      [
+       "blank", 12]]
+    },
+    {
+     "id": "th-n4",
+     "t": "Nét cong hở phải, cong hở trái, cong kín",
+     "z": "thuong",
+     "note": "Cong hở phải và cong kín đi ngược chiều kim đồng hồ. Cong hở trái đi theo chiều kim đồng hồ.",
+     "rows": [
+      [
+       "stroke",
+       "conghophai"],
+      [
+       "stroke",
+       "conghotrai"],
+      [
+       "stroke",
+       "congkin"],
+      [
+       "blank", 12]]
+    },
+    {
+     "id": "th-n5",
+     "t": "Nét khuyết trên, khuyết dưới, nét thắt",
+     "z": "thuong",
+     "note": "Nét khuyết cao 5 ô li. Hai nét giao nhau đúng đường kẻ. Nét thắt là một vòng nhỏ, gọn.",
+     "rows": [
+      [
+       "stroke",
+       "khuyettren"],
+      [
+       "stroke",
+       "khuyetduoi"],
+      [
+       "stroke",
+       "that"],
+      [
+       "blank", 12]]
+    }]
+  },
+  {
+   "part": "Phần 3 · Chữ số",
+   "lessons": [
+    {
+     "id": "th-s1",
+     "t": "Chữ số 1, 4, 7",
+     "z": "thuong",
+     "note": "Chữ số cao 4 ô li. Kéo nét thẳng, nét xiên thật rõ.",
+     "rows": [
+      [
+       "rep",
+       "1"],
+      [
+       "rep",
+       "4"],
+      [
+       "rep",
+       "7"],
+      [
+       "pair",
+       "14 47 71"],
+      [
+       "blank", 12]]
+    },
+    {
+     "id": "th-s2",
+     "t": "Chữ số 2, 3, 5",
+     "z": "thuong",
+     "note": "Uốn phần cong cho tròn, không kéo rộng ra ngoài 2 ô li.",
+     "rows": [
+      [
+       "rep",
+       "2"],
+      [
+       "rep",
+       "3"],
+      [
+       "rep",
+       "5"],
+      [
+       "pair",
+       "23 35 52"],
+      [
+       "blank", 12]]
+    },
+    {
+     "id": "th-s3",
+     "t": "Chữ số 0, 6, 8, 9",
+     "z": "thuong",
+     "note": "Số 0 tròn như chữ o nhưng cao gấp đôi. Vòng cong của 6, 8, 9 khép kín, gọn.",
+     "rows": [
+      [
+       "rep",
+       "0"],
+      [
+       "rep",
+       "6"],
+      [
+       "rep",
+       "8"],
+      [
+       "rep",
+       "9"],
+      [
+       "pair",
+       "06 68 89 90"]]
+    }]
+  },
+  {
+   "part": "Phần 4 · Chữ thường",
+   "lessons": [
+    {
+     "id": "th-c1",
+     "t": "Nhóm nét móc: i, t",
+     "z": "thuong",
+     "note": "Chữ i cao 2 ô li, chữ t cao 3 ô li. Viết xong thân chữ mới chấm i, gạch ngang t.",
+     "rows": [
+      [
+       "rep",
+       "i"],
+      [
+       "rep",
+       "t"],
+      [
+       "pair",
+       "ti it"],
+      [
+       "blank", 12]]
+    },
+    {
+     "id": "th-c2",
+     "t": "Nhóm nét móc: u, ư",
+     "z": "thuong",
+     "note": "Chữ u có hai nét móc ngược. Chữ ư thêm dấu râu, viết từ trên xuống.",
+     "rows": [
+      [
+       "rep",
+       "u"],
+      [
+       "rep",
+       "ư"],
+      [
+       "pair",
+       "tu tư ui"],
+      [
+       "blank", 12]]
+    },
+    {
+     "id": "th-c3",
+     "t": "Nhóm nét móc: n, m, p",
+     "z": "thuong",
+     "note": "Ba chữ cùng kết thúc bằng nét móc hai đầu. Nét sổ của p kéo xuống dưới đường chân 2 ô li.",
+     "rows": [
+      [
+       "rep",
+       "n"],
+      [
+       "rep",
+       "m"],
+      [
+       "rep",
+       "p"],
+      [
+       "pair",
+       "in im pin mi"],
+      [
+       "blank", 12]]
+    },
+    {
+     "id": "th-c4",
+     "t": "Nhóm nét cong kín: o, ô, ơ",
+     "z": "thuong",
+     "note": "Nét cong kín tròn đều như quả trứng. Dấu mũ cân giữa, dấu râu viết từ trên xuống.",
+     "rows": [
+      [
+       "rep",
+       "o"],
+      [
+       "rep",
+       "ô"],
+      [
+       "rep",
+       "ơ"],
+      [
+       "pair",
+       "to tô tơ no"],
+      [
+       "blank", 12]]
+    },
+    {
+     "id": "th-c5",
+     "t": "Nhóm nét cong kín: a, ă, â",
+     "z": "thuong",
+     "note": "Viết nét cong kín, rồi lia viết lên viết nét móc ngược sát bên phải.",
+     "rows": [
+      [
+       "rep",
+       "a"],
+      [
+       "rep",
+       "ă"],
+      [
+       "rep",
+       "â"],
+      [
+       "pair",
+       "ma na ăn ân"],
+      [
+       "blank", 12]]
+    },
+    {
+     "id": "th-c6",
+     "t": "Nhóm nét cong kín: d, đ, q",
+     "z": "thuong",
+     "note": "Ba chữ cao 4 ô li: d, đ vươn lên trên, q kéo xuống dưới đường chân.",
+     "rows": [
+      [
+       "rep",
+       "d"],
+      [
+       "rep",
+       "đ"],
+      [
+       "rep",
+       "q"],
+      [
+       "pair",
+       "da đa đi qua"],
+      [
+       "blank", 12]]
+    },
+    {
+     "id": "th-c7",
+     "t": "Nhóm nét cong hở: c, x",
+     "z": "thuong",
+     "note": "Chữ c cong mở qua phải. Chữ x gồm hai nét cong tựa lưng vào nhau.",
+     "rows": [
+      [
+       "rep",
+       "c"],
+      [
+       "rep",
+       "x"],
+      [
+       "pair",
+       "ca co xa xu"],
+      [
+       "blank", 12]]
+    },
+    {
+     "id": "th-c8",
+     "t": "Nhóm nét cong hở: e, ê",
+     "z": "thuong",
+     "note": "Đặt viết gần đường chân, đưa lên tạo vòng nhỏ rồi uốn cong xuống. Chữ ê thêm dấu mũ.",
+     "rows": [
+      [
+       "rep",
+       "e"],
+      [
+       "rep",
+       "ê"],
+      [
+       "pair",
+       "me em đê xe"],
+      [
+       "blank", 12]]
+    },
+    {
+     "id": "th-c9",
+     "t": "Nhóm nét khuyết: l, b",
+     "z": "thuong",
+     "note": "Nét khuyết trên cao 5 ô li. Chữ b kết thúc bằng một nét thắt nhỏ.",
+     "rows": [
+      [
+       "rep",
+       "l"],
+      [
+       "rep",
+       "b"],
+      [
+       "pair",
+       "la lê ba bê"],
+      [
+       "blank", 12]]
+    },
+    {
+     "id": "th-c10",
+     "t": "Nhóm nét khuyết: h, k",
+     "z": "thuong",
+     "note": "Viết nét khuyết trên tới đường chân, rê viết ngược lên rồi mới viết tiếp: h có nét móc hai đầu, k có nét thắt giữa.",
+     "rows": [
+      [
+       "rep",
+       "h"],
+      [
+       "rep",
+       "k"],
+      [
+       "pair",
+       "ha hô ke ki"],
+      [
+       "blank", 12]]
+    },
+    {
+     "id": "th-c11",
+     "t": "Nhóm nét khuyết: y, g",
+     "z": "thuong",
+     "note": "Nét khuyết dưới kéo xuống 3 ô li dưới đường chân rồi vòng lên. Giữ vòng khuyết thon, gọn.",
+     "rows": [
+      [
+       "rep",
+       "y"],
+      [
+       "rep",
+       "g"],
+      [
+       "pair",
+       "ly my ga go"],
+      [
+       "blank", 12]]
+    },
+    {
+     "id": "th-c12",
+     "t": "Nhóm nét thắt: v, r, s",
+     "z": "thuong",
+     "note": "Chữ v cao 2 ô li. Chữ r, s cao hơn một chút, 2 ô li rưỡi. Vòng thắt nhỏ, gọn.",
+     "rows": [
+      [
+       "rep",
+       "v"],
+      [
+       "rep",
+       "r"],
+      [
+       "rep",
+       "s"],
+      [
+       "pair",
+       "ve ra sa su"],
+      [
+       "blank", 12]]
+    }]
+  },
+  {
+   "part": "Phần 5 · Dấu thanh",
+   "lessons": [
+    {
+     "id": "th-d1",
+     "t": "Dấu sắc, dấu huyền",
+     "z": "thuong",
+     "note": "Viết xong cả tiếng rồi mới đặt dấu, ngay trên âm chính. Dấu nằm gọn trong 1 ô li.",
+     "rows": [
+      [
+       "stroke",
+       "dausac"],
+      [
+       "stroke",
+       "dauhuyen"],
+      [
+       "rep",
+       "á à ó ò"],
+      [
+       "pair",
+       "cá cà lá là ba bà"],
+      [
+       "blank", 12]]
+    },
+    {
+     "id": "th-d2",
+     "t": "Dấu hỏi, dấu ngã, dấu nặng",
+     "z": "thuong",
+     "note": "Dấu hỏi, dấu ngã đặt trên âm chính. Dấu nặng là một chấm nhỏ ngay dưới âm chính.",
+     "rows": [
+      [
+       "stroke",
+       "dauhoi"],
+      [
+       "stroke",
+       "daunga"],
+      [
+       "stroke",
+       "daunang"],
+      [
+       "rep",
+       "ỏ õ ọ"],
+      [
+       "pair",
+       "cỏ cọ vẽ võ mẹ bé"],
+      [
+       "blank", 12]]
+    }]
+  },
+  {
+   "part": "Phần 6 · Ghép tiếng",
+   "lessons": [
+    {
+     "id": "th-g1",
+     "t": "Nối chữ liền mạch",
+     "z": "thuong",
+     "note": "Từ điểm dừng của chữ trước, đưa viết liền qua chữ sau, không nhấc viết.",
+     "rows": [
+      [
+       "pair",
+       "ba be bi bê"],
+      [
+       "pair",
+       "ma me mi mơ"],
+      [
+       "pair",
+       "la le li na"],
+      [
+       "blank", 12]]
+    },
+    {
+     "id": "th-g2",
+     "t": "Nối với chữ có nét cong",
+     "z": "thuong",
+     "note": "Gặp chữ bắt đầu bằng nét cong kín như o, a, d, q thì lia viết qua phải một chút rồi mới vòng nét cong.",
+     "rows": [
+      [
+       "pair",
+       "ca co cô cơ"],
+      [
+       "pair",
+       "bo bó cò đỏ"],
+      [
+       "pair",
+       "hòa khỏe thủy"],
+      [
+       "blank", 12]]
+    },
+    {
+     "id": "th-g3",
+     "t": "Chữ ghép và vần đơn giản",
+     "z": "thuong",
+     "note": "Các chữ trong một tiếng viết liền, gọn. Giữa hai tiếng chừa một khoảng rộng bằng một chữ o.",
+     "rows": [
+      [
+       "pair",
+       "cha nhà thỏ phở"],
+      [
+       "pair",
+       "khế tre ngà ghế"],
+      [
+       "pair",
+       "bàn mận chim vịt"],
+      [
+       "blank", 12]]
+    }]
+  },
+  {
+   "part": "Phần 7 · Từ ngữ",
+   "lessons": [
+    {
+     "id": "th-v1",
+     "t": "Từ hai tiếng",
+     "z": "thuong",
+     "note": "Sau mỗi tiếng, chừa một khoảng rộng bằng một chữ o.",
+     "rows": [
+      [
+       "pair",
+       "ông bà ba mẹ"],
+      [
+       "pair",
+       "con cá con mèo"],
+      [
+       "pair",
+       "hoa hồng đèn bàn"],
+      [
+       "blank", 12]]
+    },
+    {
+     "id": "th-v2",
+     "t": "Cụm từ ba tiếng",
+     "z": "thuong",
+     "note": "Viết đều tay từ đầu tới cuối dòng. Viết xong từng tiếng rồi mới đặt dấu thanh.",
+     "rows": [
+      [
+       "pair",
+       "bé đi học"],
+      [
+       "pair",
+       "mẹ nấu cơm"],
+      [
+       "pair",
+       "bà kể chuyện"],
+      [
+       "blank", 12]]
+    }]
+  },
+  {
+   "part": "Phần 8 · Chuyển sang cỡ Nhỏ",
+   "lessons": [
+    {
+     "id": "th-nh1",
+     "t": "Cỡ Nhỏ: chữ cao 1 tới 2 ô li",
+     "z": "nho",
+     "note": "Từ bài này, thân chữ cao 1 ô li. Chữ t cao 1 ô li rưỡi; d, đ, p, q cao 2 ô li. Viết chậm lại một chút.",
+     "rows": [
+      [
+       "pair",
+       "i u ư t n m p"],
+      [
+       "pair",
+       "o ô ơ a ă â"],
+      [
+       "pair",
+       "d đ q c x e ê"],
+      [
+       "blank", 12]]
+    },
+    {
+     "id": "th-nh2",
+     "t": "Cỡ Nhỏ: nét khuyết, nét thắt, chữ số",
+     "z": "nho",
+     "note": "Chữ l, b, h, k, y, g cao 2 ô li rưỡi. Chữ số cao 2 ô li. Giữ vòng khuyết thon, gọn.",
+     "rows": [
+      [
+       "pair",
+       "l b h k y g"],
+      [
+       "pair",
+       "v r s"],
+      [
+       "pair",
+       "0 1 2 3 4 5 6 7 8 9"],
+      [
+       "blank", 12]]
+    },
+    {
+     "id": "th-nh3",
+     "t": "Cỡ Nhỏ: tập chép từ ngữ",
+     "z": "nho",
+     "note": "Giữ chữ thẳng hàng, khoảng cách giữa hai tiếng đều nhau. Viết cỡ Nhỏ giỏi lắm rồi đó nha!",
+     "rows": [
+      [
+       "pair",
+       "con rùa quyển vở"],
+      [
+       "pair",
+       "xe đạp cái bàn"],
+      [
+       "pair",
+       "bé đi học"],
+      [
+       "blank", 12]]
+    }]
+  }],
+ "SOTAY": {
+  "th-n3": ["Ba nét móc là gốc của các chữ i, t, u, ư, n, m, p. Đầu móc cong tròn, thân nét thẳng theo đường kẻ dọc.",
+   ["Xem viết chậm để thấy chiều đưa viết của từng nét móc.",
+    "Nét móc xuôi: uốn lên chạm đường kẻ 3 rồi kéo thẳng xuống đường chân. Nét móc ngược: kéo thẳng xuống gần đường chân, uốn cong qua phải, dừng ở đường kẻ 2.",
+    "Nét móc hai đầu: ghép đầu móc xuôi với chân móc ngược, thân giữa thẳng đứng."],
+   [
+    "Đầu móc nhọn hoặc dẹt vì không uốn tròn.",
+    "Thân nét nghiêng qua trái hay qua phải.",
+    "Bụng móc hai đầu quá rộng làm chữ bè ra."]],
+  "th-c4": ["Chữ o, ô, ơ dùng chung nét cong kín cao 2 ô li, rộng 1 ô li rưỡi. Viết tròn chữ o thì các chữ a, d, đ, q, g cũng dễ.",
+   [
+    "Đặt viết dưới đường kẻ 3 một chút, phía bên phải. Đưa vòng qua trái, xuống chạm đường chân, rồi vòng lên khép lại.",
+    "Chữ ô: lia viết lên trên, viết dấu mũ gồm hai nét xiên ngắn chạm nhau ở giữa.",
+    "Chữ ơ: lia viết lên góc trên bên phải, viết dấu râu từ trên xuống, chạm nhẹ lưng chữ o."],
+   ["Vòng chữ o theo chiều kim đồng hồ.",
+    "Nét cong không khép kín, hở miệng.",
+    "Dấu mũ quá lớn hoặc lệch một bên; dấu râu viết từ dưới lên."]],
+  "th-c10": ["Chữ h và k bắt đầu bằng nét khuyết trên cao 5 ô li. Kéo tới đường chân rồi rê viết ngược lên trên nét cũ mới viết tiếp.",
+   [
+    "Đặt viết ở đường kẻ 2, đưa lên tạo nét khuyết chạm đường kẻ 6, rồi kéo thẳng xuống đường chân. Hai nét giao nhau ở đường kẻ 3.",
+    "Giữ viết chạm giấy, rê ngược lên khoảng giữa đường kẻ 2 và 3. Đoạn này là một nét riêng, có số riêng.",
+    "Chữ h: viết tiếp nét móc hai đầu. Chữ k: viết nét thắt nhỏ ở giữa rồi móc ngược."],
+   ["Chỗ giao nét khuyết quá cao hoặc quá thấp.",
+    "Không rê viết trên nét cũ mà tách ra sớm.",
+    "Vòng thắt của k quá lớn hoặc tụt xuống sát đường chân."]],
+  "th-c12": ["Chữ v, r, s có nét thắt nhỏ ở phía trên. Chữ r, s cao 2 ô li rưỡi, cao hơn chữ o nửa ô li.",
+   ["Chữ v: viết nét móc hai đầu, đưa lên tới đường kẻ 3, uốn vòng thắt nhỏ rồi đưa nhẹ qua phải.",
+    "Chữ r: đưa xiên lên cao hơn đường kẻ 3 một chút, uốn vòng thắt nhỏ, rồi viết nét móc ngược xuống đường chân.",
+    "Chữ s: đưa xiên lên cao hơn đường kẻ 3 một chút, uốn vòng thắt nhỏ, rồi lượn cong xuống đường chân."],
+   ["Viết r, s thấp bằng chữ o, hoặc cao quá tới đường kẻ 4.",
+    "Vòng thắt quá lớn.",
+    "Lưng chữ s thẳng đơ, thiếu độ cong."]],
+  "th-d2": ["Dấu thanh nằm gọn trong 1 ô li. Viết xong cả tiếng rồi mới đặt dấu, ngay trên hoặc dưới âm chính.",
+   ["Viết hết các chữ trong tiếng trước, không dừng giữa chừng để đặt dấu.",
+    "Lia viết lên trên âm chính để viết dấu hỏi hoặc dấu ngã. Chữ có dấu mũ thì đặt dấu thanh cao hơn dấu mũ một chút.",
+    "Lia viết xuống dưới âm chính để chấm dấu nặng thật gọn. Tiếng có vần oa, oe, uy thì đặt dấu ở chữ đầu của vần: hòa, khỏe, thủy."],
+   [
+    "Đặt dấu lệch sang chữ đứng trước hoặc đứng sau.",
+    "Dấu hỏi, dấu ngã quá lớn, chạm dòng trên hoặc dính vào dấu mũ.",
+    "Chấm dấu nặng quá to hoặc quá xa chữ."]]
+ },
+ "NHAPMON": [
+  {
+   "t": "Ngồi đúng tư thế",
+   "p": ["Lưng thẳng, ngực không tì vào mép bàn, hai chân đặt vững trên sàn.",
+    "Mắt cách màn hình hoặc trang giấy khoảng 25 tới 30 cm, chừng một gang tay lớn của người lớn.",
+    "Tay trái giữ nhẹ máy tính bảng hoặc góc giấy. Giấy đặt hơi nghiêng qua trái cho thuận tay."],
+   "demo": []
+  },
+  {
+   "t": "Cầm viết bằng ba ngón tay",
+   "p": ["Ngón cái và ngón trỏ giữ hai bên thân viết (hoặc S Pen), ngón giữa đỡ bên dưới. Cổ tay thả lỏng, không bóp chặt.",
+    "Đầu ngón tay cách ngòi khoảng 2 cm để nhìn rõ ngòi và đường kẻ.",
+    "Trước khi viết, ba mẹ và bé có thể cùng xòe rồi nắm bàn tay năm lần cho ngón tay dẻo."],
+   "demo": []
+  },
+  {
+   "t": "Lưới 4 ô li",
+   "p": [
+    "<b>Đường chân</b> là đường kẻ đậm, nơi các chữ đứng thẳng hàng. Mỗi dòng chia 4 ô li.",
+    "<b>Cỡ Thường</b>: thân chữ cao 2 ô li, dùng khi mới tập. <b>Cỡ Nhỏ</b>: thân chữ cao 1 ô li, dùng khi tay đã vững.",
+    "Giữa hai tiếng chừa một khoảng rộng bằng một chữ o."],
+   "demo": [
+    "~so",
+    "~congkin",
+    "~khuyettren"]
+  },
+  {
+   "t": "Bốn bước học mỗi bài",
+   "p": [
+    "<b>Xem</b>: Xem viết chậm để biết điểm đặt viết, chiều đưa viết và thứ tự từng nét.",
+    "<b>Tô</b>: tô chậm theo nét đứt, hết một nét mới nhấc viết. Lỡ lệch thì dùng Gôm sửa lại.",
+    "<b>Chép</b> và <b>Bài ôn</b>: nhìn chữ mẫu tự viết, rồi ôn lại cả bài để tay nhớ nét."],
+   "demo": []
+  },
+  {
+   "t": "Dành cho ba mẹ",
+   "p": ["Trẻ 6, 7 tuổi chỉ tập trung tốt khoảng 15 tới 20 phút mỗi lần. Mỗi ngày một bài ngắn tốt hơn ngồi viết liền một giờ.",
+    "Khen cụ thể điều bé làm tốt hôm nay: ngồi thẳng, chữ o tròn, nhớ đặt dấu. Không so sánh bé với bạn khác.",
+    "Có thể xuất tập viết PDF, in trắng đen khổ A4 hoặc A5 để bé tập thêm trên giấy bằng viết chì."],
+   "demo": []
+  }],
+ "WORDS": {
+  "a": [
+   "ba",
+   "con cá"],
+  "ă": [
+   "mặt trăng",
+   "cái khăn"],
+  "â": [
+   "con gấu",
+   "trái mận"],
+  "b": [
+   "bà",
+   "con bò"],
+  "c": [
+   "cái ca",
+   "con cò"],
+  "d": [
+   "con dê",
+   "trái dừa"],
+  "đ": [
+   "đôi dép",
+   "đèn bàn"],
+  "e": [
+   "em bé",
+   "cái xe"],
+  "ê": [
+   "con ếch",
+   "cái ghế"],
+  "g": [
+   "con gà",
+   "cái gối"],
+  "h": [
+   "hoa hồng",
+   "cái hộp"],
+  "i": [
+   "cái ví",
+   "chim sẻ"],
+  "k": [
+   "cái kéo",
+   "con kiến"],
+  "l": [
+   "trái lê",
+   "cái ly"],
+  "m": [
+   "mẹ",
+   "con mèo"],
+  "n": [
+   "cái nón",
+   "con nai"],
+  "o": [
+   "con ong",
+   "trái nho"],
+  "ô": [
+   "ông",
+   "cái tô"],
+  "ơ": [
+   "trái bơ",
+   "cái nơ"],
+  "p": [
+   "đèn pin",
+   "cái cặp"],
+  "q": [
+   "cái quạt",
+   "cái quần"],
+  "r": [
+   "con rùa",
+   "cái rổ"],
+  "s": [
+   "con sóc",
+   "cuốn sách"],
+  "t": [
+   "con tôm",
+   "cái tủ"],
+  "u": [
+   "con cua",
+   "cái muỗng"],
+  "ư": [
+   "sư tử",
+   "trái dưa"],
+  "v": [
+   "con vịt",
+   "cái võng"],
+  "x": [
+   "xe đạp",
+   "cái xô"],
+  "y": [
+   "y tá",
+   "cái yếm"]
  }
 };
