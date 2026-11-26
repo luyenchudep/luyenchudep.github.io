@@ -158,6 +158,16 @@
       display: block;
     }
 
+    .ten-phan { margin: 22px 0 8px; font-size: 16px; }
+    .bai { border: 1px solid #e3e3e3; border-radius: 6px; padding: 8px 12px; margin-bottom: 8px; }
+    .dau-bai { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+    .ma-bai { font-family: ui-monospace, Consolas, monospace; font-size: 12px; color: #777; }
+    .co-bai { font-size: 12px; color: #555; background: #f1f1f1; border-radius: 10px; padding: 0 8px; }
+    .loi-dan { margin: 4px 0; color: #333; }
+    .dong-bai { margin: 4px 0; padding-left: 22px; font-size: 14px; color: #444; }
+    .so-tay, .nhap-mon { margin-top: 6px; font-size: 14px; }
+    .so-tay summary, .nhap-mon summary { cursor: pointer; color: #1565c0; }
+
     .ds-net {
       margin: 10px 0 0;
       padding-left: 22px;
@@ -283,6 +293,12 @@
     <section id="dong-to">
       <h2>3. Dòng tô</h2>
       <div id="vung-dong-to"></div>
+    </section>
+
+    <section id="giao-trinh">
+      <h2>4. Giáo trình</h2>
+      <p class="mo-ta">Danh sách bài học theo khung đã duyệt. Mỗi bài trong app sẽ đi qua bốn bước Xem, Tô, Chép, Bài ôn.</p>
+      <div id="vung-giao-trinh"></div>
     </section>
   </main>
 
@@ -719,6 +735,58 @@
       veNetCoBan();
       veChuMau();
       veDongTo();
+      veGiaoTrinh();
+    }
+
+    // Phần 4: nhập môn và danh sách bài học, đọc thẳng từ TIEUHOC (không phụ thuộc cỡ chữ)
+    function veGiaoTrinh() {
+      const vung = document.getElementById('vung-giao-trinh');
+      if (vung.childElementCount) return;
+      const tenDong = ([kieu, gt]) => {
+        if (kieu === 'stroke') return `Nét: ${TIEUHOC.STROKES[gt] ? TIEUHOC.STROKES[gt].ten.toLowerCase() : gt}`;
+        if (kieu === 'rep') return `Lặp chữ: ${gt}`;
+        if (kieu === 'pair') return `Tiếng, từ: ${gt}`;
+        return 'Dòng trống';
+      };
+      const tao = (the, lop, chu) => { const e = document.createElement(the); if (lop) e.className = lop; if (chu != null) e.textContent = chu; return e; };
+
+      const nm = tao('details', 'nhap-mon');
+      nm.appendChild(tao('summary', '', 'Nhập môn'));
+      for (const muc of TIEUHOC.NHAPMON || []) {
+        nm.appendChild(tao('h4', '', muc.t));
+        const ul = tao('ul');
+        for (const p of muc.p) { const li = tao('li'); li.innerHTML = p; ul.appendChild(li); }   // nội dung do mình soạn, có thẻ <b>
+        nm.appendChild(ul);
+      }
+      vung.appendChild(nm);
+
+      for (const phan of TIEUHOC.COURSE || []) {
+        vung.appendChild(tao('h3', 'ten-phan', phan.part));
+        for (const b of phan.lessons) {
+          const khoi = tao('div', 'bai');
+          const dau = tao('div', 'dau-bai');
+          dau.appendChild(tao('span', 'ma-bai', b.id));
+          dau.appendChild(tao('b', '', b.t));
+          dau.appendChild(tao('span', 'co-bai', b.z === 'nho' ? 'Cỡ Nhỏ' : 'Cỡ Thường'));
+          khoi.appendChild(dau);
+          khoi.appendChild(tao('p', 'loi-dan', b.note));
+          const ol = tao('ol', 'dong-bai');
+          for (const r of b.rows) ol.appendChild(tao('li', '', tenDong(r)));
+          khoi.appendChild(ol);
+          const st = (TIEUHOC.SOTAY || {})[b.id];
+          if (st) {
+            const d = tao('details', 'so-tay');
+            d.appendChild(tao('summary', '', 'Sổ tay'));
+            d.appendChild(tao('p', '', st[0]));
+            d.appendChild(tao('h5', '', 'Cách làm'));
+            const c = tao('ol'); st[1].forEach(x => c.appendChild(tao('li', '', x))); d.appendChild(c);
+            d.appendChild(tao('h5', '', 'Lỗi hay gặp'));
+            const l = tao('ul'); st[2].forEach(x => l.appendChild(tao('li', '', x))); d.appendChild(l);
+            khoi.appendChild(d);
+          }
+          vung.appendChild(khoi);
+        }
+      }
     }
 
     document.querySelectorAll('.nhom-co button').forEach(nut => {
