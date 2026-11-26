@@ -2,7 +2,7 @@
 
 Luyện chữ đẹp tiếng Việt, kiểu thanh đậm và kiểu nét đều, ngay trên điện thoại hay máy tính bảng.
 
-Bạn viết bằng S Pen hoặc viết cảm ứng lên màn hình. Ứng dụng chỉ cho bạn từng nét: đặt viết ở đâu, kéo theo hướng nào, nét nào viết trước, nét nào viết sau. Muốn tập trên giấy thì in tập viết ra khổ A4, A5, hoặc chép vào máy reMarkable.
+Bạn viết bằng S Pen hoặc viết cảm ứng lên màn hình. Ứng dụng chỉ cho bạn từng nét: đặt viết ở đâu, kéo theo hướng nào, nét nào viết trước, nét nào viết sau. Muốn tập trên giấy thì in tập viết ra khổ A4, A5, hoặc chép vào máy reMarkable, Samsung Notes.
 
 Ứng dụng miễn phí, không quảng cáo, không cần tạo tài khoản. Toàn bộ chỉ gói trong một file HTML, không có mạng vẫn mở được, và không gửi bất cứ thứ gì của bạn ra ngoài.
 
@@ -24,7 +24,7 @@ Nên mở bằng Chrome hoặc Samsung Internet, rồi chọn **Thêm vào màn 
 </p>
 <p align="center"><sub>Tô · Chép · Xem viết chậm · Tự tô từng nét</sub></p>
 
-> **Bản 0.10.4, đang thử nghiệm.** Ứng dụng đã chạy qua các bài kiểm tra tự động trên Chrome nhưng chưa được nhiều người dùng thử trên máy thật. Cách chấm điểm và độ nhạy khi tự tô từng nét có thể còn phải chỉnh. Bạn dùng thấy chỗ nào chưa ổn, rất mong bạn góp ý.
+> **Bản 0.11.0, đang thử nghiệm.** Ứng dụng đã chạy qua các bài kiểm tra tự động trên Chrome nhưng chưa được nhiều người dùng thử trên máy thật. Cách chấm điểm và độ nhạy khi tự tô từng nét có thể còn phải chỉnh. Bạn dùng thấy chỗ nào chưa ổn, rất mong bạn góp ý.
 
 ---
 
@@ -63,7 +63,8 @@ Mỗi bài đi qua bốn bước: **Xem**, **Tô**, **Chép** và **Bài ôn**. 
 
 ### In tập viết và theo dõi việc tập
 
-- Xuất tập viết PDF mà không cần mạng, đúng khổ giấy A4, sổ A5, máy reMarkable 2 và reMarkable Paper Pro. Trang đầu là mục lục, chạm vào tên bài là tới trang đó.
+- Màn **Tạo tập viết PDF** chạy ngay trên máy mà không cần mạng, hỗ trợ khổ giấy A4, sổ A5, reMarkable 2, reMarkable Paper Pro, reMarkable Paper Pro Move, Samsung Notes và **Tự nhập** kích thước theo mm. Bạn có thể chọn một bài, **Chọn bài** theo ý, xuất cả phần, **Cả giáo trình** vào một file có mục lục, hoặc **Tự gõ** nội dung riêng.
+- Bấm **Chép đường link cấu hình này** để gửi nguyên bộ lựa chọn (khổ giấy, bài tập, kiểu dòng kẻ, kể cả nội dung Tự gõ) cho người khác. Người nhận mở đường link là tạo được đúng tập viết đó; mọi lựa chọn nằm ngay trong đường link, không gửi lên máy chủ nào.
 - Tập viết xuất ra là PDF dạng vectơ, có nhúng phông chữ. In ra hay phóng to cỡ nào nét cũng sắc, file lại nhẹ, và tìm được chữ trong tập.
 - Ngoài ra còn có buổi tập 15 phút mỗi ngày, luyện viết tên và chữ ký, bài tự soạn, nhật ký luyện chữ, và lời nhắc tự kiểm tra chữ viết trên giấy hai tuần một lần.
 
@@ -73,10 +74,10 @@ Mỗi bài đi qua bốn bước: **Xem**, **Tô**, **Chép** và **Bài ôn**. 
 
 | Máy | Dùng thế nào |
 |---|---|
-| Điện thoại, máy tính bảng Samsung Galaxy có S Pen (mở bằng Chrome hoặc Samsung Internet) | Máy chính, dùng được mọi tính năng |
+| Điện thoại, máy tính bảng Samsung Galaxy có S Pen (mở bằng Chrome hoặc Samsung Internet) | Máy chính, dùng được mọi tính năng. Có thể mở tập viết PDF bằng Samsung Notes để viết bằng S Pen |
 | Máy tính bảng Android khác, máy tính dùng chuột hoặc viết cảm ứng | Dùng được. Nếu viết không ra nét, bạn tắt **Chỉ nhận S Pen** |
 | Máy đọc sách Boox | Dùng được, nhưng nét hiện ra hơi chậm |
-| reMarkable, Kindle Scribe | Dùng tập viết PDF xuất từ ứng dụng |
+| reMarkable (2, Paper Pro, Paper Pro Move), Kindle Scribe | Dùng tập viết PDF xuất từ ứng dụng |
 
 ---
 
