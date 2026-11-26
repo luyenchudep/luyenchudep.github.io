@@ -195,6 +195,13 @@ Chưa làm: `tugo`, `ghichep`, `font`, `z`, `gray`, `a5x2`. Trường `links` ch
 
 **Đường link:** `…/index.html#cfg=<JSON nén, mã base64url>`. Phần nằm sau dấu `#` không được trình duyệt gửi lên máy chủ, nên nội dung người dùng tự gõ không lọt ra ngoài.
 
+Đã làm ở bản 0.11 (`src/engine/cfg-link.js`):
+
+- Mã bắt đầu bằng `z` là JSON nén kiểu deflate-raw; bắt đầu bằng `j` là JSON không nén (dùng khi trình duyệt không có `CompressionStream`). Mã dài quá 8.000 ký tự hoặc có ký tự lạ thì bị từ chối.
+- Màn Xuất PDF có nút **Chép đường link cấu hình này**. Không chép tự động được thì hiện đường link trong ô để người dùng tự chép.
+- Mở link: nếu kiểu chữ trong link khác kiểu đang mở thì đổi kiểu rồi tải lại trang (giữ link); sau đó mở đúng bài, mở màn Xuất PDF đã điền sẵn tùy chọn, rồi xóa phần `#cfg=` khỏi thanh địa chỉ. Link hỏng hoặc cấu hình sai thì báo bằng lời dễ hiểu, app vẫn mở bình thường.
+- Màn Xuất PDF có thêm lựa chọn **Cả giáo trình** (`scope: "tatca"`); khổ tự nhập chỉ hiện khi mở từ link, ô nhập khổ sẽ có ở màn Tạo vở.
+
 ### 5.4. Phông chữ của người dùng (bản 0.12)
 
 | Mục | Cách làm |

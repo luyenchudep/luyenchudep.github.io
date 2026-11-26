@@ -33,5 +33,6 @@ document.addEventListener("contextmenu",e=>e.preventDefault());
   if(paperDue()&&store.get("paperLast",null))setTimeout(()=>toast("Đã 2 tuần rồi — tới lúc kiểm tra chữ trên giấy (☰ → Công cụ → Kiểm tra trên giấy)"),2500);
   let ok=false;try{localStorage.setItem("td1:probe","1");ok=localStorage.getItem("td1:probe")==="1"}catch(e){}
   if(!ok)document.getElementById("warn").style.display="block";
-  if(!store.get("seenGuide3",false)){store.set("seenGuide3",true);setTimeout(openNhapMon,300)}
+  if(!store.get("seenGuide3",false)&&!location.hash.startsWith("#cfg=")){store.set("seenGuide3",true);setTimeout(openNhapMon,300)}
+  apDungCfgTuLink();
 })();
