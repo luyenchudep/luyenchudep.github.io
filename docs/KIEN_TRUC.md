@@ -1,6 +1,6 @@
 # Kiến trúc và kế hoạch phát triển ứng dụng Tập viết S Pen
 
-Bản tài liệu 0.3 · Cập nhật 25/11/2026 · Áp dụng cho mã nguồn từ bản 0.10.3
+Bản tài liệu 0.4 · Cập nhật 26/11/2026 · Áp dụng cho mã nguồn từ bản 0.10.3
 
 Tài liệu này mô tả ứng dụng được tổ chức thế nào, dữ liệu nằm ở đâu, và các bản sắp tới sẽ làm gì. Ai muốn góp ý hay góp mã thì đọc tài liệu này trước.
 
@@ -43,7 +43,8 @@ Nguyên tắc nền: **một bộ máy vẽ, nhiều đầu ra.** Màn hình và
 | Giữ bộ xuất PDF dạng vectơ đang có, nâng cấp chứ không viết lại |
 | Mã nguồn chia nhiều tệp cho dễ sửa, khi phát hành thì gộp lại thành một tệp HTML chạy được không cần mạng |
 | Cỡ chữ tính theo milimét thật trên mọi khổ. Ba nút cỡ L, M, S giữ lại để chọn nhanh, mỗi nút ứng với một cỡ tính bằng mm |
-| Mỗi kiểu chữ (thanh đậm, nét đều) có giáo trình riêng |
+| Mỗi kiểu chữ (thanh đậm, nét đều, tiểu học) có giáo trình riêng |
+| Giáo trình tiểu học theo mẫu chữ viết trong trường tiểu học (Quyết định 31/2002/QĐ-BGD&ĐT), kiểu chữ đứng, nét đều. Chữ mẫu dựng từ đường tâm nét để tô được theo nét đứt |
 | Dấu thanh đặt theo kiểu cũ: hòa, khỏe, thủy. Dùng viết tắt chuẩn (VD, SL), không dùng kiểu nhắn tin (ko, đc, vs) |
 | Nét đi ngược lại trên nét cũ (như h, n, m: kéo sổ xuống rồi rê ngược lên uốn móc) được tính là nét riêng, có số riêng. Nét chỉ đổi hướng mà không đi lại trên nét cũ (như v) vẫn là một nét |
 | Dấu râu của ơ, ư viết từ trên xuống |
@@ -103,6 +104,41 @@ SCRIPTS[kiểu] = {
 
 Kiểu dòng trong `rows`: `stroke` (nét), `pair` (cặp chữ, câu), `rep` (lặp chữ), `blank` (dòng trống).
 
+Hiện có hai kiểu: `td` (Thanh đậm) và `qs` (Nét đều). Kiểu thứ ba `th` (Tiểu học) đang dựng, xem mục 5.1.1.
+
+### 5.1.1. Giáo trình tiểu học (`th`)
+
+Khác hai kiểu kia ở chỗ chữ mẫu không lấy từ phông mà vẽ từ **đường tâm nét**, nhờ vậy cho nét đứt để tô đúng kiểu vở tiểu học. Phông Playwrite VN chỉ dùng cho chữ người dùng tự gõ.
+
+```
+SCRIPTS.th = {
+  name: "Tiểu học", font: "PW",     // PW = Playwrite VN, chỉ dùng cho chữ tự gõ
+  CO: { thuong: 2, nho: 1 },        // số ô li ứng với 1 đơn vị chữ: cỡ Thường (cỡ vừa) và cỡ Nhỏ
+  STROKES,  // nét cơ bản, cùng dạng với hai kiểu kia: { w, d: [["M",x,y], ["L",x,y], ["C",x1,y1,x2,y2,x,y]] }
+  CHU,      // chữ mẫu vẽ từ đường tâm nét (dưới đây)
+  DUCTUS,   // không ghi tay: dựng tự động từ CHU (lấy mẫu điểm trên đường cong), để dùng chung phần mũi tên và Xem viết chậm
+  COURSE, SOTAY, NHAPMON, WORDS     // như hai kiểu kia, làm sau
+}
+
+CHU[chữ] = {
+  rong,              // bề rộng chữ (đơn vị chữ)
+  vao, ra,           // điểm nối với chữ đứng trước và chữ đứng sau [x, y]
+  cach: [            // một hay nhiều cách viết; cách đầu tiên là mặc định
+    { ten: "Cách 1",
+      net: [ { loai: "congkin", d: [...], lien?: 1, dau?: 1 }, … ] }
+  ]
+}
+```
+
+- Tọa độ tính theo **đơn vị chữ**: 1 đơn vị = chiều cao chữ o. x qua phải, y lên trên, y = 0 là đường chân. Chữ đứng, không nghiêng.
+- `loai` là tên nét cơ bản trong `STROKES` mà nét này thuộc về (VD `congkin`, `mocnguoc`), dùng để tô màu và giải thích "chữ a gồm nét cong kín và nét móc ngược".
+- `lien: 1`: nét này viết tiếp từ nét trước, không nhấc viết. Theo quy ước ở mục 2, nét đi ngược lại trên nét cũ vẫn là nét riêng, có số riêng.
+- `dau: 1`: dấu phụ (chấm của i, dấu mũ, dấu râu…).
+- Điểm đặt viết là điểm đầu của nét đầu tiên; điểm dừng viết là điểm cuối của nét cuối cùng. Không ghi riêng.
+- Chiều cao theo mẫu: b g h k l y = 2,5; t = 1,5; r s = 1,25; d đ p q = 2; còn lại = 1; chữ số = 2; dấu thanh nằm trong ô vuông cạnh 0,5.
+
+Trong lúc chưa tách mã (trước bản 0.11), dữ liệu này nằm ở `thunghiem/tieuhoc-net.js` và xem thử bằng `thunghiem/tieuhoc-xem.html`. Khi tách mã, chuyển thành `src/data/scripts-th.js`.
+
 Mỗi nét trong `DUCTUS` có dạng `{ r: [đoạn 1, đoạn 2, …], s: phía đặt mũi tên, mark?: 1 nếu là dấu phụ }`. Mỗi đoạn là danh sách điểm `[x, y]`, tính theo chiều cao thân chữ (x sang phải, y lên trên, y = 0 là đường chân). Các đoạn trong cùng một nét được viết liền, không nhấc bút.
 
 ### 5.2. Khổ trang (thay `PDF_PRESETS` ở bản 0.11)
@@ -126,8 +162,8 @@ Các hãng máy đọc sách không công bố khổ trang mẫu, nên số đo 
 ```
 cfg = {
   v: 1,                         // phiên bản cấu trúc cfg
-  script: "td" | "qs",          // kiểu chữ
-  font: "PS" | "AL" | "QS" | "user:<tên>",
+  script: "td" | "qs" | "th",   // kiểu chữ
+  font: "PS" | "AL" | "QS" | "PW" | "user:<tên>",
   scope: "bai" | "phan" | "tatca" | "tugo" | "ghichep",
   lessons: ["n1", "n2"],        // khi chọn bài hoặc phần
   text: "…",                    // khi tự gõ nội dung
@@ -179,7 +215,7 @@ Trang cuối mỗi vở có đường link (kèm mã QR) **Mở cấu hình này
 
 ```
 src/
-  data/scripts-td.js, scripts-qs.js   // giáo trình
+  data/scripts-td.js, scripts-qs.js, scripts-th.js   // giáo trình
   data/fonts.js, pdff-*.js            // số đo phông, phông nhúng
   data/presets.js                     // khổ trang (mm)
   engine/layout.js                    // lớp 2: dàn trang
@@ -203,7 +239,8 @@ Người dùng vẫn nhận **một tệp HTML** như hiện nay.
 | | Khổ trang tính theo mm, thêm Samsung Notes và tỷ lệ 9:16 | Thước 50 mm trong vở A4 in ra đo đúng ±0,5 mm |
 | | Lưu và đọc cấu hình qua đường link | Mở link ra đúng cấu hình |
 | | Màn Tạo vở mới, có ô tự gõ nội dung | Mọi mục của `cfg` đều chọn được |
-| **0.12** | Phông chữ của người dùng | Phông đủ dấu xuất PDF đúng; phông thiếu dấu được báo |
+| **0.12** | Ghép giáo trình Tiểu học vào app, chọn ngang hàng Thanh đậm và Nét đều | Tô theo nét đứt, xuất vở 4 ô li đúng mm |
+| | Phông chữ của người dùng | Phông đủ dấu xuất PDF đúng; phông thiếu dấu được báo |
 | | Trang kiểm tra; kiểu dòng kẻ trơn, kẻ chấm | Đạt danh sách kiểm tra ở mục 10 |
 | | In 2 trang A5 trên 1 tờ A4 | Cắt đôi ra đúng khổ A5 |
 | | Vẽ thêm khuyết trên cho l, h, k ở chữ thanh đậm | Chữ mẫu đúng kiểu viết thanh đậm truyền thống |
