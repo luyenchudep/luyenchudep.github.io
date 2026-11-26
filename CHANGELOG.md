@@ -1,5 +1,25 @@
 # Những thay đổi qua từng bản
 
+## Bản 0.11.0 (26/11/2026): tạo tập viết PDF linh hoạt hơn, chia sẻ cấu hình qua đường link
+
+### Màn Tạo tập viết PDF mới và thêm khổ giấy
+
+- Màn "Xuất tập viết PDF" được làm lại thành **Tạo tập viết PDF** (thẻ trong Danh mục cũng đổi tên theo). Mọi lựa chọn nay nằm gọn trên một màn, dễ xem và chỉnh hơn.
+- Chọn nội dung tập viết theo 7 cách: Bài này, **Chọn bài** (mới: đánh dấu nhiều bài từ danh sách chia theo phần), Cả phần, **Cả giáo trình** (mới: gom cả bộ bài vào một file có mục lục; VD chữ thanh đậm ra 173 trang), Luyện thêm, Bài tự do, và **Tự gõ** (mới: gõ hoặc dán tối đa 2.000 ký tự, mỗi dòng thành một dòng tập, không ghi đè lên Bài tự do).
+- Thêm ba khổ giấy mới: **Samsung Notes** (70×140 mm, mở file bằng Samsung Notes để viết bằng S Pen; trang mục lục vẫn có nhưng không chạm để chuyển trang được, vì Samsung Notes không mở liên kết khi đang viết), **reMarkable Paper Pro Move** (91,8×163,2 mm), và **Tự nhập** kích thước rộng × cao từ 40 tới 500 mm.
+- Khổ giấy reMarkable 2 và reMarkable Paper Pro nay khớp đúng kích thước màn hình tính bằng mm (trước lệch vài phần mười mm). Với trang khổ nhỏ, ứng dụng tự thu nhỏ chữ tiêu đề và lề cho vừa.
+
+### Chia sẻ cấu hình tập viết qua đường link
+
+- Nút mới **Chép đường link cấu hình này** tạo một đường link mang theo toàn bộ lựa chọn của bạn: khổ giấy, bài tập, Tô hay Chép, dòng kẻ, mũi tên, lề, kể cả danh sách bài đã chọn hay nội dung **Tự gõ**.
+- Người nhận chỉ cần mở đường link là có sẵn đúng bài, đúng lựa chọn (ứng dụng tự đổi sang chữ thanh đậm hay nét đều nếu cần), chỉ việc bấm tạo file là xong.
+- Toàn bộ cấu hình nằm ngay trong đường link, không gửi lên máy chủ nào. Nếu máy không cho chép tự động, đường link sẽ hiện trong một ô để bạn tự chép.
+- Khi đường link bị hỏng hoặc chép thiếu, ứng dụng báo rõ để bạn biết và vẫn mở bình thường.
+
+### Dành cho người góp mã
+
+- Mã nguồn được chia thành nhiều file nhỏ trong thư mục `src/`, kèm công cụ gộp lại thành một file `index.html` như cũ (xem mục "Sửa mã nguồn" trong `README.md`). Ứng dụng vẫn chạy y như trước; tập viết PDF từ các lựa chọn cũ ra giống hệt bản 0.10.4.
+
 ## Bản 0.10.4 (26/11/2026): nhấn vừa tay là ra nét đậm, học liền mạch hơn
 
 ### Viết nhẹ tay hơn, đỡ mòn ngòi S Pen
