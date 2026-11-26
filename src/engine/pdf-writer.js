@@ -212,8 +212,10 @@ async function assembleVectorPdf(doc,pages,ptW,ptH,W,H,title){
 /* Nút "Tạo và tải file PDF": dựng cfg từ màn Xuất PDF (pdfOpt) và bài đang mở, gọi exportPdf(cfg) rồi tải file về */
 function pdfCfgTuManHinh(){
   const l=LESSONS[cur.li];
-  const scope={cur:"bai",part:"phan",weak:"luyenthem",free:"tudo"}[pdfOpt.scope];
-  return {v:1,script:SCRIPT,scope,lessons:[l.id],mode:pdfOpt.mode,grid:pdfOpt.grid||S.gridStyle||"french",arrows:pdfOpt.arrows,preset:pdfOpt.preset,barSide:pdfOpt.barSide};
+  const scope={cur:"bai",part:"phan",all:"tatca",weak:"luyenthem",free:"tudo"}[pdfOpt.scope];
+  const c={v:1,script:SCRIPT,scope,lessons:[l.id],mode:pdfOpt.mode,grid:pdfOpt.grid||S.gridStyle||"french",arrows:pdfOpt.arrows,preset:pdfOpt.preset,barSide:pdfOpt.barSide};
+  if(pdfOpt.preset==="tunhap"){c.wMm=pdfOpt.wMm;c.hMm=pdfOpt.hMm}
+  return c;
 }
 async function generateWorkbookPdf(){
   if(pdfOpt.busy)return;
@@ -229,7 +231,7 @@ async function generateWorkbookPdf(){
     a.download=`Vo-luyen-chu-${SCRIPT}-${pdfOpt.preset}-${pdfOpt.scope}-${today()}.pdf`;
     a.click();
     setTimeout(()=>URL.revokeObjectURL(a.href),6000);
-    toast(`Đã xuất xong tập viết PDF (${r.soTrang} trang) chuẩn ${PDF_PRESETS[pdfOpt.preset].name}!`);
+    toast(`Đã xuất xong tập viết PDF (${r.soTrang} trang) chuẩn ${khoDangChon().name}!`);
     doneOk=true;
   }catch(err){
     console.error(err);
