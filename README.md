@@ -93,6 +93,16 @@ Mỗi bài đi qua bốn bước: **Xem**, **Tô**, **Chép** và **Bài ôn**. 
 
 ---
 
+## Sửa mã nguồn
+
+File `index.html` được gộp tự động từ thư mục `src/`, nên đừng sửa thẳng file này.
+
+1. Sửa file cần sửa trong `src/` (xem bảng các file ở [`docs/KIEN_TRUC.md`](docs/KIEN_TRUC.md) mục 7).
+2. Gộp lại bằng lệnh `node tools/build.js` (cần cài [Node.js](https://nodejs.org/), không cần cài thêm thư viện nào).
+3. Mở `index.html` trong trình duyệt để xem thử, rồi đưa cả `src/` lẫn `index.html` lên.
+
+Lệnh `node tools/build.js --check` cho biết `index.html` có đúng là bản gộp mới nhất từ `src/` hay không.
+
 ## Giấy phép
 
 - **Mã nguồn** theo giấy phép MIT: bạn được tự do dùng, chia sẻ và sửa. Xem file [`LICENSE`](LICENSE).
