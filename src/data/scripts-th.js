@@ -1218,8 +1218,7 @@ SCRIPTS.th = {
         "Lưng thẳng, ngực không tì vào mép bàn, hai chân đặt vững trên sàn.",
         "Mắt cách màn hình hoặc trang giấy khoảng 25 tới 30 cm, chừng một gang tay lớn của người lớn.",
         "Tay trái giữ nhẹ máy tính bảng hoặc góc giấy. Giấy đặt hơi nghiêng qua trái cho thuận tay."
-      ],
-      "demo": []
+      ]
     },
     {
       "t": "Cầm viết bằng ba ngón tay",
@@ -1227,8 +1226,7 @@ SCRIPTS.th = {
         "Ngón cái và ngón trỏ giữ hai bên thân viết (hoặc S Pen), ngón giữa đỡ bên dưới. Cổ tay thả lỏng, không bóp chặt.",
         "Đầu ngón tay cách ngòi khoảng 2 cm để nhìn rõ ngòi và đường kẻ.",
         "Trước khi viết, ba mẹ và bé có thể cùng xòe rồi nắm bàn tay năm lần cho ngón tay dẻo."
-      ],
-      "demo": []
+      ]
     },
     {
       "t": "Lưới 4 ô li",
@@ -1237,7 +1235,7 @@ SCRIPTS.th = {
         "<b>Cỡ Thường</b>: thân chữ cao 2 ô li, dùng khi mới tập. <b>Cỡ Nhỏ</b>: thân chữ cao 1 ô li, dùng khi tay đã vững.",
         "Giữa hai tiếng chừa một khoảng rộng bằng một chữ o."
       ],
-      "demo": []
+      "demo": ["~so","~congkin","~khuyettren"]
     },
     {
       "t": "Bốn bước học mỗi bài",
@@ -1245,8 +1243,7 @@ SCRIPTS.th = {
         "<b>Xem</b>: Xem viết chậm để biết điểm đặt viết, chiều đưa viết và thứ tự từng nét.",
         "<b>Tô</b>: tô chậm theo nét đứt, hết một nét mới nhấc viết. Lỡ lệch thì dùng Gôm sửa lại.",
         "<b>Chép</b> và <b>Bài ôn</b>: nhìn chữ mẫu tự viết, rồi ôn lại cả bài để tay nhớ nét."
-      ],
-      "demo": []
+      ]
     },
     {
       "t": "Dành cho ba mẹ",
@@ -1254,8 +1251,7 @@ SCRIPTS.th = {
         "Trẻ 6, 7 tuổi chỉ tập trung tốt khoảng 15 tới 20 phút mỗi lần. Mỗi ngày một bài ngắn tốt hơn ngồi viết liền một giờ.",
         "Khen cụ thể điều bé làm tốt hôm nay: ngồi thẳng, chữ o tròn, nhớ đặt dấu. Không so sánh bé với bạn khác.",
         "Có thể xuất tập viết PDF, in trắng đen khổ A4 hoặc A5 để bé tập thêm trên giấy bằng viết chì."
-      ],
-      "demo": []
+      ]
     }
   ],
   "WORDS": {
