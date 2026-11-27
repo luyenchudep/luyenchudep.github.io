@@ -1,7 +1,7 @@
 /* Giáo trình Tiểu học (th): mẫu chữ viết trong trường tiểu học, Quyết định 31/2002/QĐ-BGD&ĐT, chữ đứng nét đều.
    Cấu trúc: docs/KIEN_TRUC.md mục 5.1.1. Tọa độ nét theo đơn vị chữ (1 = chiều cao chữ o, y lên trên, y = 0 là đường chân).
-   Bài ghép tiếng, từ ngữ và cỡ Nhỏ (th-g*, th-v*, th-nh*) tạm ẩn cho tới khi có nối chữ: xem TH_DU_BAI. */
-const TH_DU_BAI = false;
+   Bài ghép tiếng, từ ngữ và cỡ Nhỏ (th-g*, th-v*, th-nh*) hiện từ khi có nối chữ (bản 0.12): TH_DU_BAI = true. */
+const TH_DU_BAI = true;
 SCRIPTS.th = {
   "name": "Tiểu học",
   "font": "TH",

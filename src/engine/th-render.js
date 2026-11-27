@@ -11,7 +11,7 @@ FONTS.TH = { x: 1, asc: 2.5, desc: 1.5, slant: 0, fam: "TH", wt: 500 };   // tr�
 const TH_LA = () => SCRIPT === "th";
 const laPhongTH = fam => (fam || SC.font) === "TH";
 
-const TH_KHOANG_CHU = 0.3;   // khoảng giữa hai chữ trong một tiếng (đơn vị chữ); khi có nối chữ sẽ thay bằng nét nối
+const TH_KHOANG_CHU = 0.3;   // khoảng giữa hai chữ trong một tiếng khi lia viết (đơn vị chữ): hở nhẹ
 const TH_KHOANG_TIENG = 0.8; // khoảng giữa hai tiếng: rộng bằng một chữ o
 const TH_DY_NANG = -0.5;   // dời ô dấu nặng xuống nửa đơn vị: chấm nằm khoảng 0,25 dưới đường chân
 const TH_DAU = { "́": "dausac", "̀": "dauhuyen", "̉": "dauhoi", "̃": "daunga", "̣": "daunang" };
@@ -63,18 +63,66 @@ function baoThieuTH(ch) {
     _thBaoThieu = setTimeout(() => toast(`Kiểu Tiểu học chưa có hình cho: ${[...TH_THIEU].join(" ")} (chữ hoa sẽ có ở bản sau). Các chữ này được bỏ qua.`), 400);
   }
 }
+/* ================== NỐI CHỮ TRONG MỘT TIẾNG ==================
+   Dựa vào điểm dừng viết của chữ trước và điểm đặt viết của chữ sau:
+   - Nối liền: chữ trước dừng ở bên phải, khoảng giữa thân chữ (sau nét móc ngược, nét thắt…), chữ sau bắt đầu ở bên trái
+     (nét hất, nét móc xuôi, nét khuyết trên, chữ e, r, s…). Chữ sau được đặt sát lại; nếu hai điểm không trùng thì vẽ
+     một nét nối cong mềm, tiếp tuyến với cuối nét trước và đầu nét sau.
+   - Lia viết (hở nhẹ): chữ trước dừng trong lòng chữ hay dưới đường chân (o, ô, ơ, s, q…), hoặc chữ sau bắt đầu ở bên
+     phải (nét cong kín như o, a, d, g, q; chữ c), hoặc có chữ số. Hai chữ cách nhau TH_KHOANG_CHU.
+   Quy tắc đối chiếu với tài liệu dạy tập viết: phiếu nghiên cứu G-11 (ngoài repo). */
+const TH_NOI_SAT = 0.08;     // hai điểm gần nhau hơn mức này thì coi như nối liền, không cần nét nối
+const TH_NOI_KHOANG = 0.14;  // khoảng ngang tối thiểu cho nét nối khi hai điểm chênh nhau
+const thSo = ch => /^[0-9]$/.test(ch);
+function thDonVi(v) { const l = Math.hypot(v[0], v[1]) || 1; return [v[0] / l, v[1] / l]; }
+/* Điểm đặt viết, điểm dừng viết và hướng nét tại hai điểm đó (bỏ qua dấu phụ, dấu thanh) */
+const _thDC = new Map();
+function thDauCuoi(h) {
+  if (_thDC.has(h)) return _thDC.get(h);
+  const ns = h.nets.filter(n => !n.dau), d0 = ns[0].d, dn = ns[ns.length - 1].d;
+  const dat = [d0[0][1], d0[0][2]], g1 = d0[1];
+  const tiep = g1 ? [g1[1], g1[2]] : [dat[0] + 1, dat[1]];
+  const gl = dn[dn.length - 1], dung = [gl[gl.length - 2], gl[gl.length - 1]];
+  let truoc;
+  if (gl[0] === "C") truoc = [gl[3], gl[4]];
+  else { const gp = dn[dn.length - 2]; truoc = gp ? [gp[gp.length - 2], gp[gp.length - 1]] : [dung[0] - 1, dung[1]]; }
+  const kq = { dat, huongDat: thDonVi([tiep[0] - dat[0], tiep[1] - dat[1]]), dung, huongDung: thDonVi([dung[0] - truoc[0], dung[1] - truoc[1]]) };
+  _thDC.set(h, kq);
+  return kq;
+}
+/* Hai chữ có nối liền được không */
+function thNoiDuoc(a, b) {
+  if (thSo(a.ch) || thSo(b.ch)) return false;
+  const A = thDauCuoi(a.h), B = thDauCuoi(b.h);
+  const aRaPhai = A.dung[0] >= a.h.rong - 0.2 && A.dung[1] > 0.1 && A.dung[1] < 1.05;   // chữ trước dừng ở bên phải, quanh thân chữ (e, c, x dừng thấp vẫn nối được)
+  const bVaoTrai = B.dat[0] <= 0.2 && B.dat[1] > 0.2 && B.dat[1] < 1.05;                // chữ sau bắt đầu ở bên trái, quanh thân chữ
+  return aRaPhai && bVaoTrai;
+}
 function danChuoiTH(s) {
-  const o = []; let x = 0, truoc = null;
+  const o = [], noi = []; let x = 0, truoc = null;
   for (const ch of String(s ?? "").normalize("NFC")) {
     if (ch === "\r") continue;
     if (ch === " " || ch === "\u00A0" || ch === "\t" || ch === "\n") { x += TH_KHOANG_TIENG; truoc = null; continue; }
     if (TH_DAU_CAU.includes(ch)) { o.push({ ch, x, h: null, dauCau: true }); x += TH_RONG_DAU_CAU; truoc = null; continue; }
     const h = hinhChuTH(ch);
     if (!h) { baoThieuTH(ch); truoc = null; continue; }
-    if (truoc) x += TH_KHOANG_CHU;
-    o.push({ ch, x, h }); x += h.rong; truoc = h;
+    const c = { ch, x, h };
+    if (truoc) {
+      if (thNoiDuoc(truoc, c)) {
+        const A = thDauCuoi(truoc.h), B = thDauCuoi(h);
+        const pA = [truoc.x + A.dung[0], A.dung[1]], dy = B.dat[1] - A.dung[1];
+        const khoang = Math.abs(dy) < TH_NOI_SAT ? 0 : Math.max(TH_NOI_KHOANG, Math.abs(dy) * 0.45);
+        c.x = pA[0] + khoang - B.dat[0];
+        if (khoang > 0) {
+          /* Nét nối: đường cong bậc ba tiếp tuyến với cuối nét trước và đầu nét sau */
+          const pB = [c.x + B.dat[0], B.dat[1]], k = Math.min(0.22, Math.hypot(pB[0] - pA[0], pB[1] - pA[1]) * 0.45);
+          noi.push({ d: [["M", pA[0], pA[1]], ["C", pA[0] + A.huongDung[0] * k, pA[1] + A.huongDung[1] * k, pB[0] - B.huongDat[0] * k, pB[1] - B.huongDat[1] * k, pB[0], pB[1]]] });
+        }
+      } else c.x = truoc.x + truoc.h.rong + TH_KHOANG_CHU;
+    }
+    o.push(c); x = c.x + h.rong; truoc = c;
   }
-  return { chu: o, rong: x };
+  return { chu: o, noi, rong: x };
 }
 function doRongTH(s) { return danChuoiTH(s).rong; }
 
@@ -103,6 +151,7 @@ function veChuoiTH(ctx, s, x, b, xh, color, dut) {
     if (dut && thNgan(n.d)) { ctx.setLineDash([]); veDuongTH(ctx, n.d, x + c.x * xh, b, xh); ctx.setLineDash([Math.max(3, xh * .16), Math.max(3, xh * .12)]); }
     else veDuongTH(ctx, n.d, x + c.x * xh, b, xh);
   }
+  for (const n of danChuoiTH(s).noi) veDuongTH(ctx, n.d, x, b, xh);
   ctx.restore();
 }
 /* Nét cơ bản; riêng dấu thanh khi tập riêng thì đặt ở chỗ dấu nằm trên chữ (cao hơn thân chữ), dấu nặng dưới đường chân */
