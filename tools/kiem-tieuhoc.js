@@ -5,7 +5,7 @@
   Cách chạy (từ thư mục gốc của repo):
     node tools/kiem-tieuhoc.js
 
-  Công cụ đọc các file nguồn, chạy trong một ngữ cảnh vm tách biệt và thực hiện 12 phép kiểm:
+  Công cụ đọc các file nguồn, chạy trong một ngữ cảnh vm tách biệt và thực hiện 13 phép kiểm:
     1. Cấu trúc nét vẽ và tham số lệnh M/L/C trong SC.CHU.
     2. Tính hợp lệ của mã loại nét (loai) trong SC.CHU.
     3. Hình chữ và vị trí dấu thanh qua hinhChuTH (29 chữ thường, 10 chữ số, 60 chữ có dấu thanh).
@@ -18,6 +18,7 @@
    10. Kiểu nối chữ (nối liền hoặc lia viết) của các cặp mẫu.
    11. Chữ hoa Tiểu học (29 chữ hoa trong SC.CHU, chiều cao thân chữ, 60 chữ hoa có dấu thanh và dàn chuỗi mẫu).
    12. Các bài chữ hoa trong SC.COURSE và SC.SOTAY (8 nét cơ bản ở th-h0, phủ đủ và đúng thứ tự 29 chữ hoa A → Y, cỡ chữ, sổ tay, dàn chuỗi và phần Tự do ở cuối).
+   13. Độ mượt chỗ nối trong SC.COURSE và SC.WORDS (đường cong bậc ba, lệch tiếp tuyến nhỏ hơn 20° ở hai đầu và nét nối không đi lùi quá 0,02).
 
   Mỗi phép kiểm in một dòng "ĐẠT ..." hoặc "HỎNG ..." kèm chi tiết; thoát với mã 1 nếu có phép hỏng.
 */
@@ -1194,6 +1195,204 @@ function main() {
     return {
       dat: true,
       chiTiet: `bài th-h0 đủ 8 nét cơ bản, ${dsBaiHoaSo.length} bài th-h<số> phủ đủ 29 chữ hoa đúng thứ tự A → Y, ${dsBaiHoa.length} bài (${soBaiHoaThuong} cỡ Thường, ${soBaiHoaNho} cỡ Nhỏ) đúng cỡ và đủ sổ tay, ${soChuoiHoa} chuỗi rep/pair dàn sạch không chứa f/j/w/z, phần cuối chứa bài free`,
+    };
+  });
+
+  // Phép kiểm 13: độ mượt chỗ nối trong SC.COURSE và SC.WORDS
+  kiem(13, 'Độ mượt chỗ nối trong SC.COURSE và SC.WORDS', () => {
+    const dsChuoi = [];
+    for (const phan of SC.COURSE || []) {
+      for (const bai of phan.lessons || []) {
+        for (const dong of bai.rows || []) {
+          if (Array.isArray(dong) && (dong[0] === 'rep' || dong[0] === 'pair') && typeof dong[1] === 'string') {
+            dsChuoi.push({ nguon: `bài "${bai.id}"`, chuoi: dong[1] });
+          }
+        }
+      }
+    }
+    for (const [khoa, dsTu] of Object.entries(SC.WORDS || {})) {
+      if (!Array.isArray(dsTu)) continue;
+      for (const tu of dsTu) {
+        if (typeof tu === 'string') {
+          dsChuoi.push({ nguon: `WORDS["${khoa}"]`, chuoi: tu });
+        }
+      }
+    }
+
+    const GOC_TOI_DA = 20;
+    const TAY_DON_NHO = 1e-4;
+    const LUI_TOI_DA = 0.02;
+    const SO_MAU = 20;
+
+    function gocGiuaDo(v1, v2) {
+      const l1 = Math.hypot(v1[0], v1[1]);
+      const l2 = Math.hypot(v2[0], v2[1]);
+      if (l1 < 1e-9 || l2 < 1e-9) return 0;
+      const cos = Math.max(-1, Math.min(1, (v1[0] * v2[0] + v1[1] * v2[1]) / (l1 * l2)));
+      return Math.acos(cos) * (180 / Math.PI);
+    }
+
+    const loi = [];
+    let tongNetNoi = 0;
+
+    for (const { nguon, chuoi } of dsChuoi) {
+      const kq = ctx.danChuoiTH(chuoi);
+      if (!kq || !Array.isArray(kq.chu) || !Array.isArray(kq.noi)) {
+        loi.push(`${nguon} ("${chuoi}"): kết quả danChuoiTH không hợp lệ`);
+        continue;
+      }
+
+      const dauCuoi = kq.chu.map(c => (c && !c.dauCau && c.h ? ctx.thDauCuoi(c.h) : null));
+      const daKhop = new Set();
+
+      for (let ni = 0; ni < kq.noi.length; ni++) {
+        tongNetNoi++;
+        const n = kq.noi[ni];
+        if (!n || !Array.isArray(n.d) || n.d.length < 2) {
+          loi.push(`${nguon} ("${chuoi}") nét nối ${ni}: danh sách lệnh d không hợp lệ`);
+          continue;
+        }
+
+        const g0 = n.d[0];
+        const g1 = n.d[1];
+        const gl = n.d[n.d.length - 1];
+        const coToaDoDauCuoi =
+          Array.isArray(g0) &&
+          g0[0] === 'M' &&
+          g0.length === 3 &&
+          typeof g0[1] === 'number' &&
+          Number.isFinite(g0[1]) &&
+          typeof g0[2] === 'number' &&
+          Number.isFinite(g0[2]) &&
+          Array.isArray(gl) &&
+          gl.length >= 3 &&
+          typeof gl[gl.length - 2] === 'number' &&
+          Number.isFinite(gl[gl.length - 2]) &&
+          typeof gl[gl.length - 1] === 'number' &&
+          Number.isFinite(gl[gl.length - 1]);
+
+        let cTruoc = null;
+        let dcTruoc = null;
+        let cSau = null;
+        let dcSau = null;
+
+        if (coToaDoDauCuoi) {
+          const sx = g0[1];
+          const sy = g0[2];
+          const ex = gl[gl.length - 2];
+          const ey = gl[gl.length - 1];
+
+          // Ưu tiên tìm cặp chữ liền kề chưa khớp
+          for (let i = 0; i < kq.chu.length - 1; i++) {
+            if (daKhop.has(i)) continue;
+            const a = dauCuoi[i];
+            const b = dauCuoi[i + 1];
+            if (!a || !b) continue;
+            const pAx = kq.chu[i].x + a.dung[0];
+            const pAy = a.dung[1];
+            const pBx = kq.chu[i + 1].x + b.dat[0];
+            const pBy = b.dat[1];
+            if (Math.hypot(sx - pAx, sy - pAy) < 0.001 && Math.hypot(ex - pBx, ey - pBy) < 0.001) {
+              cTruoc = kq.chu[i];
+              dcTruoc = a;
+              cSau = kq.chu[i + 1];
+              dcSau = b;
+              daKhop.add(i);
+              break;
+            }
+          }
+
+          // Dự phòng: tìm riêng chữ có điểm dừng viết trùng điểm đầu và chữ có điểm đặt viết trùng điểm cuối
+          if (!cTruoc || !cSau) {
+            for (let i = 0; i < kq.chu.length; i++) {
+              const dc = dauCuoi[i];
+              if (!dc) continue;
+              if (!cTruoc && Math.hypot(sx - (kq.chu[i].x + dc.dung[0]), sy - dc.dung[1]) < 0.001) {
+                cTruoc = kq.chu[i];
+                dcTruoc = dc;
+              }
+              if (!cSau && Math.hypot(ex - (kq.chu[i].x + dc.dat[0]), ey - dc.dat[1]) < 0.001) {
+                cSau = kq.chu[i];
+                dcSau = dc;
+              }
+            }
+          }
+        }
+
+        const nhanCap = cTruoc && cSau ? `cặp "${cTruoc.ch}${cSau.ch}"` : `nét nối ${ni}`;
+
+        // 1. Nét nối phải là đường cong bậc ba (["M", x0, y0], ["C", x1, y1, x2, y2, x3, y3])
+        const laCongBacBa =
+          n.d.length === 2 &&
+          Array.isArray(g0) &&
+          g0[0] === 'M' &&
+          g0.length === 3 &&
+          Array.isArray(g1) &&
+          g1[0] === 'C' &&
+          g1.length === 7 &&
+          g0.slice(1).every(v => typeof v === 'number' && Number.isFinite(v)) &&
+          g1.slice(1).every(v => typeof v === 'number' && Number.isFinite(v));
+
+        if (!laCongBacBa) {
+          loi.push(`${nguon} ("${chuoi}"), ${nhanCap}: nét nối không phải đường cong bậc ba (["M", ...], ["C", ...])`);
+          continue;
+        }
+
+        const x0 = g0[1], y0 = g0[2];
+        const x1 = g1[1], y1 = g1[2];
+        const x2 = g1[3], y2 = g1[4];
+        const x3 = g1[5], y3 = g1[6];
+
+        // 2. Phải tìm thấy chữ trước (trùng điểm dừng viết) và chữ sau (trùng điểm đặt viết)
+        if (!cTruoc || !cSau) {
+          loi.push(
+            `${nguon} ("${chuoi}") nét nối ${ni}: không tìm thấy cặp chữ khớp điểm đầu (${x0.toFixed(3)}, ${y0.toFixed(3)}) → cuối (${x3.toFixed(3)}, ${y3.toFixed(3)})`
+          );
+          continue;
+        }
+
+        // 3. Góc lệch tiếp tuyến ở hai đầu nhỏ hơn 20° (bỏ qua đầu có tay đòn gần bằng 0)
+        const vDau = [x1 - x0, y1 - y0];
+        if (Math.hypot(vDau[0], vDau[1]) >= TAY_DON_NHO) {
+          const gocDau = gocGiuaDo(vDau, dcTruoc.huongDung);
+          if (!(gocDau < GOC_TOI_DA)) {
+            loi.push(`${nguon} ("${chuoi}"), ${nhanCap}: góc lệch tiếp tuyến đầu = ${gocDau.toFixed(1)}° (>= ${GOC_TOI_DA}°)`);
+          }
+        }
+
+        const vCuoi = [x3 - x2, y3 - y2];
+        if (Math.hypot(vCuoi[0], vCuoi[1]) >= TAY_DON_NHO) {
+          const gocCuoi = gocGiuaDo(vCuoi, dcSau.huongDat);
+          if (!(gocCuoi < GOC_TOI_DA)) {
+            loi.push(`${nguon} ("${chuoi}"), ${nhanCap}: góc lệch tiếp tuyến cuối = ${gocCuoi.toFixed(1)}° (>= ${GOC_TOI_DA}°)`);
+          }
+        }
+
+        // 4. Nét nối không đi lùi: lấy mẫu 20 điểm dọc nét nối, hoành độ không giảm quá 0,02
+        let maxX = x0;
+        let luiMax = 0;
+        for (let s = 1; s < SO_MAU; s++) {
+          const t = s / (SO_MAU - 1);
+          const u = 1 - t;
+          const xt = u * u * u * x0 + 3 * u * u * t * x1 + 3 * u * t * t * x2 + t * t * t * x3;
+          if (xt > maxX) maxX = xt;
+          else if (maxX - xt > luiMax) luiMax = maxX - xt;
+        }
+        if (luiMax > LUI_TOI_DA) {
+          loi.push(`${nguon} ("${chuoi}"), ${nhanCap}: nét nối đi lùi ngang ${luiMax.toFixed(4)} (> 0,02)`);
+        }
+      }
+    }
+
+    if (loi.length) {
+      return {
+        dat: false,
+        chiTiet: `đã kiểm ${tongNetNoi} nét nối, có ${loi.length} lỗi: ${tomTatLoi(loi, 20)}`,
+      };
+    }
+    return {
+      dat: true,
+      chiTiet: `đã kiểm ${tongNetNoi} nét nối trong ${dsChuoi.length} chuỗi: đều là đường cong bậc ba, lệch tiếp tuyến dưới ${GOC_TOI_DA}° ở hai đầu và không đi lùi`,
     };
   });
 
