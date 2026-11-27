@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mẫu font Sao Mai Tập Viết — Nét liền và Nét đứt</title>
+<style>
+  @font-face {
+    font-family: 'Sao Mai Tap Viet';
+    src: url('SaoMaiTapViet-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Sao Mai Tap Viet Net Dut';
+    src: url('SaoMaiTapVietNetDut-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    --bg: #ECE5D5;
+    --paper: #F7F2E7;
+    --ink: #1F1B16;
+    --muted: #52473B;
+    --line: #D4C8B4;
+    --soft: #E9E0CE;
+    --accent: #184E9E;
+    --accent-ink: #FFFFFF;
+    --hl: #E2ECF9;
+    --dut-ink: #5A534A;
+    --grid-thin: rgba(94, 134, 184, 0.24);
+    --grid-med: rgba(74, 118, 174, 0.42);
+    --grid-bold: rgba(45, 92, 152, 0.68);
+    --sz: 72px;
+    --oli: calc(var(--sz) * 0.16);
+    --o4: calc(var(--oli) * 4);
+    --line-oli: 12;
+    --base-y: calc(var(--oli) * 8);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.55;
+  }
+
+  a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+
+  .wrap {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 20px 16px 48px;
+  }
+
+  header.hero {
+    background: var(--paper);
+    border: 1.5px solid var(--line);
+    border-radius: 16px;
+    padding: 20px 22px;
+    margin-bottom: 16px;
+  }
+
+  header.hero h1 {
+    margin: 0 0 6px;
+    font-size: 1.55rem;
+    line-height: 1.3;
+  }
+
+  header.hero p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.96rem;
+  }
+
+  .hero-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    margin-top: 12px;
+    font-size: 0.92rem;
+    font-weight: 600;
+  }
+
+  .font-warn {
+    display: none;
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: #FCEAE8;
+    border: 1px solid #E5B2AE;
+    color: #8F1A16;
+    font-size: 0.9rem;
+  }
+  .font-warn.show {
+    display: block;
+  }
+
+  .toolbar {
+    position: sticky;
+    top: 8px;
+    z-index: 20;
+    background: var(--paper);
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    padding: 12px 16px;
+    margin-bottom: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+    box-shadow: 0 4px 14px rgba(31, 27, 22, 0.08);
+  }
+
+  .ctrl-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .ctrl-label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  input[type="range"] {
+    width: 170px;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  .size-val {
+    min-width: 56px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--accent);
+    background: var(--hl);
+    padding: 3px 9px;
+    border-radius: 8px;
+    text-align: center;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    border: 1.5px solid var(--line);
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 10px;
+    padding: 6px 12px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .btn:hover {
+    background: var(--soft);
+  }
+  .btn.on {
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-color: var(--accent);
+  }
+
+  .card {
+    background: var(--paper);
+    border: 1.5px solid var(--line);
+    border-radius: 16px;
+    padding: 18px 20px 20px;
+    margin-bottom: 18px;
+  }
+
+  .card-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 6px 14px;
+    margin-bottom: 12px;
+  }
+
+  .card h2 {
+    margin: 0;
+    font-size: 1.15rem;
+  }
+
+  .card-note {
+    font-size: 0.86rem;
+    color: var(--muted);
+  }
+
+  .try-input {
+    width: 100%;
+    min-height: 76px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    background: #FFFFFF;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1.5;
+    resize: vertical;
+  }
+  .try-input:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+    border-color: var(--accent);
+  }
+
+  .variant {
+    margin-top: 12px;
+  }
+  .variant:first-of-type {
+    margin-top: 0;
+  }
+
+  .variant-tag {
+    display: inline-block;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--muted);
+    background: var(--soft);
+    border: 1px solid var(--line);
+    border-radius: 8px 8px 0 0;
+    border-bottom: 0;
+    padding: 3px 10px;
+  }
+
+  .oli-box {
+    position: relative;
+    padding: 0 16px;
+    border: 1.5px solid var(--line);
+    border-radius: 0 12px 12px 12px;
+    background-color: #FFFDF8;
+    font-size: var(--sz);
+    line-height: calc(var(--oli) * var(--line-oli));
+    letter-spacing: 0.01em;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    background-image:
+      linear-gradient(to bottom, var(--grid-bold) 0, var(--grid-bold) 1.6px, transparent 1.6px),
+      linear-gradient(to bottom, var(--grid-thin) 0, var(--grid-thin) 1px, transparent 1px),
+      linear-gradient(to right, var(--grid-med) 0, var(--grid-med) 1.1px, transparent 1.1px),
+      linear-gradient(to right, var(--grid-thin) 0, var(--grid-thin) 1px, transparent 1px);
+    background-size:
+      100% var(--o4),
+      100% var(--oli),
+      var(--o4) 100%,
+      var(--oli) 100%;
+    background-position:
+      0 calc(var(--base-y) - 0.8px),
+      0 var(--base-y),
+      16px 0,
+      16px 0;
+  }
+
+  body.no-grid .oli-box {
+    background-image: none;
+  }
+
+  .font-lien {
+    font-family: 'Sao Mai Tap Viet', sans-serif;
+    color: var(--ink);
+  }
+
+  .font-dut {
+    font-family: 'Sao Mai Tap Viet Net Dut', sans-serif;
+    color: var(--dut-ink);
+  }
+
+  .measure-box {
+    position: fixed;
+    top: -9999px;
+    left: -9999px;
+    visibility: hidden;
+    pointer-events: none;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    font-size: var(--sz);
+    line-height: calc(var(--oli) * var(--line-oli));
+    white-space: nowrap;
+  }
+
+  .measure-probe {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    vertical-align: baseline;
+  }
+
+  footer.foot {
+    margin-top: 22px;
+    padding: 16px 20px;
+    background: var(--paper);
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+  footer.foot p {
+    margin: 0 0 6px;
+  }
+  footer.foot p:last-child {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 640px) {
+    .wrap {
+      padding: 12px 10px 36px;
+    }
+    .card {
+      padding: 14px 12px 16px;
+    }
+    .oli-box {
+      padding: 0 10px;
+      background-position:
+        0 calc(var(--base-y) - 0.8px),
+        0 var(--base-y),
+        10px 0,
+        10px 0;
+    }
+    input[type="range"] {
+      width: 135px;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <h1>Mẫu font Sao Mai Tập Viết</h1>
+    <p>Font chữ tiểu học tiếng Việt theo Quyết định 31/2002/QĐ-BGD&amp;ĐT, gồm hai bản: <strong>Sao Mai Tap Viet</strong> (nét liền) và <strong>Sao Mai Tap Viet Net Dut</strong> (nét đứt để tô).</p>
+    <div class="hero-links">
+      <a href="README.md">Hướng dẫn cài đặt &amp; soạn phiếu</a>
+      <a href="OFL.txt">Giấy phép SIL OFL 1.1</a>
+      <a href="https://luyenchudep.github.io/" target="_blank" rel="noopener">Mở ứng dụng Tập viết (chữ nối, xem viết chậm, tập viết PDF)</a>
+    </div>
+    <div id="fontWarn" class="font-warn" role="alert">
+      Chưa nạp được file font. Hãy đặt trang này trong cùng thư mục với hai file <code>SaoMaiTapViet-Regular.ttf</code> và <code>SaoMaiTapVietNetDut-Regular.ttf</code>.
+    </div>
+  </header>
+
+  <div class="toolbar" role="region" aria-label="Điều chỉnh hiển thị">
+    <div class="ctrl-group">
+      <label class="ctrl-label" for="sizeRange">Cỡ chữ:</label>
+      <input id="sizeRange" type="range" min="36" max="136" step="2" value="72">
+      <span id="sizeVal" class="size-val">72 px</span>
+      <div class="btn-row">
+        <button type="button" class="btn" data-size="48">Nhỏ</button>
+        <button type="button" class="btn on" data-size="72">Thường</button>
+        <button type="button" class="btn" data-size="108">Lớn</button>
+      </div>
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">Lưới 4 ô li:</span>
+      <button type="button" id="gridBtn" class="btn on" aria-pressed="true">Bật</button>
+    </div>
+  </div>
+
+  <!-- 1. Ô gõ thử chữ -->
+  <section class="card">
+    <div class="card-head">
+      <h2>Gõ thử chữ</h2>
+      <span class="card-note">Gõ nội dung bất kỳ vào ô bên dưới để xem ngay cả bản nét liền và nét đứt</span>
+    </div>
+    <textarea id="tryInput" class="try-input" aria-label="Ô gõ thử chữ">Bé tập viết chữ đẹp.
+Có công mài sắt, có ngày nên kim.</textarea>
+
+    <div class="variant">
+      <span class="variant-tag">Nét liền — Sao Mai Tap Viet</span>
+      <div id="tryLien" class="oli-box font-lien"></div>
+    </div>
+    <div class="variant">
+      <span class="variant-tag">Nét đứt để tô — Sao Mai Tap Viet Net Dut</span>
+      <div id="tryDut" class="oli-box font-dut"></div>
+    </div>
+  </section>
+
+  <!-- 2. Bảng chữ cái thường -->
+  <section class="card">
+    <div class="card-head">
+      <h2>Bảng chữ cái thường (29 chữ)</h2>
+      <span class="card-note">Thân chữ cao 2 ô li; b, h, k, l cao 5 ô li; g, y xuống 3 ô li dưới đường chân</span>
+    </div>
+    <div class="variant">
+      <span class="variant-tag">Nét liền</span>
+      <div class="oli-box font-lien">a ă â b c d đ e ê g h i k l m n o ô ơ p q r s t u ư v x y</div>
+    </div>
+    <div class="variant">
+      <span class="variant-tag">Nét đứt để tô</span>
+      <div class="oli-box font-dut">a ă â b c d đ e ê g h i k l m n o ô ơ p q r s t u ư v x y</div>
+    </div>
+  </section>
+
+  <!-- 3. Bảng chữ cái hoa -->
+  <section class="card">
+    <div class="card-head">
+      <h2>Bảng chữ cái hoa (29 chữ)</h2>
+      <span class="card-note">Chữ hoa cao 5 ô li (2,5 lần thân chữ thường)</span>
+    </div>
+    <div class="variant">
+      <span class="variant-tag">Nét liền</span>
+      <div class="oli-box font-lien">A Ă Â B C D Đ E Ê G H I K L M N O Ô Ơ P Q R S T U Ư V X Y</div>
+    </div>
+    <div class="variant">
+      <span class="variant-tag">Nét đứt để tô</span>
+      <div class="oli-box font-dut">A Ă Â B C D Đ E Ê G H I K L M N O Ô Ơ P Q R S T U Ư V X Y</div>
+    </div>
+  </section>
+
+  <!-- 4. Chữ số -->
+  <section class="card">
+    <div class="card-head">
+      <h2>Chữ số (0 tới 9)</h2>
+      <span class="card-note">10 chữ số theo mẫu chữ tiểu học</span>
+    </div>
+    <div class="variant">
+      <span class="variant-tag">Nét liền</span>
+      <div class="oli-box font-lien">0 1 2 3 4 5 6 7 8 9</div>
+    </div>
+    <div class="variant">
+      <span class="variant-tag">Nét đứt để tô</span>
+      <div class="oli-box font-dut">0 1 2 3 4 5 6 7 8 9</div>
+    </div>
+  </section>
+
+  <!-- 5. Tất cả nguyên âm có dấu thanh (thường) -->
+  <section class="card">
+    <div class="card-head">
+      <h2>Nguyên âm thường có dấu thanh</h2>
+      <span class="card-note">Đủ 12 nhóm nguyên âm thường với 5 dấu thanh (huyền, sắc, hỏi, ngã, nặng)</span>
+    </div>
+    <div class="variant">
+      <span class="variant-tag">Nét liền</span>
+      <div class="oli-box font-lien">a à á ả ã ạ   ă ằ ắ ẳ ẵ ặ   â ầ ấ ẩ ẫ ậ
+e è é ẻ ẽ ẹ   ê ề ế ể ễ ệ   i ì í ỉ ĩ ị
+o ò ó ỏ õ ọ   ô ồ ố ổ ỗ ộ   ơ ờ ớ ở ỡ ợ
+u ù ú ủ ũ ụ   ư ừ ứ ử ữ ự   y ỳ ý ỷ ỹ ỵ</div>
+    </div>
+    <div class="variant">
+      <span class="variant-tag">Nét đứt để tô</span>
+      <div class="oli-box font-dut">a à á ả ã ạ   ă ằ ắ ẳ ẵ ặ   â ầ ấ ẩ ẫ ậ
+e è é ẻ ẽ ẹ   ê ề ế ể ễ ệ   i ì í ỉ ĩ ị
+o ò ó ỏ õ ọ   ô ồ ố ổ ỗ ộ   ơ ờ ớ ở ỡ ợ
+u ù ú ủ ũ ụ   ư ừ ứ ử ữ ự   y ỳ ý ỷ ỹ ỵ</div>
+    </div>
+  </section>
+
+  <!-- 6. Tất cả nguyên âm có dấu thanh (hoa) -->
+  <section class="card">
+    <div class="card-head">
+      <h2>Nguyên âm hoa có dấu thanh</h2>
+      <span class="card-note">Đủ 12 nhóm nguyên âm hoa với 5 dấu thanh</span>
+    </div>
+    <div class="variant">
+      <span class="variant-tag">Nét liền</span>
+      <div class="oli-box font-lien">A À Á Ả Ã Ạ   Ă Ằ Ắ Ẳ Ẵ Ặ   Â Ầ Ấ Ẩ Ẫ Ậ
+E È É Ẻ Ẽ Ẹ   Ê Ề Ế Ể Ễ Ệ   I Ì Í Ỉ Ĩ Ị
+O Ò Ó Ỏ Õ Ọ   Ô Ồ Ố Ổ Ỗ Ộ   Ơ Ờ Ớ Ở Ỡ Ợ
+U Ù Ú Ủ Ũ Ụ   Ư Ừ Ứ Ử Ữ Ự   Y Ỳ Ý Ỷ Ỹ Ỵ</div>
+    </div>
+    <div class="variant">
+      <span class="variant-tag">Nét đứt để tô</span>
+      <div class="oli-box font-dut">A À Á Ả Ã Ạ   Ă Ằ Ắ Ẳ Ẵ Ặ   Â Ầ Ấ Ẩ Ẫ Ậ
+E È É Ẻ Ẽ Ẹ   Ê Ề Ế Ể Ễ Ệ   I Ì Í Ỉ Ĩ Ị
+O Ò Ó Ỏ Õ Ọ   Ô Ồ Ố Ổ Ỗ Ộ   Ơ Ờ Ớ Ở Ỡ Ợ
+U Ù Ú Ủ Ũ Ụ   Ư Ừ Ứ Ử Ữ Ự   Y Ỳ Ý Ỷ Ỹ Ỵ</div>
+    </div>
+  </section>
+
+  <!-- 7. Câu mẫu -->
+  <section class="card">
+    <div class="card-head">
+      <h2>Câu mẫu</h2>
+      <span class="card-note">Dấu câu (phẩy, chấm) dùng font dự phòng của máy</span>
+    </div>
+    <div class="variant">
+      <span class="variant-tag">Nét liền</span>
+      <div class="oli-box font-lien">Có công mài sắt, có ngày nên kim.
+Học ăn, học nói, học gói, học mở.
+Bé tập viết chữ đẹp.
+Uống nước nhớ nguồn.
+Hòa bình, khỏe mạnh, chăm ngoan.</div>
+    </div>
+    <div class="variant">
+      <span class="variant-tag">Nét đứt để tô</span>
+      <div class="oli-box font-dut">Có công mài sắt, có ngày nên kim.
+Học ăn, học nói, học gói, học mở.
+Bé tập viết chữ đẹp.
+Uống nước nhớ nguồn.
+Hòa bình, khỏe mạnh, chăm ngoan.</div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <p><strong>Lưu ý:</strong> Font hiện dùng dạng chữ rời (chưa tự nối nét trong tiếng), chưa có các chữ cái <code>f, j, w, z</code> và dấu câu — trình duyệt hoặc phần mềm soạn thảo sẽ tự mượn font dự phòng cho các ký tự này.</p>
+    <p>Phát hành miễn phí theo giấy phép <a href="OFL.txt">SIL Open Font License 1.1</a>. Muốn có thêm chữ nối, Xem viết chậm, Tự tô từng nét và Tạo tập viết PDF đúng 1 ô li = 2 mm, mời mở <a href="https://luyenchudep.github.io/" target="_blank" rel="noopener">luyenchudep.github.io</a>.</p>
+  </footer>
+</div>
+
+<!-- Hộp ẩn dùng đo đúng vị trí đường chân chữ để đường kẻ đậm của lưới 4 ô li luôn khớp -->
+<div id="measureBox" class="measure-box font-lien" aria-hidden="true">o<span id="measureProbe" class="measure-probe"></span></div>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var sizeRange = document.getElementById('sizeRange');
+  var sizeVal = document.getElementById('sizeVal');
+  var gridBtn = document.getElementById('gridBtn');
+  var tryInput = document.getElementById('tryInput');
+  var tryLien = document.getElementById('tryLien');
+  var tryDut = document.getElementById('tryDut');
+  var measureBox = document.getElementById('measureBox');
+  var measureProbe = document.getElementById('measureProbe');
+  var fontWarn = document.getElementById('fontWarn');
+  var presetBtns = document.querySelectorAll('[data-size]');
+
+  function syncTryText() {
+    var val = tryInput.value || ' ';
+    tryLien.textContent = val;
+    tryDut.textContent = val;
+  }
+
+  function syncBaseline() {
+    if (!measureBox || !measureProbe) return;
+    var y = measureProbe.getBoundingClientRect().top - measureBox.getBoundingClientRect().top;
+    if (y > 0) {
+      root.style.setProperty('--base-y', y.toFixed(2) + 'px');
+    }
+  }
+
+  function setSize(px) {
+    var n = Math.max(36, Math.min(136, Number(px) || 72));
+    sizeRange.value = String(n);
+    sizeVal.textContent = n + ' px';
+    root.style.setProperty('--sz', n + 'px');
+    for (var i = 0; i < presetBtns.length; i++) {
+      var b = presetBtns[i];
+      b.classList.toggle('on', Number(b.getAttribute('data-size')) === n);
+    }
+    requestAnimationFrame(syncBaseline);
+  }
+
+  sizeRange.addEventListener('input', function () {
+    setSize(sizeRange.value);
+  });
+
+  for (var i = 0; i < presetBtns.length; i++) {
+    presetBtns[i].addEventListener('click', function () {
+      setSize(this.getAttribute('data-size'));
+    });
+  }
+
+  gridBtn.addEventListener('click', function () {
+    var off = document.body.classList.toggle('no-grid');
+    gridBtn.textContent = off ? 'Tắt' : 'Bật';
+    gridBtn.classList.toggle('on', !off);
+    gridBtn.setAttribute('aria-pressed', String(!off));
+  });
+
+  tryInput.addEventListener('input', syncTryText);
+
+  syncTryText();
+  setSize(72);
+
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function () {
+      syncBaseline();
+      var hasError = false;
+      document.fonts.forEach(function (f) {
+        if (f.family.indexOf('Sao Mai') !== -1 && f.status === 'error') {
+          hasError = true;
+        }
+      });
+      if (hasError) {
+        fontWarn.classList.add('show');
+      }
+    });
+  }
+})();
+</script>
+</body>
+</html>
