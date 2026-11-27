@@ -72,7 +72,7 @@ function baoThieuTH(ch) {
    - Lia viết (hở nhẹ): chữ trước dừng trong lòng chữ hay dưới đường chân (o, ô, ơ, s, q…), hoặc chữ sau bắt đầu ở bên
      phải (nét cong kín như o, a, d, g, q; chữ c), hoặc có chữ số. Hai chữ cách nhau TH_KHOANG_CHU.
    Quy tắc đối chiếu với tài liệu dạy tập viết: phiếu nghiên cứu G-11 (ngoài repo). */
-const TH_NOI_SAT = 0.08;     // hai điểm chênh nhau ít hơn mức này thì đặt sát, chỉ nối bằng một đoạn thẳng ngắn
+const TH_NOI_SAT = 0.02;     // hai điểm gần hơn mức này thì coi như liền, không vẽ nét nối
 const TH_NOI_KHOANG = 0.14;  // khoảng ngang tối thiểu cho nét nối khi hai điểm chênh nhau
 const thSo = ch => /^[0-9]$/.test(ch);
 function thDonVi(v) { const l = Math.hypot(v[0], v[1]) || 1; return [v[0] / l, v[1] / l]; }
@@ -111,6 +111,57 @@ function thBoHat(h) {
   _thBoHat.set(h, kq);
   return kq;
 }
+/* Nối mượt: cắt bỏ đoạn đầu (dài khoảng `dai`) của nét mở đầu chữ sau; nét nối sẽ thay đoạn này, nên chỗ nối liền một mạch.
+   Đoạn đầu là phần đưa viết vào chữ: nét hất (i, u, t, r…), đoạn đưa lên trước vòng khuyết (b, h, k, l), đầu nét móc xuôi (m, n, v). */
+const TH_CAT_DAU = { hat: 0.18, khuyettren: 0.3, mocxuoi: 0.2, mochaidau: 0.2 };
+const thLerp = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+const _thCat = new Map();
+function thCatDau(h) {
+  if (_thCat.has(h)) return _thCat.get(h);
+  let kq = h;
+  const n0 = h.nets[0], d = n0.d, g = d[1], dai = TH_CAT_DAU[n0.loai] ?? 0.1;
+  if (g && (g[0] === "C" || g[0] === "L")) {
+    const P0 = [d[0][1], d[0][2]], P = g[0] === "C" ? [P0, [g[1], g[2]], [g[3], g[4]], [g[5], g[6]]] : null;
+    const P3 = g[0] === "C" ? P[3] : [g[1], g[2]];
+    const diem = u => P ? thLerp(thLerp(thLerp(P[0], P[1], u), thLerp(P[1], P[2], u), u), thLerp(thLerp(P[1], P[2], u), thLerp(P[2], P[3], u), u), u) : thLerp(P0, P3, u);
+    let acc = 0, truoc = P0, u0 = null;
+    for (let i = 1; i <= 60; i++) { const u = i / 60, q = diem(u); acc += Math.hypot(q[0] - truoc[0], q[1] - truoc[1]); truoc = q; if (acc >= dai) { u0 = u; break; } }
+    if (u0 && u0 < 0.85) {
+      let dau;
+      if (P) {   /* chia đường cong bậc ba tại u0 (de Casteljau), lấy nửa sau */
+        const p12 = thLerp(P[1], P[2], u0), p23 = thLerp(P[2], P[3], u0), p123 = thLerp(p12, p23, u0), q = diem(u0);
+        dau = [["M", q[0], q[1]], ["C", p123[0], p123[1], p23[0], p23[1], P3[0], P3[1]]];
+      } else { const q = diem(u0); dau = [["M", q[0], q[1]], ["L", P3[0], P3[1]]]; }
+      kq = { rong: h.rong, nets: [{ ...n0, d: dau.concat(d.slice(2)) }].concat(h.nets.slice(1)) };
+    }
+  }
+  _thCat.set(h, kq);
+  return kq;
+}
+/* Nối mượt, phía chữ trước: cắt đoạn hất cuối của nét kết thúc (móc ngược hất thẳng lên nửa thân chữ) để nét nối
+   bắt đầu từ đáy móc, vươn chéo một đường sang chữ sau như viết tay. Chữ dừng cao (b, v) và nét cong (c, e, x) giữ nguyên. */
+const TH_CAT_CUOI = { mocnguoc: 0.26, mochaidau: 0.26, khuyetduoi: 0.16 };
+const _thCatC = new Map();
+function thCatCuoi(h) {
+  if (_thCatC.has(h)) return _thCatC.get(h);
+  let kq = h;
+  let ns = h.nets.filter(n => !n.dau);
+  if (ns.length > 1 && ns[ns.length - 1].loai === "ngang" && !ns[ns.length - 1].lien) ns = ns.slice(0, -1);
+  const net = ns[ns.length - 1], dai = TH_CAT_CUOI[net.loai] || 0, d = net.d, g = d[d.length - 1], gt = d[d.length - 2];
+  if (dai && g[0] === "C" && gt) {
+    const P = [[gt[gt.length - 2], gt[gt.length - 1]], [g[1], g[2]], [g[3], g[4]], [g[5], g[6]]];
+    const diem = u => thLerp(thLerp(thLerp(P[0], P[1], u), thLerp(P[1], P[2], u), u), thLerp(thLerp(P[1], P[2], u), thLerp(P[2], P[3], u), u), u);
+    let acc = 0, sau = P[3], u0 = null;
+    for (let i = 59; i >= 0; i--) { const u = i / 60, q = diem(u); acc += Math.hypot(q[0] - sau[0], q[1] - sau[1]); sau = q; if (acc >= dai) { u0 = u; break; } }
+    if (u0 && u0 > 0.15) {   /* chia tại u0, giữ nửa đầu */
+      const p01 = thLerp(P[0], P[1], u0), p12 = thLerp(P[1], P[2], u0), p012 = thLerp(p01, p12, u0), q = diem(u0);
+      const moi = { ...net, d: d.slice(0, -1).concat([["C", p01[0], p01[1], p012[0], p012[1], q[0], q[1]]]) };
+      kq = { rong: h.rong, nets: h.nets.map(n => n === net ? moi : n) };
+    }
+  }
+  _thCatC.set(h, kq);
+  return kq;
+}
 function danChuoiTH(s) {
   const o = [], noi = []; let x = 0, truoc = null;
   for (const ch of String(s ?? "").normalize("NFC")) {
@@ -124,18 +175,20 @@ function danChuoiTH(s) {
       if (thNoiDuoc(truoc, c)) {
         /* Chữ trước dừng cao (b, v) mà chữ sau mở đầu bằng nét hất (i, u, t…): bỏ nét hất, nối thẳng vào đỉnh nét kế tiếp */
         if (thDauCuoi(truoc.h).dung[1] > 0.75 && h.nets[0].loai === "hat") c.h = thBoHat(h);
+        else c.h = thCatDau(h);
+        if (thDauCuoi(truoc.h).dung[1] <= 0.75) truoc.h = thCatCuoi(truoc.h);
         const A = thDauCuoi(truoc.h), B = thDauCuoi(c.h);
         const pA = [truoc.x + A.dung[0], A.dung[1]], dy = B.dat[1] - A.dung[1];
-        /* Nối xuống (b, v sang e, ê) cần khoảng ngang rộng hơn để nét nối không dựng đứng */
-        const khoang = Math.abs(dy) < TH_NOI_SAT ? 0 : Math.max(TH_NOI_KHOANG, Math.abs(dy) * (dy < 0 ? 0.7 : 0.45));
+        /* Khoảng ngang của nét nối: đủ để nét đi tới thoai thoải; nối xuống (b, v sang e, ê) rộng hơn */
+        const khoang = Math.max(TH_NOI_KHOANG, Math.abs(dy) * (dy < 0 ? 0.7 : 0.6));
         c.x = pA[0] + khoang - B.dat[0];
-        const pB = [c.x + B.dat[0], B.dat[1]];
-        if (khoang > 0) {
-          /* Nét nối: đường cong bậc ba tiếp tuyến với cuối nét trước và đầu nét sau. Tay đòn không dài quá nửa khoảng ngang
-             để nét nối luôn đi tới, không gập ngược (b, v dừng cao nối xuống e, i) */
-          const k = Math.min(0.22, Math.hypot(pB[0] - pA[0], pB[1] - pA[1]) * 0.45, khoang * 0.5);
+        const pB = [c.x + B.dat[0], B.dat[1]], dai = Math.hypot(pB[0] - pA[0], pB[1] - pA[1]);
+        if (dai > TH_NOI_SAT) {
+          /* Nét nối: đường cong bậc ba, tiếp tuyến trùng hướng cuối nét trước và hướng đầu nét sau (không gãy góc).
+             Tay đòn giới hạn theo khoảng ngang để nét nối luôn đi tới, không gập ngược */
+          const k = Math.min(0.32, dai * 0.45, khoang / (Math.max(A.huongDung[0], 0) + Math.max(B.huongDat[0], 0) + 1e-6));
           noi.push({ d: [["M", pA[0], pA[1]], ["C", pA[0] + A.huongDung[0] * k, pA[1] + A.huongDung[1] * k, pB[0] - B.huongDat[0] * k, pB[1] - B.huongDat[1] * k, pB[0], pB[1]]] });
-        } else if (Math.abs(dy) > 0.01) noi.push({ d: [["M", pA[0], pA[1]], ["L", pB[0], pB[1]]] });
+        }
       } else c.x = truoc.x + truoc.h.rong + TH_KHOANG_CHU;
     }
     o.push(c); x = c.x + c.h.rong; truoc = c;
