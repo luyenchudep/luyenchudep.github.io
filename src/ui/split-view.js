@@ -19,7 +19,7 @@ function renderSidePane(){
   if(!document.body.classList.contains("split"))return;
   const box=document.getElementById("sideBody");if(!box)return;
   if(sideTab==="list"){
-    let h=`<div class="row" style="border:0;padding:4px 0 8px"><span>Kiểu chữ</span><div class="seg">${DS_KIEU_CHU.map(([v,t])=>[v,t.replace(" 10°","")]).map(([v,t])=>`<button class="${SCRIPT===v?"on":""}" onclick="setScript('${v}')">${t}</button>`).join("")}</div></div>`;
+    let h=`<div class="row" style="border:0;padding:4px 0 8px"><span>Kiểu chữ</span><div class="seg">${DS_KIEU_CHU.map(([v,t,m])=>[v,t.replace(" 10°",""),m]).map(([v,t,m])=>`<button class="${SCRIPT===v?"on":""}" title="${m||t}" onclick="setScript('${v}')">${t}</button>`).join("")}</div></div>`;
     if(!sidePartOpen)sidePartOpen=new Set([curPartName()]);
     for(const p of COURSE)h+=partBlock(p,sidePartOpen,"sidePartOpen",true);
     box.innerHTML=h;return;

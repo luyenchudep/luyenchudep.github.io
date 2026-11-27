@@ -4491,15 +4491,15 @@ SCRIPTS.qs = {
   "nmTitle": "Nhập môn · chữ nét đều nghiêng 10°",
   "pen": {"pressure":false,"width":2.6,"contrast":"med","color":"k"}
 };
-/* Giáo trình Tiểu học (th): mẫu chữ viết trong trường tiểu học, Quyết định 31/2002/QĐ-BGD&ĐT, chữ đứng nét đều.
+/* Giáo trình Sao Mai Tập Viết (th, chữ tiểu học): mẫu chữ viết trong trường tiểu học, Quyết định 31/2002/QĐ-BGD&ĐT, chữ đứng nét đều.
    Cấu trúc: docs/KIEN_TRUC.md mục 5.1.1. Tọa độ nét theo đơn vị chữ (1 = chiều cao chữ o, y lên trên, y = 0 là đường chân).
    Bài ghép tiếng, từ ngữ và cỡ Nhỏ (th-g*, th-v*, th-nh*) hiện từ khi có nối chữ (bản 0.12): TH_DU_BAI = true. */
 const TH_DU_BAI = true;
 SCRIPTS.th = {
-  "name": "Tiểu học",
+  "name": "Sao Mai Tập Viết",
   "font": "TH",
   "XH": {"thuong":26,"nho":13},
-  "nmTitle": "Nhập môn · chữ viết tiểu học",
+  "nmTitle": "Nhập môn · Sao Mai Tập Viết (chữ tiểu học)",
   "pen": {"pressure":false,"width":2.6,"contrast":"med","color":"k"},
   "chuan": "Mẫu chữ viết trong trường tiểu học (Quyết định 31/2002/QĐ-BGD&ĐT), kiểu chữ đứng, nét đều",
   "CO": {"thuong":2,"nho":1},
@@ -6622,12 +6622,11 @@ function drawSimple(ctx,ch,x0,b,xh,dark){
 /* ================== KIỂU CHỮ ================== */
 const GS={get(k,d){try{const v=localStorage.getItem("td1:"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
  set(k,v){try{localStorage.setItem("td1:"+k,JSON.stringify(v));return true}catch(e){return false}}};
-/* Ba kiểu chữ: td (Thanh đậm), qs (Nét đều), th (Tiểu học). Mỗi kiểu lưu bài và tiến độ riêng theo tiền tố PFX. */
+/* Ba kiểu chữ: td (Thanh đậm), qs (Nét đều), th (Sao Mai Tập Viết, chữ tiểu học). Mỗi kiểu lưu bài và tiến độ riêng theo tiền tố PFX. */
 const KIEU_CHU=["td","qs","th"];
 const SCRIPT=(v=>KIEU_CHU.includes(v)?v:"td")(GS.get("script","td")),SC=SCRIPTS[SCRIPT],PFX=SCRIPT+"1:";
-/* Tiểu học đang làm (bản 0.12): chỉ hiện ở chỗ chọn kiểu chữ khi mở app bằng link có ?tieuhoc (nhớ luôn cho lần sau) hoặc đang ở kiểu này */
-const DS_KIEU_CHU=[["td","Thanh đậm"],["qs","Nét đều 10°"]].concat([["th","Tiểu học"]]);
-/* Tiểu học: tạm ẩn bài ghép tiếng, từ ngữ, cỡ Nhỏ cho tới khi có nối chữ (TH_DU_BAI trong scripts-th.js) */
+/* [mã, tên trên nút, mô tả hiện khi đưa chuột vào nút và dưới nút khi đang chọn] */
+const DS_KIEU_CHU=[["td","Thanh đậm"],["qs","Nét đều 10°"],["th","Sao Mai","Sao Mai Tập Viết · chữ tiểu học theo mẫu của Bộ Giáo dục"]];
 const COURSE=SCRIPT==="th"&&!TH_DU_BAI?SC.COURSE.map(p=>({...p,lessons:p.lessons.filter(l=>!/^th-(g|v|nh)\d/.test(l.id))})).filter(p=>p.lessons.length):SC.COURSE,STROKES=SC.STROKES,DUCTUS=SC.DUCTUS,SOTAY=SC.SOTAY,NHAPMON=SC.NHAPMON,WORDS=SC.WORDS;
 function setScript(v){if(v===SCRIPT)return;GS.set("script",v);location.reload()}
 function drawGuide(ctx,ch,x,b,xh,dark){(S.arrowStyle==="full"?drawArrows:drawSimple)(ctx,ch,x,b,xh,dark)}
@@ -7085,7 +7084,7 @@ function baoThieuTH(ch) {
   /* Báo một lần sau khi vẽ xong (không báo lúc đang xuất PDF chạy ngầm) */
   if (typeof toast === "function" && typeof document !== "undefined" && !(typeof exporting !== "undefined" && exporting)) {
     clearTimeout(_thBaoThieu);
-    _thBaoThieu = setTimeout(() => toast(`Kiểu Tiểu học chưa có hình cho: ${[...TH_THIEU].join(" ")} (f, j, w, z sẽ có ở bản sau). Các chữ này được bỏ qua.`), 400);
+    _thBaoThieu = setTimeout(() => toast(`Kiểu Sao Mai chưa có hình cho: ${[...TH_THIEU].join(" ")} (f, j, w, z sẽ có ở bản sau). Các chữ này được bỏ qua.`), 400);
   }
 }
 /* ================== NỐI CHỮ TRONG MỘT TIẾNG ==================
@@ -8273,7 +8272,7 @@ function renderSidePane(){
   if(!document.body.classList.contains("split"))return;
   const box=document.getElementById("sideBody");if(!box)return;
   if(sideTab==="list"){
-    let h=`<div class="row" style="border:0;padding:4px 0 8px"><span>Kiểu chữ</span><div class="seg">${DS_KIEU_CHU.map(([v,t])=>[v,t.replace(" 10°","")]).map(([v,t])=>`<button class="${SCRIPT===v?"on":""}" onclick="setScript('${v}')">${t}</button>`).join("")}</div></div>`;
+    let h=`<div class="row" style="border:0;padding:4px 0 8px"><span>Kiểu chữ</span><div class="seg">${DS_KIEU_CHU.map(([v,t,m])=>[v,t.replace(" 10°",""),m]).map(([v,t,m])=>`<button class="${SCRIPT===v?"on":""}" title="${m||t}" onclick="setScript('${v}')">${t}</button>`).join("")}</div></div>`;
     if(!sidePartOpen)sidePartOpen=new Set([curPartName()]);
     for(const p of COURSE)h+=partBlock(p,sidePartOpen,"sidePartOpen",true);
     box.innerHTML=h;return;
@@ -8602,7 +8601,7 @@ function openMenu(keepScroll=false){
   if(!partOpen)partOpen=new Set([curPartName()]);
   const real=LESSONS.slice(0,NREAL),n=real.filter(l=>l.id!=="free").length,k=[...done].filter(id=>real.some(l=>l.id===id&&id!=="free")).length;
   const due=dueItems().length,toolAlert=due>0||paperDue();
-  let h=`<div class="mHead"><h3>Danh mục</h3><div class="seg">${DS_KIEU_CHU.map(([v,t])=>`<button class="${SCRIPT===v?"on":""}" onclick="setScript('${v}')">${t}</button>`).join("")}</div></div>`;
+  let h=`<div class="mHead"><h3>Danh mục</h3><div class="seg">${DS_KIEU_CHU.map(([v,t,m])=>`<button class="${SCRIPT===v?"on":""}" title="${m||t}" onclick="setScript('${v}')">${t}</button>`).join("")}</div></div>`;
   h+=`<div class="mTabs">${[["bai","book","Bài học"],["cong","target","Công cụ"],["cai","sliders","Cài đặt"]].map(([v,icn,t])=>`<button class="${menuTab===v?"on":""}" onclick="setMenuTab('${v}')">${ic(icn)}${t}${v==="cong"&&toolAlert?`<span class="dot"></span>`:""}</button>`).join("")}</div>`;
   if(menuTab==="bai"){
     h+=`<div class="prog" style="margin-bottom:4px">${SC.name} · đã tập ${k}/${n} bài</div><div class="bar"><div style="width:${Math.round(k/n*100)}%"></div></div>`;

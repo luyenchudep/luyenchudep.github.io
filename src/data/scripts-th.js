@@ -1,12 +1,12 @@
-/* Giáo trình Tiểu học (th): mẫu chữ viết trong trường tiểu học, Quyết định 31/2002/QĐ-BGD&ĐT, chữ đứng nét đều.
+/* Giáo trình Sao Mai Tập Viết (th, chữ tiểu học): mẫu chữ viết trong trường tiểu học, Quyết định 31/2002/QĐ-BGD&ĐT, chữ đứng nét đều.
    Cấu trúc: docs/KIEN_TRUC.md mục 5.1.1. Tọa độ nét theo đơn vị chữ (1 = chiều cao chữ o, y lên trên, y = 0 là đường chân).
    Bài ghép tiếng, từ ngữ và cỡ Nhỏ (th-g*, th-v*, th-nh*) hiện từ khi có nối chữ (bản 0.12): TH_DU_BAI = true. */
 const TH_DU_BAI = true;
 SCRIPTS.th = {
-  "name": "Tiểu học",
+  "name": "Sao Mai Tập Viết",
   "font": "TH",
   "XH": {"thuong":26,"nho":13},
-  "nmTitle": "Nhập môn · chữ viết tiểu học",
+  "nmTitle": "Nhập môn · Sao Mai Tập Viết (chữ tiểu học)",
   "pen": {"pressure":false,"width":2.6,"contrast":"med","color":"k"},
   "chuan": "Mẫu chữ viết trong trường tiểu học (Quyết định 31/2002/QĐ-BGD&ĐT), kiểu chữ đứng, nét đều",
   "CO": {"thuong":2,"nho":1},

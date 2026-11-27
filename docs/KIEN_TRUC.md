@@ -104,9 +104,9 @@ SCRIPTS[kiểu] = {
 
 Kiểu dòng trong `rows`: `stroke` (nét), `pair` (cặp chữ, câu), `rep` (lặp chữ), `blank` (dòng trống).
 
-Hiện có ba kiểu: `td` (Thanh đậm), `qs` (Nét đều) và `th` (Tiểu học, từ bản 0.12, xem mục 5.1.1).
+Hiện có ba kiểu: `td` (Thanh đậm), `qs` (Nét đều) và `th` (Sao Mai Tập Viết, chữ tiểu học, từ bản 0.12; tên hiện trong app là "Sao Mai"; xem mục 5.1.1).
 
-### 5.1.1. Giáo trình tiểu học (`th`)
+### 5.1.1. Giáo trình tiểu học Sao Mai Tập Viết (`th`)
 
 Khác hai kiểu kia ở chỗ chữ mẫu không lấy từ phông mà vẽ từ **đường tâm nét**, nhờ vậy cho nét đứt để tô đúng kiểu vở tiểu học. Phông Playwrite VN chỉ dùng cho chữ người dùng tự gõ.
 
