@@ -49,7 +49,7 @@ function openPdfModal(keepScroll=false){
   <div class="row"><span>Khổ giấy hoặc máy</span><div class="seg">${nutChon(Object.entries(KHO_TRANG).map(([v,k])=>[v,k.ngan]),pdfOpt.preset,v=>`pdfOpt.preset='${v}'`)}<button class="${pdfOpt.preset==="tunhap"?"on":""}" onclick="chonKhoTuNhap();openPdfModal(true)">Tự nhập</button></div></div>
   ${oKho}<div class="prog" id="pdfKhoMoTa" style="margin:4px 0 8px">${pr?`<b>${escHtml(pr.name)}:</b> ${escHtml(pr.desc)}`:escHtml(loiKho)}</div>
   <div class="row"><span>Cách tập trên dòng</span><div class="seg">${nutChon([["to","② Tô"],["nho","③ Chép"]],pdfOpt.mode,v=>`pdfOpt.mode='${v}'`)}</div></div>
-  <div class="row"><span>Kiểu dòng kẻ</span><div class="seg">${nutChon([["french","Lưới xiên Pháp"],["oly4","4 ô li Việt Nam"]],pdfOpt.grid,v=>`pdfOpt.grid='${v}'`)}</div></div>
+  ${SCRIPT==="th"?"":`<div class="row"><span>Kiểu dòng kẻ</span><div class="seg">${nutChon([["french","Lưới xiên Pháp"],["oly4","4 ô li Việt Nam"]],pdfOpt.grid,v=>`pdfOpt.grid='${v}'`)}</div></div>`}
   <div class="row"><span>Chừa lề thanh công cụ</span><div class="seg">${nutChon([["left","Lề trái (tay phải)"],["right","Lề phải (tay trái)"]],pdfOpt.barSide,v=>`pdfOpt.barSide='${v}'`)}</div></div>
   <div class="row"><span>Mũi tên thứ tự nét ở chữ mẫu</span><div class="seg">${nutChon([[true,"Bật"],[false,"Tắt"]],pdfOpt.arrows,v=>`pdfOpt.arrows=${v}`)}</div></div>
   <div id="pdfProg" class="prog" style="display:none;color:var(--accent);font-weight:700;margin-top:8px"></div>

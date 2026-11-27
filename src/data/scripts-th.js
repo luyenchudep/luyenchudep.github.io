@@ -4,7 +4,7 @@
 const TH_DU_BAI = false;
 SCRIPTS.th = {
   "name": "Tiểu học",
-  "font": "QS",
+  "font": "TH",
   "XH": {"thuong":26,"nho":13},
   "nmTitle": "Nhập môn · chữ viết tiểu học",
   "pen": {"pressure":false,"width":2.6,"contrast":"med","color":"k"},

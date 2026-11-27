@@ -10,7 +10,7 @@ function sizeFor(l){const F=fontOf(l),xh=XH[l.z]*S.scale,fs=xh/F.x;
   return {xh,fs,asc:fs*F.asc,desc:fs*F.desc,tan:Math.tan(F.slant*Math.PI/180),fam:F.fam,F}}
 function traceColor(){return T.trace[S.trace]||T.trace.dark}
 function fnt(fs,fam){const F=FONTS[fam||SC.font];return `${F.wt} ${fs}px '${F.fam}'`}
-function mw(t,fs,fam){bctx.font=fnt(fs,fam);return bctx.measureText(t).width}
+function mw(t,fs,fam){if(laPhongTH(fam))return doRongTH(t)*fs;bctx.font=fnt(fs,fam);return bctx.measureText(t).width}
 
 function wrap(text,maxW,fs,fam){
   if(mw(text,fs,fam)<=maxW)return [text];
@@ -57,7 +57,7 @@ function lessonRows(l){
   if(l.id==="luyen")buildLuyen(false);
   return l.rows;
 }
-function repGap(fs){return Math.max(fs*.25,16)}
+function repGap(fs){return SCRIPT==="th"?fs*TH_KHOANG_TIENG:Math.max(fs*.25,16)}   /* Tiểu học: giữa hai lần lặp cách bằng một chữ o, như giữa hai tiếng */
 /* Thang luyện: Tô = tô rõ → tô mờ → chỉ còn chấm đặt bút → chữ trong từ; Nhớ = tên chữ + dòng trống */
 function groupsFor(r,m,avail,mode){
   const G=[],fit=s=>2*mw(s,m.fs,m.fam)+repGap(m.fs)<=avail,one=typeof r[1]==="string"&&[...r[1]].length===1;

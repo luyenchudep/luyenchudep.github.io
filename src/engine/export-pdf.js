@@ -32,6 +32,7 @@ function chuanHoaPdfCfg(cfg) {
     if (c.text.length > TU_GO_TOI_DA) throw new Error(`Nội dung tự gõ dài quá ${TU_GO_TOI_DA} ký tự`);
   }
   c.arrows = c.arrows !== false;
+  if (c.script === "th") c.grid = "oly4";   // Tiểu học luôn dùng lưới 4 ô li
   return c;
 }
 

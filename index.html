@@ -4497,7 +4497,7 @@ SCRIPTS.qs = {
 const TH_DU_BAI = false;
 SCRIPTS.th = {
   "name": "Tiểu học",
-  "font": "QS",
+  "font": "TH",
   "XH": {"thuong":26,"nho":13},
   "nmTitle": "Nhập môn · chữ viết tiểu học",
   "pen": {"pressure":false,"width":2.6,"contrast":"med","color":"k"},
@@ -6002,7 +6002,7 @@ function sizeFor(l){const F=fontOf(l),xh=XH[l.z]*S.scale,fs=xh/F.x;
   return {xh,fs,asc:fs*F.asc,desc:fs*F.desc,tan:Math.tan(F.slant*Math.PI/180),fam:F.fam,F}}
 function traceColor(){return T.trace[S.trace]||T.trace.dark}
 function fnt(fs,fam){const F=FONTS[fam||SC.font];return `${F.wt} ${fs}px '${F.fam}'`}
-function mw(t,fs,fam){bctx.font=fnt(fs,fam);return bctx.measureText(t).width}
+function mw(t,fs,fam){if(laPhongTH(fam))return doRongTH(t)*fs;bctx.font=fnt(fs,fam);return bctx.measureText(t).width}
 
 function wrap(text,maxW,fs,fam){
   if(mw(text,fs,fam)<=maxW)return [text];
@@ -6049,7 +6049,7 @@ function lessonRows(l){
   if(l.id==="luyen")buildLuyen(false);
   return l.rows;
 }
-function repGap(fs){return Math.max(fs*.25,16)}
+function repGap(fs){return SCRIPT==="th"?fs*TH_KHOANG_TIENG:Math.max(fs*.25,16)}   /* Tiểu học: giữa hai lần lặp cách bằng một chữ o, như giữa hai tiếng */
 /* Thang luyện: Tô = tô rõ → tô mờ → chỉ còn chấm đặt bút → chữ trong từ; Nhớ = tên chữ + dòng trống */
 function groupsFor(r,m,avail,mode){
   const G=[],fit=s=>2*mw(s,m.fs,m.fam)+repGap(m.fs)<=avail,one=typeof r[1]==="string"&&[...r[1]].length===1;
@@ -6105,7 +6105,7 @@ function guides(ctx,b,m,x0,x1){
   const gx0=x0!=null?x0:(layout?Math.max(12,layout.safeSide-6):16);
   const gx1=x1!=null?x1:(W-(layout?Math.max(12,layout.safeSide-6):16));
   if(S.xBand&&T.xBand){ctx.fillStyle=T.xBand;ctx.fillRect(gx0,b-m.xh,gx1-gx0,m.xh)}
-  if(S.gridStyle==="oly4"){
+  if(S.gridStyle==="oly4"||SCRIPT==="th"){
     /* Hệ 4 ô ly chuẩn vở tiểu học Việt Nam (1 ly = xh / 2) */
     const ly=m.xh/2,topY=b-Math.max(m.asc,ly*5),botY=b+Math.max(m.desc,ly*3);
     ctx.strokeStyle=T.slant;ctx.lineWidth=0.85;ctx.setLineDash([]);
@@ -6132,13 +6132,13 @@ function guides(ctx,b,m,x0,x1){
   ctx.lineWidth=1;ctx.strokeStyle=T.desc;ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(gx0,b+m.desc);ctx.lineTo(gx1,b+m.desc);ctx.stroke();
   ctx.setLineDash([]);
 }
-function text(ctx,s,x,b,fs,color,fam){const F=FONTS[fam||SC.font];ctx.font=fnt(fs,fam);ctx.fillStyle=color;ctx.textBaseline="alphabetic";
+function text(ctx,s,x,b,fs,color,fam){if(laPhongTH(fam))return veChuoiTH(ctx,s,x,b,fs,color,color===traceColor());const F=FONTS[fam||SC.font];ctx.font=fnt(fs,fam);ctx.fillStyle=color;ctx.textBaseline="alphabetic";
   if(F.skew){const tn=Math.tan(F.slant*Math.PI/180);ctx.save();ctx.transform(1,0,-tn,1,tn*b,0);ctx.fillText(s,x,b);ctx.restore()}else ctx.fillText(s,x,b)}
 function hint(ctx,s,x,b,m){const sz=Math.max(14,m.xh*.62);ctx.font=`600 ${sz}px 'QS',sans-serif`;ctx.fillStyle=T.hint;ctx.textBaseline="alphabetic";
   const t=s.length>36?s.slice(0,35)+"…":s;ctx.fillText(t,x,b-m.asc*.98+sz)}
 /* mũi tên trên cả một chuỗi chữ: mỗi chữ đặt theo vị trí đo được */
 function arrowsOnText(ctx,s,x,b,fs,xh,fam){
-  if(fam==="AL")return;ctx.font=fnt(fs,fam);const chars=[...s];let pre="";
+  if(fam==="AL")return;if(laPhongTH(fam))return muiTenChuoiTH(ctx,s,x,b,xh);ctx.font=fnt(fs,fam);const chars=[...s];let pre="";
   for(const ch of chars){const x0=x+ctx.measureText(pre).width;if(DUCTUS[ch])drawGuide(ctx,ch,x0,b,xh,themeName()==="dark");pre+=ch}}
 /* nét cơ bản thanh đậm — bề rộng theo hướng viết xuống */
 function samplePath(d){
@@ -6170,6 +6170,7 @@ function drawBasicQS(ctx,kind,x,b,xh,color,tan){
   ctx.stroke();ctx.restore()}
 function drawBasic(ctx,kind,x0,b,xh,color,tan){
   if(SCRIPT==="qs")return drawBasicQS(ctx,kind,x0,b,xh,color,tan);
+  if(SCRIPT==="th")return veNetCoBanTH(ctx,kind,x0,b,xh,color,color===traceColor());
   if(!STROKES[kind])return;
   const pts=samplePath(STROKES[kind].d),n=pts.length,thick=.24*xh,thin=Math.max(.05*xh,1.1);
   let ws=pts.map((p,i)=>{const a=pts[Math.max(0,i-1)],c=pts[Math.min(n-1,i+1)];const dx=c[0]-a[0],dy=c[1]-a[1];
@@ -6272,6 +6273,125 @@ function drawCompare(ctx){
   const {m,padT,unit,up}=layout;
   pages[cur.page].forEach((row,i)=>drawRow(ctx,row,padT+i*unit+up*m.fs,m,"cmp"));}
 
+/* ================== VẼ CHỮ MẪU TIỂU HỌC TỪ ĐƯỜNG TÂM NÉT ==================
+   Kiểu Tiểu học không dùng phông: chữ mẫu vẽ từ đường tâm nét trong SC.CHU (docs/KIEN_TRUC.md mục 5.1.1).
+   Chữ có dấu thanh được ghép lúc vẽ: chữ gốc + một nét dấu trong SC.STROKES (dausac, dauhuyen, dauhoi, daunga, daunang).
+   Bộ vẽ chỉ chạy khi SCRIPT === "th"; hai kiểu kia không đổi gì.
+
+   Các chỗ nối vào app: text(), mw(), arrowsOnText(), drawBasic() trong draw.js và layout.js gọi các hàm ở đây
+   khi phông là "TH". DUCTUS (mũi tên, chấm đặt viết, So sánh) được dựng từ CHU lúc khởi động. */
+
+/* Phông giả "TH": đơn vị chữ = cỡ chữ (x = 1); phần trên đường chân tới 2,6 đơn vị (chữ cao 2,5 và dấu), phần dưới 1,6 */
+FONTS.TH = { x: 1, asc: 2.6, desc: 1.6, slant: 0, fam: "TH", wt: 500 };
+const TH_LA = () => SCRIPT === "th";
+const laPhongTH = fam => (fam || SC.font) === "TH";
+
+const TH_KHOANG_CHU = 0.3;   // khoảng giữa hai chữ trong một tiếng (đơn vị chữ); khi có nối chữ sẽ thay bằng nét nối
+const TH_KHOANG_TIENG = 0.8; // khoảng giữa hai tiếng: rộng bằng một chữ o
+const TH_DAU = { "́": "dausac", "̀": "dauhuyen", "̉": "dauhoi", "̃": "daunga", "̣": "daunang" };
+/* Vị trí ngang của âm chính để đặt dấu thanh (đơn vị chữ, tính từ mép trái chữ) */
+const TH_TAM_DAU = { a: .4, "ă": .4, "â": .4, e: .38, "ê": .36, i: .28, o: .4, "ô": .4, "ơ": .4, u: .57, "ư": .57, y: .57 };
+
+/* Dời một đường (danh sách lệnh M/L/C) đi (dx, dy) */
+function thDoi(d, dx, dy) {
+  return d.map(g => g[0] === "C" ? ["C", g[1] + dx, g[2] + dy, g[3] + dx, g[4] + dy, g[5] + dx, g[6] + dy] : [g[0], g[1] + dx, g[2] + dy]);
+}
+function thDinh(nets) { let t = 0; for (const n of nets) for (const g of n.d) for (let i = 2; i < g.length; i += 2) t = Math.max(t, g[i]); return t; }
+
+/* Hình một chữ (đã ghép dấu thanh), tính theo đơn vị chữ, mép trái chữ ở x = 0. Không có hình thì trả null. */
+const _thHinh = new Map();
+function hinhChuTH(ch) {
+  if (_thHinh.has(ch)) return _thHinh.get(ch);
+  let kq = null;
+  const tach = ch.normalize("NFD");
+  let dau = null, goc = "";
+  for (const c of tach) { if (TH_DAU[c]) dau = TH_DAU[c]; else goc += c; }
+  goc = goc.normalize("NFC");
+  const mau = SC.CHU && SC.CHU[goc];
+  if (mau) {
+    let nets = mau.cach[0].net.map(n => ({ d: n.d, dau: !!n.dau, lien: !!n.lien, loai: n.loai }));
+    if (dau) {
+      if (goc === "i") nets = nets.filter(n => n.loai !== "cham");   // ì, í, ỉ, ĩ, ị: dấu thanh thay cho chấm
+      const nd = SC.STROKES[dau], tam = TH_TAM_DAU[goc] ?? mau.rong / 2;
+      const dy = dau === "daunang" ? -0.65 : thDinh(nets) + 0.1;
+      nets = nets.concat([{ d: thDoi(nd.d, tam - 0.25, dy), dau: true, lien: false, loai: dau }]);
+    }
+    kq = { rong: mau.rong, nets };
+  }
+  _thHinh.set(ch, kq);
+  return kq;
+}
+
+/* Dàn một chuỗi: vị trí mép trái từng chữ (đơn vị chữ) và tổng bề rộng. Chữ chưa có hình được ghi vào TH_THIEU. */
+const TH_THIEU = new Set();
+function danChuoiTH(s) {
+  const o = []; let x = 0, truoc = null;
+  for (const ch of String(s).normalize("NFC")) {
+    if (ch === " ") { x += TH_KHOANG_TIENG; truoc = null; continue; }
+    const h = hinhChuTH(ch);
+    if (!h) { TH_THIEU.add(ch); x += 0.5; truoc = null; continue; }
+    if (truoc) x += TH_KHOANG_CHU;
+    o.push({ ch, x, h }); x += h.rong; truoc = h;
+  }
+  return { chu: o, rong: x };
+}
+function doRongTH(s) { return danChuoiTH(s).rong; }
+
+/* Vẽ một đường tâm nét lên ctx: gốc chữ ở (x0, b), mỗi đơn vị chữ = xh điểm ảnh, y hướng lên */
+function veDuongTH(ctx, d, x0, b, xh) {
+  ctx.beginPath();
+  for (const g of d) {
+    if (g[0] === "M") ctx.moveTo(x0 + g[1] * xh, b - g[2] * xh);
+    else if (g[0] === "L") ctx.lineTo(x0 + g[1] * xh, b - g[2] * xh);
+    else ctx.bezierCurveTo(x0 + g[1] * xh, b - g[2] * xh, x0 + g[3] * xh, b - g[4] * xh, x0 + g[5] * xh, b - g[6] * xh);
+  }
+  ctx.stroke();
+}
+const thNgan = d => d.length === 2 && d[1][0] === "L" && Math.hypot(d[1][1] - d[0][1], d[1][2] - d[0][2]) < .06;   // chấm (VD chấm chữ i)
+/* Kiểu vẽ: nét liền cho chữ mẫu; nét đứt cho dòng Tô */
+function datNetTH(ctx, xh, color, dut) {
+  ctx.strokeStyle = color; ctx.lineCap = "round"; ctx.lineJoin = "round";
+  ctx.lineWidth = dut ? Math.max(1.6, xh * .07) : Math.max(2, xh * .085);
+  ctx.setLineDash(dut ? [Math.max(3, xh * .16), Math.max(3, xh * .12)] : []);
+}
+function veChuoiTH(ctx, s, x, b, xh, color, dut) {
+  ctx.save(); datNetTH(ctx, xh, color, dut);
+  for (const c of danChuoiTH(s).chu) for (const n of c.h.nets) {
+    if (dut && thNgan(n.d)) { ctx.setLineDash([]); veDuongTH(ctx, n.d, x + c.x * xh, b, xh); ctx.setLineDash([Math.max(3, xh * .16), Math.max(3, xh * .12)]); }
+    else veDuongTH(ctx, n.d, x + c.x * xh, b, xh);
+  }
+  ctx.restore();
+}
+/* Nét cơ bản; riêng dấu thanh khi tập riêng thì đặt ở chỗ dấu nằm trên chữ (cao hơn thân chữ), dấu nặng dưới đường chân */
+function duongNetCoBanTH(kind) {
+  const st = SC.STROKES[kind]; if (!st) return null;
+  return st.dau ? thDoi(st.d, 0, kind === "daunang" ? -0.65 : 1.1) : st.d;
+}
+function veNetCoBanTH(ctx, kind, x, b, xh, color, dut) {
+  const d = duongNetCoBanTH(kind); if (!d) return;
+  ctx.save(); datNetTH(ctx, xh, color, dut); veDuongTH(ctx, d, x, b, xh); ctx.restore();
+}
+function muiTenChuoiTH(ctx, s, x, b, xh) {
+  for (const c of danChuoiTH(s).chu) if (DUCTUS[c.ch]) drawGuide(ctx, c.ch, x + c.x * xh, b, xh, themeName() === "dark");
+}
+
+/* DUCTUS cho Tiểu học: mỗi nét một lượt, lấy điểm cách đều dọc đường tâm nét (samplePath ở draw.js) */
+function thLayDiem(d) {
+  const p = samplePath(d), o = [p[0]]; let acc = 0;
+  for (let i = 1; i < p.length; i++) { acc += Math.hypot(p[i][0] - p[i - 1][0], p[i][1] - p[i - 1][1]); if (acc >= .12 || i === p.length - 1) { o.push(p[i]); acc = 0; } }
+  return o.map(([a, c]) => [Math.round(a * 1000) / 1000, Math.round(c * 1000) / 1000]);
+}
+function dungDuctusTH() {
+  if (!TH_LA()) return;
+  const them = (ch, nets) => { DUCTUS[ch] = nets.map(n => ({ r: [thLayDiem(n.d)], s: -1, ...(n.dau ? { mark: 1 } : {}) })); };
+  const goc = Object.keys(SC.CHU);
+  for (const c of goc) {
+    them(c, hinhChuTH(c).nets);
+    if (/^[aăâeêioôơuưy]$/.test(c)) for (const dau of Object.keys(TH_DAU)) { const ch = (c + dau).normalize("NFC"); const h = hinhChuTH(ch); if (h) them(ch, h.nets); }
+  }
+  for (const k of Object.keys(SC.STROKES)) DUCTUS["~" + k] = [{ r: [thLayDiem(duongNetCoBanTH(k))], s: -1 }];
+}
+dungDuctusTH();
 /* ================== MỰC (NÉT VIẾT) & TẨY THÔNG MINH ================== */
 let exporting=false,pendingResize=false,inkLoading=false,journalDirty=false,restoring=false;
 let strokes=[],history=[],redoStack=[],live=null,tool="pen",clearArm=false,lastPalmToast=0,inkDirty=false,loadSeq=0;
@@ -8481,7 +8601,7 @@ function openPdfModal(keepScroll=false){
   <div class="row"><span>Khổ giấy hoặc máy</span><div class="seg">${nutChon(Object.entries(KHO_TRANG).map(([v,k])=>[v,k.ngan]),pdfOpt.preset,v=>`pdfOpt.preset='${v}'`)}<button class="${pdfOpt.preset==="tunhap"?"on":""}" onclick="chonKhoTuNhap();openPdfModal(true)">Tự nhập</button></div></div>
   ${oKho}<div class="prog" id="pdfKhoMoTa" style="margin:4px 0 8px">${pr?`<b>${escHtml(pr.name)}:</b> ${escHtml(pr.desc)}`:escHtml(loiKho)}</div>
   <div class="row"><span>Cách tập trên dòng</span><div class="seg">${nutChon([["to","② Tô"],["nho","③ Chép"]],pdfOpt.mode,v=>`pdfOpt.mode='${v}'`)}</div></div>
-  <div class="row"><span>Kiểu dòng kẻ</span><div class="seg">${nutChon([["french","Lưới xiên Pháp"],["oly4","4 ô li Việt Nam"]],pdfOpt.grid,v=>`pdfOpt.grid='${v}'`)}</div></div>
+  ${SCRIPT==="th"?"":`<div class="row"><span>Kiểu dòng kẻ</span><div class="seg">${nutChon([["french","Lưới xiên Pháp"],["oly4","4 ô li Việt Nam"]],pdfOpt.grid,v=>`pdfOpt.grid='${v}'`)}</div></div>`}
   <div class="row"><span>Chừa lề thanh công cụ</span><div class="seg">${nutChon([["left","Lề trái (tay phải)"],["right","Lề phải (tay trái)"]],pdfOpt.barSide,v=>`pdfOpt.barSide='${v}'`)}</div></div>
   <div class="row"><span>Mũi tên thứ tự nét ở chữ mẫu</span><div class="seg">${nutChon([[true,"Bật"],[false,"Tắt"]],pdfOpt.arrows,v=>`pdfOpt.arrows=${v}`)}</div></div>
   <div id="pdfProg" class="prog" style="display:none;color:var(--accent);font-weight:700;margin-top:8px"></div>
@@ -8835,6 +8955,7 @@ function chuanHoaPdfCfg(cfg) {
     if (c.text.length > TU_GO_TOI_DA) throw new Error(`Nội dung tự gõ dài quá ${TU_GO_TOI_DA} ký tự`);
   }
   c.arrows = c.arrows !== false;
+  if (c.script === "th") c.grid = "oly4";   // Tiểu học luôn dùng lưới 4 ô li
   return c;
 }
 
