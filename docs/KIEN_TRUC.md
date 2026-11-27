@@ -1,6 +1,6 @@
 # Kiến trúc và kế hoạch phát triển ứng dụng Tập viết S Pen
 
-Bản tài liệu 0.5 · Cập nhật 26/11/2026 · Áp dụng cho mã nguồn từ bản 0.11.0
+Bản tài liệu 0.6 · Cập nhật 27/11/2026 · Áp dụng cho mã nguồn từ bản 0.12.0
 
 Tài liệu này mô tả ứng dụng được tổ chức thế nào, dữ liệu nằm ở đâu, và các bản sắp tới sẽ làm gì. Ai muốn góp ý hay góp mã thì đọc tài liệu này trước.
 
@@ -104,7 +104,7 @@ SCRIPTS[kiểu] = {
 
 Kiểu dòng trong `rows`: `stroke` (nét), `pair` (cặp chữ, câu), `rep` (lặp chữ), `blank` (dòng trống).
 
-Hiện có hai kiểu: `td` (Thanh đậm) và `qs` (Nét đều). Kiểu thứ ba `th` (Tiểu học) đang dựng, xem mục 5.1.1.
+Hiện có ba kiểu: `td` (Thanh đậm), `qs` (Nét đều) và `th` (Tiểu học, từ bản 0.12, xem mục 5.1.1).
 
 ### 5.1.1. Giáo trình tiểu học (`th`)
 
@@ -137,12 +137,12 @@ CHU[chữ] = {
 - Điểm đặt viết là điểm đầu của nét đầu tiên; điểm dừng viết là điểm cuối của nét cuối cùng. Không ghi riêng.
 - Chiều cao theo mẫu: b g h k l y = 2,5; t = 1,5; r s = 1,25; d đ p q = 2; còn lại = 1; chữ số = 2; dấu thanh nằm trong ô vuông cạnh 0,5.
 - **Dấu thanh** (`dausac`, `dauhuyen`, `dauhoi`, `daunga`, `daunang`) nằm trong `STROKES`, vẽ trong ô vuông cạnh 0,5, gốc tọa độ ở góc dưới bên trái ô. Chữ có dấu thanh không ghi riêng trong `CHU` mà ghép lúc vẽ: chữ gốc + dấu, dấu trên đặt cách đỉnh chữ (hoặc đỉnh dấu mũ) 0,1 và canh giữa âm chính, dấu nặng đặt dưới đường chân 0,15.
-- **Bộ vẽ** (`src/engine/th-render.js`, từ bản 0.12): `SC.font` của kiểu `th` là phông giả `"TH"`. Khi gặp phông này, `text()`, `mw()`, `arrowsOnText()` và `drawBasic()` vẽ và đo chữ từ đường tâm nét thay vì phông: chữ mẫu nét liền, dòng Tô nét đứt; dấu thanh ghép lúc vẽ; hai chữ trong một tiếng cách 0,3 đơn vị (tạm, chờ nối chữ), hai tiếng cách 0,8 đơn vị (rộng bằng chữ o). `DUCTUS` dựng từ `CHU` lúc khởi động, gồm cả chữ có dấu thanh và các nét cơ bản (`~` + mã nét). Kiểu `th` luôn dùng lưới 4 ô li.
+- **Bộ vẽ** (`src/engine/th-render.js`, từ bản 0.12): `SC.font` của kiểu `th` là phông giả `"TH"`. Khi gặp phông này, `text()`, `mw()`, `arrowsOnText()` và `drawBasic()` vẽ và đo chữ từ đường tâm nét thay vì phông: chữ mẫu nét liền, dòng Tô nét đứt; dấu thanh ghép lúc vẽ; nối chữ trong một tiếng (nối liền hoặc lia viết hở nhẹ tùy cặp chữ), hai tiếng cách 0,8 đơn vị (rộng bằng chữ o). `DUCTUS` dựng từ `CHU` lúc khởi động, gồm cả chữ có dấu thanh và các nét cơ bản (`~` + mã nét). Kiểu `th` luôn dùng lưới 4 ô li, cỡ Thường (2 ô li) và cỡ Nhỏ (1 ô li), in tập viết PDF đúng 1 ô li = 2 mm.
 - Trong `COURSE` của kiểu `th`, trường `z` là cỡ chữ: `"thuong"` hoặc `"nho"` (hai kiểu kia dùng `L`, `M`, `S`).
 
-Từ bản 0.12, dữ liệu dùng trong app nằm ở `src/data/scripts-th.js` (`SCRIPTS.th`). Bản xem thử cũ vẫn ở `thunghiem/`. Trong lúc làm bản 0.12, kiểu Tiểu học chỉ hiện ở chỗ chọn kiểu chữ khi mở app bằng link có `?tieuhoc`; các bài ghép tiếng, từ ngữ, cỡ Nhỏ ẩn cho tới khi có nối chữ (`TH_DU_BAI`). Kiểu chữ đang dùng lưu ở khóa `td1:script` (`td`, `qs` hoặc `th`), bài và tiến độ của mỗi kiểu lưu theo tiền tố riêng (`td1:`, `qs1:`, `th1:`).
+Từ bản 0.12, dữ liệu dùng trong ứng dụng nằm ở `src/data/scripts-th.js` (`SCRIPTS.th`), gồm 32 bài trong 9 phần, hiện trực tiếp ở mục đổi kiểu chữ. Kiểu chữ đang dùng lưu ở khóa `td1:script` (`td`, `qs` hoặc `th`), bài và tiến độ của mỗi kiểu lưu theo tiền tố riêng (`td1:`, `qs1:`, `th1:`).
 
-Mỗi nét trong `DUCTUS` có dạng `{ r: [đoạn 1, đoạn 2, …], s: phía đặt mũi tên, mark?: 1 nếu là dấu phụ }`. Mỗi đoạn là danh sách điểm `[x, y]`, tính theo chiều cao thân chữ (x sang phải, y lên trên, y = 0 là đường chân). Các đoạn trong cùng một nét được viết liền, không nhấc bút.
+Mỗi nét trong `DUCTUS` có dạng `{ r: [đoạn 1, đoạn 2, …], s: phía đặt mũi tên, mark?: 1 nếu là dấu phụ }`. Mỗi đoạn là danh sách điểm `[x, y]`, tính theo chiều cao thân chữ (x sang phải, y lên trên, y = 0 là đường chân). Các đoạn trong cùng một nét được viết liền, không nhấc viết.
 
 ### 5.2. Khổ trang (thay `PDF_PRESETS` ở bản 0.11)
 
@@ -204,7 +204,7 @@ Chưa làm: `ghichep`, `font`, `z`, `gray`, `a5x2`. Trường `links` chưa đ�
 - Mở link: nếu kiểu chữ trong link khác kiểu đang mở thì đổi kiểu rồi tải lại trang (giữ link); sau đó mở đúng bài, mở màn Xuất PDF đã điền sẵn tùy chọn, rồi xóa phần `#cfg=` khỏi thanh địa chỉ. Link hỏng hoặc cấu hình sai thì báo bằng lời dễ hiểu, app vẫn mở bình thường.
 - Màn **Tạo tập viết PDF** (thay màn Xuất PDF cũ, `openPdfModal` trong `src/engine/pdf-export.js`) chọn được: nội dung (Bài này, Chọn bài, Cả phần, Cả giáo trình, Luyện thêm, Bài tự do, Tự gõ), khổ giấy (6 khổ có sẵn và Tự nhập theo mm), Tô hay Chép, kiểu dòng kẻ, lề thanh công cụ, mũi tên. Có nút tạo PDF và nút chép đường link.
 
-### 5.4. Phông chữ của người dùng (bản 0.12)
+### 5.4. Phông chữ của người dùng (bản 0.13)
 
 | Mục | Cách làm |
 |---|---|
@@ -248,19 +248,23 @@ src/
   data/icons.js            // biểu tượng
   data/scripts-td.js       // giáo trình Thanh đậm
   data/scripts-qs.js       // giáo trình Nét đều
+  data/scripts-th.js       // giáo trình Tiểu học (th)
   data/fonts.js            // số đo phông (FONTS)
+  data/presets.js          // khổ trang theo mm (KHO_TRANG)
   data/pdff.js             // phông nhúng vào PDF (PDFF)
   engine/arrows.js         // mũi tên hướng viết, chấm đặt viết
   engine/script-select.js  // chọn kiểu chữ
   engine/storage.js        // lưu trữ, cài đặt
   engine/layout.js         // hình học chữ, bài ôn, phân trang
   engine/draw.js           // vẽ nền, dòng kẻ, chữ mẫu
+  engine/th-render.js      // bộ vẽ chữ mẫu, dấu thanh và nối chữ cho kiểu Tiểu học
   engine/ink.js            // mực, lực nhấn S Pen, Gôm
   engine/audio.js          // âm thanh giấy
   engine/measure.js        // đo nét viết
   engine/pdf-export.js     // xuất vở PDF
   engine/pdf-writer.js     // ghi PDF vectơ, nhúng phông; nút "Tạo và tải file PDF"
   engine/export-pdf.js     // exportPdf(cfg): xuất vở PDF từ một gói cấu hình
+  engine/cfg-link.js       // lưu và đọc cấu hình tập viết qua đường link
   ui/zoom-box.js           // hộp viết phóng to
   ui/split-view.js         // chia đôi màn hình máy tính bảng
   ui/name-lab.js           // luyện tên riêng, chữ ký
@@ -273,10 +277,11 @@ src/
   ui/pen.js                // viết S Pen, viết yêu thích, kiểm tra S Pen
   ui/float-bar.js          // bảng nổi
 tools/build.js             // gộp src/ thành index.html (--check để kiểm)
+tools/kiem-tieuhoc.js      // 10 phép kiểm dữ liệu, bộ vẽ và nối chữ Tiểu học
 index.html                 // tệp phát hành, chạy được không cần mạng; không sửa tay
 ```
 
-Sắp thêm: `data/scripts-th.js` (giáo trình Tiểu học, hiện ở `thunghiem/`), `data/presets.js` (khổ trang theo mm), `release/bo-chuan.json` (bộ vở làm sẵn).
+Sắp thêm: `release/bo-chuan.json` (bộ tập viết làm sẵn).
 
 Người dùng vẫn nhận **một tệp HTML** như hiện nay.
 
@@ -289,14 +294,15 @@ Người dùng vẫn nhận **một tệp HTML** như hiện nay.
 | | Khổ trang tính theo mm, thêm Samsung Notes và tỷ lệ 9:16 | Thước 50 mm trong vở A4 in ra đo đúng ±0,5 mm |
 | | Lưu và đọc cấu hình qua đường link | Mở link ra đúng cấu hình |
 | | Màn Tạo vở mới, có ô tự gõ nội dung | Mọi mục của `cfg` đều chọn được |
-| **0.12** | Ghép giáo trình Tiểu học vào app, chọn ngang hàng Thanh đậm và Nét đều | Tô theo nét đứt, xuất vở 4 ô li đúng mm |
+| **0.12** *(đã xong)* | Ghép giáo trình Tiểu học vào ứng dụng, chọn ngang hàng Thanh đậm và Nét đều 10° | Tô theo nét đứt, xuất tập viết PDF 4 ô li đúng mm |
 | | Xem viết chậm, Tự tô từng nét, cỡ Thường và cỡ Nhỏ, nối chữ cho Tiểu học | Chữ nối đúng mẫu; 1 ô li in ra đúng 2 mm |
-| **0.13** | Phông chữ của người dùng | Phông đủ dấu xuất PDF đúng; phông thiếu dấu được báo |
+| **0.13** | Chữ hoa cho kiểu Tiểu học | Đủ bảng chữ hoa tiểu học, tô theo nét đứt |
+| | Phông chữ của người dùng | Phông đủ dấu xuất PDF đúng; phông thiếu dấu được báo |
+| | Vẽ thêm khuyết trên cho l, h, k ở chữ thanh đậm | Chữ mẫu đúng kiểu viết thanh đậm truyền thống |
 | | Trang kiểm tra; kiểu dòng kẻ trơn, kẻ chấm | Đạt danh sách kiểm tra ở mục 10 |
 | | In 2 trang A5 trên 1 tờ A4 | Cắt đôi ra đúng khổ A5 |
-| | Vẽ thêm khuyết trên cho l, h, k ở chữ thanh đậm | Chữ mẫu đúng kiểu viết thanh đậm truyền thống |
-| | Màn Trang ghi chép (dòng kẻ, kẻ chấm, Cornell) | Đạt mục 10 trên cả 5 khổ |
 | | Mời người dùng thử trên reMarkable, Boox, iPad | Thu được số đo thật và độ xám phù hợp |
+| **0.14** | Màn Trang ghi chép (dòng kẻ, kẻ chấm, Cornell) | Đạt mục 10 trên cả 5 khổ |
 | **1.0** | GitHub tự tạo bộ vở làm sẵn, trang cuối có link và mã QR | Releases có đủ tệp, đúng tên |
 | | Hướng dẫn dùng cho từng loại máy | |
 
