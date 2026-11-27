@@ -1,8 +1,15 @@
 /* ================== KIỂU CHỮ ================== */
 const GS={get(k,d){try{const v=localStorage.getItem("td1:"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
  set(k,v){try{localStorage.setItem("td1:"+k,JSON.stringify(v));return true}catch(e){return false}}};
-const SCRIPT=GS.get("script","td")==="qs"?"qs":"td",SC=SCRIPTS[SCRIPT],PFX=SCRIPT==="qs"?"qs1:":"td1:";
-const COURSE=SC.COURSE,STROKES=SC.STROKES,DUCTUS=SC.DUCTUS,SOTAY=SC.SOTAY,NHAPMON=SC.NHAPMON,WORDS=SC.WORDS;
+/* Ba kiểu chữ: td (Thanh đậm), qs (Nét đều), th (Tiểu học). Mỗi kiểu lưu bài và tiến độ riêng theo tiền tố PFX. */
+const KIEU_CHU=["td","qs","th"];
+const SCRIPT=(v=>KIEU_CHU.includes(v)?v:"td")(GS.get("script","td")),SC=SCRIPTS[SCRIPT],PFX=SCRIPT+"1:";
+/* Tiểu học đang làm (bản 0.12): chỉ hiện ở chỗ chọn kiểu chữ khi mở app bằng link có ?tieuhoc (nhớ luôn cho lần sau) hoặc đang ở kiểu này */
+if(/[?&]tieuhoc\b/.test(location.search))GS.set("hienTieuHoc",true);
+const HIEN_TIEU_HOC=SCRIPT==="th"||GS.get("hienTieuHoc",false);
+const DS_KIEU_CHU=[["td","Thanh đậm"],["qs","Nét đều 10°"]].concat(HIEN_TIEU_HOC?[["th","Tiểu học"]]:[]);
+/* Tiểu học: tạm ẩn bài ghép tiếng, từ ngữ, cỡ Nhỏ cho tới khi có nối chữ (TH_DU_BAI trong scripts-th.js) */
+const COURSE=SCRIPT==="th"&&!TH_DU_BAI?SC.COURSE.map(p=>({...p,lessons:p.lessons.filter(l=>!/^th-(g|v|nh)\d/.test(l.id))})).filter(p=>p.lessons.length):SC.COURSE,STROKES=SC.STROKES,DUCTUS=SC.DUCTUS,SOTAY=SC.SOTAY,NHAPMON=SC.NHAPMON,WORDS=SC.WORDS;
 function setScript(v){if(v===SCRIPT)return;GS.set("script",v);location.reload()}
 function drawGuide(ctx,ch,x,b,xh,dark){(S.arrowStyle==="full"?drawArrows:drawSimple)(ctx,ch,x,b,xh,dark)}
 const LESSONS=[];COURSE.forEach(p=>p.lessons.forEach(l=>{l.part=p.part;LESSONS.push(l)}));
@@ -14,4 +21,5 @@ LESSONS.push(LUYEN);
 const STROKE_NAME={up:"nét lên mảnh",down:"nét xuống đậm",updown:"lên mảnh – xuống đậm",under:"móc dưới",over:"móc trên",compound:"móc hai đầu",oval:"vòng bầu dục",c:"nét cong",asc:"khuyết trên",desc:"khuyết dưới",
   tall:"nét sổ dài",short:"nét sổ ngắn",flat:"nét ngang",slash:"nét xiên trái",back:"nét xiên phải",v:"nét xiên chữ v",o:"vòng tròn",rc:"nét cong phải",u:"nét móc dưới",n:"nét móc trên",hook:"nét móc đuôi"};
 if(SCRIPT==="qs")STROKE_NAME.c="nét cong trái";
+if(SCRIPT==="th")for(const k in STROKES)STROKE_NAME[k]=STROKES[k].ten.toLowerCase();
 

@@ -139,7 +139,7 @@ CHU[chữ] = {
 - **Dấu thanh** (`dausac`, `dauhuyen`, `dauhoi`, `daunga`, `daunang`) nằm trong `STROKES`, vẽ trong ô vuông cạnh 0,5, gốc tọa độ ở góc dưới bên trái ô. Chữ có dấu thanh không ghi riêng trong `CHU` mà ghép lúc vẽ: chữ gốc + dấu, dấu trên đặt cách đỉnh chữ (hoặc đỉnh dấu mũ) 0,1 và canh giữa âm chính, dấu nặng đặt dưới đường chân 0,15.
 - Trong `COURSE` của kiểu `th`, trường `z` là cỡ chữ: `"thuong"` hoặc `"nho"` (hai kiểu kia dùng `L`, `M`, `S`).
 
-Trong lúc chưa tách mã (trước bản 0.11), dữ liệu này nằm ở `thunghiem/tieuhoc-net.js` và xem thử bằng `thunghiem/tieuhoc-xem.html`. Khi tách mã, chuyển thành `src/data/scripts-th.js`.
+Từ bản 0.12, dữ liệu dùng trong app nằm ở `src/data/scripts-th.js` (`SCRIPTS.th`). Bản xem thử cũ vẫn ở `thunghiem/`. Trong lúc làm bản 0.12, kiểu Tiểu học chỉ hiện ở chỗ chọn kiểu chữ khi mở app bằng link có `?tieuhoc`; các bài ghép tiếng, từ ngữ, cỡ Nhỏ ẩn cho tới khi có nối chữ (`TH_DU_BAI`). Kiểu chữ đang dùng lưu ở khóa `td1:script` (`td`, `qs` hoặc `th`), bài và tiến độ của mỗi kiểu lưu theo tiền tố riêng (`td1:`, `qs1:`, `th1:`).
 
 Mỗi nét trong `DUCTUS` có dạng `{ r: [đoạn 1, đoạn 2, …], s: phía đặt mũi tên, mark?: 1 nếu là dấu phụ }`. Mỗi đoạn là danh sách điểm `[x, y]`, tính theo chiều cao thân chữ (x sang phải, y lên trên, y = 0 là đường chân). Các đoạn trong cùng một nét được viết liền, không nhấc bút.
 
@@ -289,11 +289,12 @@ Người dùng vẫn nhận **một tệp HTML** như hiện nay.
 | | Lưu và đọc cấu hình qua đường link | Mở link ra đúng cấu hình |
 | | Màn Tạo vở mới, có ô tự gõ nội dung | Mọi mục của `cfg` đều chọn được |
 | **0.12** | Ghép giáo trình Tiểu học vào app, chọn ngang hàng Thanh đậm và Nét đều | Tô theo nét đứt, xuất vở 4 ô li đúng mm |
-| | Phông chữ của người dùng | Phông đủ dấu xuất PDF đúng; phông thiếu dấu được báo |
+| | Xem viết chậm, Tự tô từng nét, cỡ Thường và cỡ Nhỏ, nối chữ cho Tiểu học | Chữ nối đúng mẫu; 1 ô li in ra đúng 2 mm |
+| **0.13** | Phông chữ của người dùng | Phông đủ dấu xuất PDF đúng; phông thiếu dấu được báo |
 | | Trang kiểm tra; kiểu dòng kẻ trơn, kẻ chấm | Đạt danh sách kiểm tra ở mục 10 |
 | | In 2 trang A5 trên 1 tờ A4 | Cắt đôi ra đúng khổ A5 |
 | | Vẽ thêm khuyết trên cho l, h, k ở chữ thanh đậm | Chữ mẫu đúng kiểu viết thanh đậm truyền thống |
-| **0.13** | Màn Trang ghi chép (dòng kẻ, kẻ chấm, Cornell) | Đạt mục 10 trên cả 5 khổ |
+| | Màn Trang ghi chép (dòng kẻ, kẻ chấm, Cornell) | Đạt mục 10 trên cả 5 khổ |
 | | Mời người dùng thử trên reMarkable, Boox, iPad | Thu được số đo thật và độ xám phù hợp |
 | **1.0** | GitHub tự tạo bộ vở làm sẵn, trang cuối có link và mã QR | Releases có đủ tệp, đúng tên |
 | | Hướng dẫn dùng cho từng loại máy | |

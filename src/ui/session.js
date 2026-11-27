@@ -42,7 +42,7 @@ async function journalSnap(snap){
   const l=LESSONS[li],w=360,h=Math.max(120,Math.round(H/Math.max(1,W)*w)),c=document.createElement("canvas");c.width=w;c.height=h;
   const full=renderFullExport();
   c.getContext("2d").drawImage(full,0,0,w,h);
-  const rec={d:today(),t:(SCRIPT==="qs"?"Nét đều · ":"")+(li>=NREAL?l.t:`Bài ${li+1} · ${l.t}`),p:pg+1,m:md,img:c.toDataURL("image/jpeg",.62)};
+  const rec={d:today(),t:(SCRIPT==="td"?"":SC.name+" · ")+(li>=NREAL?l.t:`Bài ${li+1} · ${l.t}`),p:pg+1,m:md,img:c.toDataURL("image/jpeg",.62)};
   try{idb.transaction("j","readwrite").objectStore("j").put(rec,`${rec.d}|${SCRIPT}|${k}`)}catch(e){}
 }
 async function openJournal(){

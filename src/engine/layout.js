@@ -41,7 +41,9 @@ function buildReview(force=false){
     for(const l of LESSONS.slice(0,NREAL)){if(!done.has(l.id)||!l.rows||l.f)continue;for(const r of l.rows)if(r[0]==="rep"&&[...r[1]].length===1)pool.add(r[1])}
     let more=[...pool].filter(c=>!arr.includes(c));if(!more.length&&!arr.length)more=[..."aoeiu"];
     const rnd=seeded(today());more.sort(()=>rnd()-.5);arr=arr.concat(more.slice(0,8-arr.length))}
-  const interleave=SCRIPT==="td"?[["pair","a d g q  a d g q"],["pair","n m u v  l b h k"]]:[["pair","o c e a d q g p b"],["pair","i l t f j  n m u v"]];REVIEW.rows=arr.map(itemRow).concat(interleave,[["pair","abcdefghijklm"],["pair","nopqrstuvwxyz"]]);
+  const interleave=SCRIPT==="td"?[["pair","a d g q  a d g q"],["pair","n m u v  l b h k"]]:SCRIPT==="th"?[["pair","o a d q g"],["pair","i t u n m p"]]:[["pair","o c e a d q g p b"],["pair","i l t f j  n m u v"]];
+  const bangChu=SCRIPT==="th"?[["pair","a ă â b c d đ e ê g h i k l m"],["pair","n o ô ơ p q r s t u ư v x y"]]:[["pair","abcdefghijklm"],["pair","nopqrstuvwxyz"]];
+  REVIEW.rows=arr.map(itemRow).concat(interleave,bangChu);
   frozenReview=REVIEW.rows.slice();
 }
 let luyenRounds=1;
@@ -81,8 +83,8 @@ function computePages(l,mode,scale,Hh,ppOverride,v3){
   const so=S.scale;S.scale=scale;const m=sizeFor(l);S.scale=so;const F=m.F;
   let padL,padR,padT,padB,unit,safeSide;
   const up=Math.max(l.up||F.asc+.25,F.asc+.05),dn=Math.max(l.dn||F.desc+.1,F.desc+.03);
-  if(v3){safeSide=14;padL=14+(l.f?0:m.xh*.35);padR=10;padT=8;padB=4;unit=(up+dn)*m.fs+m.xh*(SCRIPT==="qs"?.6:.35)}
-  else{safeSide=W<520?24:18;padL=safeSide+(l.f?0:m.xh*.35);padR=safeSide;padT=Hh<420?50:56;padB=Hh<420?8:20;unit=(up+dn)*m.fs+m.xh*(SCRIPT==="qs"?.68:.44)}
+  if(v3){safeSide=14;padL=14+(l.f?0:m.xh*.35);padR=10;padT=8;padB=4;unit=(up+dn)*m.fs+m.xh*(SCRIPT!=="td"?.6:.35)}
+  else{safeSide=W<520?24:18;padL=safeSide+(l.f?0:m.xh*.35);padR=safeSide;padT=Hh<420?50:56;padB=Hh<420?8:20;unit=(up+dn)*m.fs+m.xh*(SCRIPT!=="td"?.68:.44)}
   const perPage=ppOverride||Math.max(1,Math.floor((Hh-padT-padB)/unit));
   const avail=Math.max(80,W-padL-padR-6);
   const lay={m,padL,padR,padT,unit,perPage,up,safeSide};

@@ -28,7 +28,7 @@ const DEFAULT_FAVS=SCRIPT==="td"?[
   {name:"Dạ quang",penType:"marker",color:"y",width:10,contrast:"soft",pressure:false,nibAngle:38}
 ];
 
-const PENK=["penType","pressure","width","contrast","color","nibAngle","tiltOn","stab","favs","activeFav","targetFav"],gset=GS.get("settings",{});if(SCRIPT==="qs")PENK.forEach(k=>delete gset[k]);
+const PENK=["penType","pressure","width","contrast","color","nibAngle","tiltOn","stab","favs","activeFav","targetFav"],gset=GS.get("settings",{});if(SCRIPT!=="td")PENK.forEach(k=>delete gset[k]);
 const S=Object.assign({
   scale:1.25,trace:"dark",penOnly:true,theme:"sepia",lowLat:true,
   rowArrows:false,arrowStyle:"simple",measure:true,predict:true,hover:true,
@@ -49,7 +49,7 @@ if(!GS.get("v31Init",false)){
   if(!gset.trace)S.trace="dark";
   saveS();GS.set("v31Init",true);
 }
-function saveS(){const g=GS.get("settings",{}),p={};for(const k in S){if(PENK.includes(k)){p[k]=S[k];if(SCRIPT==="qs")continue}g[k]=S[k]}GS.set("settings",g);store.set("pen",p)}
+function saveS(){const g=GS.get("settings",{}),p={};for(const k in S){if(PENK.includes(k)){p[k]=S[k];if(SCRIPT!=="td")continue}g[k]=S[k]}GS.set("settings",g);store.set("pen",p)}
 
 const THEMES={
  sepia:{
