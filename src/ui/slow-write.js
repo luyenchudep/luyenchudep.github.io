@@ -17,7 +17,7 @@ function drawCard(cv,items,fam){
   const Wc=cv.parentElement.clientWidth-2,d=Math.min(devicePixelRatio||1,3),F=FONTS[fam||SC.font],xh=Math.min(44,Wc/7.5),fs=xh/F.x;
   const th=SCRIPT==="th",up=(th?2.5:2.3)*xh,dn=(th?1.5:1.3)*xh,pitch=up+dn+(th?12:10),ctx=cv.getContext("2d");
   ctx.font=fnt(fs,F.fam);
-  const widths=items.map(it=>it[0]==="~"?(STROKES[it.slice(1)].w+1.3)*xh:ctx.measureText(it).width+xh*1.2);
+  const widths=items.map(it=>it[0]==="~"?(STROKES[it.slice(1)].w+1.3)*xh:mw(it,fs,F.fam)+xh*1.2);
   const rows=[];let row=[],x=0;
   items.forEach((it,i)=>{const w=widths[i]+xh*.8;if(x+w>Wc-xh*.6&&row.length){rows.push(row);row=[];x=0}row.push([it,x]);x+=w});if(row.length)rows.push(row);
   const Hc=rows.length*pitch+12;cv.width=Wc*d;cv.height=Hc*d;cv.style.height=Hc+"px";ctx.setTransform(d,0,0,d,0,0);

@@ -5,7 +5,7 @@
   Cách chạy (từ thư mục gốc của repo):
     node tools/kiem-tieuhoc.js
 
-  Công cụ đọc các file nguồn, chạy trong một ngữ cảnh vm tách biệt và thực hiện 8 phép kiểm:
+  Công cụ đọc các file nguồn, chạy trong một ngữ cảnh vm tách biệt và thực hiện 10 phép kiểm:
     1. Cấu trúc nét vẽ và tham số lệnh M/L/C trong SC.CHU.
     2. Tính hợp lệ của mã loại nét (loai) trong SC.CHU.
     3. Hình chữ và vị trí dấu thanh qua hinhChuTH (29 chữ thường, 10 chữ số, 60 chữ có dấu thanh).
@@ -14,6 +14,8 @@
     6. Hàm đo độ rộng doRongTH.
     7. Mã nét trong các dòng stroke của SC.COURSE.
     8. Phủ đủ 29 chữ thường trong dòng rep của đúng một bài có mã bắt đầu th-c.
+    9. Nối chữ qua danChuoiTH cho toàn bộ chuỗi rep, pair trong SC.COURSE và các từ trong SC.WORDS.
+   10. Kiểu nối chữ (nối liền hoặc lia viết) của các cặp mẫu.
 
   Mỗi phép kiểm in một dòng "ĐẠT ..." hoặc "HỎNG ..." kèm chi tiết; thoát với mã 1 nếu có phép hỏng.
 */
@@ -103,7 +105,10 @@ function napMoiTruong() {
   vm.runInContext(maRender, ctx, { filename: 'src/engine/th-render.js' });
 
   const TH_THIEU = vm.runInContext('TH_THIEU', ctx);
-  return { ctx, TH_THIEU };
+  const TH_KHOANG_CHU = vm.runInContext('TH_KHOANG_CHU', ctx);
+  const TH_NOI_SAT = vm.runInContext('TH_NOI_SAT', ctx);
+  const TH_DAU_CAU = vm.runInContext('TH_DAU_CAU', ctx);
+  return { ctx, TH_THIEU, TH_KHOANG_CHU, TH_NOI_SAT, TH_DAU_CAU };
 }
 
 const CHU_THUONG_29 = [
@@ -151,7 +156,7 @@ function tomTatLoi(ds, gioiHan = 10) {
 }
 
 function main() {
-  const { ctx, TH_THIEU } = napMoiTruong();
+  const { ctx, TH_THIEU, TH_KHOANG_CHU, TH_NOI_SAT, TH_DAU_CAU } = napMoiTruong();
   const SC = ctx.SC;
 
   let soDat = 0;
@@ -456,6 +461,220 @@ function main() {
     }
     if (loi.length) return { dat: false, chiTiet: tomTatLoi(loi) };
     return { dat: true, chiTiet: `đủ 29 chữ thường, mỗi chữ nằm trong đúng 1 bài (tổng ${soBai} bài th-c*)` };
+  });
+
+  // Phép kiểm 9: nối chữ qua danChuoiTH cho toàn bộ chuỗi rep, pair trong COURSE và từ trong WORDS
+  kiem(9, 'Nối chữ qua danChuoiTH trong SC.COURSE và SC.WORDS', () => {
+    const dsChuoi = [];
+    for (const phan of SC.COURSE || []) {
+      for (const bai of phan.lessons || []) {
+        for (const dong of bai.rows || []) {
+          if (Array.isArray(dong) && (dong[0] === 'rep' || dong[0] === 'pair') && typeof dong[1] === 'string') {
+            dsChuoi.push({ nguon: `bài "${bai.id}"`, chuoi: dong[1] });
+          }
+        }
+      }
+    }
+    for (const [khoa, dsTu] of Object.entries(SC.WORDS || {})) {
+      if (!Array.isArray(dsTu)) continue;
+      for (const tu of dsTu) {
+        if (typeof tu === 'string') {
+          dsChuoi.push({ nguon: `WORDS["${khoa}"]`, chuoi: tu });
+        }
+      }
+    }
+
+    const loi = [];
+    let tongNetNoi = 0;
+    let tongCapTrongTieng = 0;
+
+    for (const { nguon, chuoi } of dsChuoi) {
+      const kq = ctx.danChuoiTH(chuoi);
+      if (!kq || !Array.isArray(kq.chu) || !Array.isArray(kq.noi) || typeof kq.rong !== 'number' || !Number.isFinite(kq.rong)) {
+        loi.push(`${nguon} ("${chuoi}"): kết quả danChuoiTH không hợp lệ`);
+        continue;
+      }
+
+      // Xác định các cặp chỉ số liền nhau trong cùng một tiếng (không xen dấu cách, dấu câu hay chữ thiếu)
+      const capTrongTieng = [];
+      let idxChu = 0;
+      let truocTrongTieng = false;
+      for (const ch of chuoi.normalize('NFC')) {
+        if (ch === '\r') continue;
+        if (ch === ' ' || ch === '\u00A0' || ch === '\t' || ch === '\n') {
+          truocTrongTieng = false;
+          continue;
+        }
+        if (TH_DAU_CAU.includes(ch)) {
+          idxChu++;
+          truocTrongTieng = false;
+          continue;
+        }
+        const h = ctx.hinhChuTH(ch);
+        if (!h) {
+          truocTrongTieng = false;
+          continue;
+        }
+        if (truocTrongTieng) capTrongTieng.push(idxChu - 1);
+        idxChu++;
+        truocTrongTieng = true;
+      }
+
+      // Kiểm không chồng chữ trong cùng một tiếng
+      for (const i of capTrongTieng) {
+        tongCapTrongTieng++;
+        const c1 = kq.chu[i];
+        const c2 = kq.chu[i + 1];
+        if (!c1 || !c2 || !c1.h || !c2.h) continue;
+        const A = ctx.thDauCuoi(c1.h);
+        const B = ctx.thDauCuoi(c2.h);
+        const diemDung = c1.x + A.dung[0];
+        const diemDat = c2.x + B.dat[0];
+        if (diemDat < diemDung - 0.001) {
+          loi.push(`${nguon} ("${chuoi}"), cặp "${c1.ch}${c2.ch}": điểm đặt chữ sau (${diemDat.toFixed(4)}) lùi quá điểm dừng chữ trước (${diemDung.toFixed(4)})`);
+        }
+      }
+
+      // Kiểm mọi nét nối trong noi[].d: số hữu hạn và đúng điểm dừng chữ trước → điểm đặt chữ liền sau
+      const daKhop = new Set();
+      for (let ni = 0; ni < kq.noi.length; ni++) {
+        tongNetNoi++;
+        const n = kq.noi[ni];
+        if (!n || !Array.isArray(n.d) || n.d.length < 2) {
+          loi.push(`${nguon} ("${chuoi}") nét nối ${ni}: danh sách lệnh d rỗng hoặc thiếu`);
+          continue;
+        }
+        let hopLeSo = true;
+        for (let gi = 0; gi < n.d.length; gi++) {
+          const g = n.d[gi];
+          const can = Array.isArray(g) && SO_THAM_SO[g[0]];
+          if (!can || g.length !== can + 1) {
+            loi.push(`${nguon} ("${chuoi}") nét nối ${ni} lệnh ${gi}: cú pháp lệnh không hợp lệ`);
+            hopLeSo = false;
+            continue;
+          }
+          for (let pi = 1; pi < g.length; pi++) {
+            if (typeof g[pi] !== 'number' || !Number.isFinite(g[pi])) {
+              loi.push(`${nguon} ("${chuoi}") nét nối ${ni} lệnh ${gi} tham số ${pi}: không phải số hữu hạn (${g[pi]})`);
+              hopLeSo = false;
+            }
+          }
+        }
+        if (!hopLeSo) continue;
+        if (n.d[0][0] !== 'M') {
+          loi.push(`${nguon} ("${chuoi}") nét nối ${ni}: lệnh đầu không phải M`);
+          continue;
+        }
+        const sx = n.d[0][1];
+        const sy = n.d[0][2];
+        const gl = n.d[n.d.length - 1];
+        const ex = gl[gl.length - 2];
+        const ey = gl[gl.length - 1];
+
+        let timThay = false;
+        for (const i of capTrongTieng) {
+          if (daKhop.has(i)) continue;
+          const c1 = kq.chu[i];
+          const c2 = kq.chu[i + 1];
+          if (!c1 || !c2 || !c1.h || !c2.h) continue;
+          const A = ctx.thDauCuoi(c1.h);
+          const B = ctx.thDauCuoi(c2.h);
+          const pAx = c1.x + A.dung[0];
+          const pAy = A.dung[1];
+          const pBx = c2.x + B.dat[0];
+          const pBy = B.dat[1];
+          if (Math.hypot(sx - pAx, sy - pAy) < 0.001 && Math.hypot(ex - pBx, ey - pBy) < 0.001) {
+            daKhop.add(i);
+            timThay = true;
+            break;
+          }
+        }
+        if (!timThay) {
+          loi.push(`${nguon} ("${chuoi}") nét nối ${ni}: điểm đầu (${sx.toFixed(3)}, ${sy.toFixed(3)}) → cuối (${ex.toFixed(3)}, ${ey.toFixed(3)}) không khớp cặp chữ liền kề nào`);
+        }
+      }
+
+      // Kiểm rong bằng mép phải chữ cuối (khi chuỗi không kết thúc bằng dấu cách hay dấu câu)
+      const norm = chuoi.normalize('NFC').replace(/\r/g, '');
+      const dsKyTu = [...norm];
+      const kyTuCuoi = dsKyTu[dsKyTu.length - 1];
+      const ketThucDacBiet = !kyTuCuoi || kyTuCuoi === ' ' || kyTuCuoi === '\u00A0' || kyTuCuoi === '\t' || kyTuCuoi === '\n' || TH_DAU_CAU.includes(kyTuCuoi);
+      if (!ketThucDacBiet && kq.chu.length > 0) {
+        const chuCuoi = kq.chu[kq.chu.length - 1];
+        if (!chuCuoi.dauCau && chuCuoi.h) {
+          const mepPhai = chuCuoi.x + chuCuoi.h.rong;
+          if (Math.abs(kq.rong - mepPhai) >= 0.001) {
+            loi.push(`${nguon} ("${chuoi}"): rong=${kq.rong.toFixed(4)} khác mép phải chữ cuối (${mepPhai.toFixed(4)})`);
+          }
+        }
+      }
+    }
+
+    if (loi.length) return { dat: false, chiTiet: tomTatLoi(loi) };
+    return {
+      dat: true,
+      chiTiet: `đã kiểm ${dsChuoi.length} chuỗi (${tongCapTrongTieng} cặp trong tiếng, ${tongNetNoi} nét nối): tọa độ hữu hạn, khớp đầu cuối, không chồng chữ và đúng độ rộng`,
+    };
+  });
+
+  // Phép kiểm 10: kiểu nối chữ (nối liền hoặc lia viết) của các cặp mẫu
+  kiem(10, 'Kiểu nối chữ của các cặp mẫu', () => {
+    const CAP_NOI_LIEN = ['in', 'im', 'mi', 'tu', 'ti', 'nh', 've', 'em'];
+    const CAP_LIA_VIET = ['ba', 'ca', 'on', 'su', 'ra'];
+    const loi = [];
+
+    for (const cap of CAP_NOI_LIEN) {
+      const kq = ctx.danChuoiTH(cap);
+      if (!kq || !Array.isArray(kq.chu) || kq.chu.length !== 2) {
+        loi.push(`"${cap}": cần có 2 chữ, nhận ${kq && Array.isArray(kq.chu) ? kq.chu.length : 'không hợp lệ'}`);
+        continue;
+      }
+      const [c1, c2] = kq.chu;
+      if (!ctx.thNoiDuoc(c1, c2)) {
+        loi.push(`"${cap}": phải nối liền nhưng thNoiDuoc trả về false`);
+        continue;
+      }
+      const A = ctx.thDauCuoi(c1.h);
+      const B = ctx.thDauCuoi(c2.h);
+      const dy = Math.abs(B.dat[1] - A.dung[1]);
+      const pAx = c1.x + A.dung[0];
+      const pBx = c2.x + B.dat[0];
+      if (dy < TH_NOI_SAT) {
+        if (kq.noi.length !== 0 || Math.abs(pBx - pAx) >= 0.001) {
+          loi.push(`"${cap}": phải nối sát trực tiếp (noi.length=${kq.noi.length}, lệch ngang=${Math.abs(pBx - pAx).toFixed(4)})`);
+        }
+      } else if (kq.noi.length !== 1) {
+        loi.push(`"${cap}": phải có đúng 1 nét nối nhưng có ${kq.noi.length}`);
+      } else if (pBx < pAx - 0.001) {
+        loi.push(`"${cap}": điểm đặt chữ sau (${pBx.toFixed(4)}) lùi quá điểm dừng chữ trước (${pAx.toFixed(4)})`);
+      }
+    }
+
+    for (const cap of CAP_LIA_VIET) {
+      const kq = ctx.danChuoiTH(cap);
+      if (!kq || !Array.isArray(kq.chu) || kq.chu.length !== 2) {
+        loi.push(`"${cap}": cần có 2 chữ, nhận ${kq && Array.isArray(kq.chu) ? kq.chu.length : 'không hợp lệ'}`);
+        continue;
+      }
+      const [c1, c2] = kq.chu;
+      if (ctx.thNoiDuoc(c1, c2)) {
+        loi.push(`"${cap}": phải lia viết nhưng thNoiDuoc trả về true`);
+        continue;
+      }
+      if (kq.noi.length !== 0) {
+        loi.push(`"${cap}": phải lia viết nhưng lại có ${kq.noi.length} nét nối`);
+      }
+      const ho = c2.x - (c1.x + c1.h.rong);
+      if (Math.abs(ho - TH_KHOANG_CHU) >= 0.001) {
+        loi.push(`"${cap}": khoảng hở = ${ho.toFixed(4)}, phải đúng TH_KHOANG_CHU (${TH_KHOANG_CHU})`);
+      }
+    }
+
+    if (loi.length) return { dat: false, chiTiet: tomTatLoi(loi, 20) };
+    return {
+      dat: true,
+      chiTiet: `${CAP_NOI_LIEN.length} cặp nối liền (${CAP_NOI_LIEN.join(', ')}) và ${CAP_LIA_VIET.length} cặp lia viết (${CAP_LIA_VIET.join(', ')}) đều đúng quy tắc`,
+    };
   });
 
   const tong = soDat + soHong;
