@@ -1,0 +1,9 @@
+{
+  "name": "sinh-font-sao-mai-tap-viet",
+  "private": true,
+  "description": "Công cụ sinh font Sao Mai Tập Viết từ dữ liệu nét chữ tiểu học (chỉ dùng khi phát triển, không thuộc ứng dụng).",
+  "dependencies": {
+    "clipper-lib": "^6.4.2",
+    "opentype.js": "^2.0.0"
+  }
+}
