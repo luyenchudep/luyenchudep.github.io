@@ -7,7 +7,7 @@ if(!ictx)ictx=ink.getContext("2d");
 let W=0,H=0,DPR=1,pages=[],layout=null;
 function fontOf(l){return FONTS[l.f||SC.font]}
 function sizeFor(l){const F=fontOf(l),xh=(XH[l.z]||XH[Z_MAC_DINH]||Object.values(XH)[0])*S.scale,fs=xh/F.x;
-  return {xh,fs,asc:fs*F.asc,desc:fs*F.desc,tan:Math.tan(F.slant*Math.PI/180),fam:F.fam,F}}
+  return {xh,fs,asc:fs*F.asc,desc:fs*F.desc,tan:Math.tan(F.slant*Math.PI/180),fam:F.fam,F,co:SCRIPT==="th"?thCo(l.z):undefined}}
 function traceColor(){return T.trace[S.trace]||T.trace.dark}
 function fnt(fs,fam){const F=FONTS[fam||SC.font];return `${F.wt} ${fs}px '${F.fam}'`}
 function mw(t,fs,fam){if(laPhongTH(fam))return doRongTH(t)*fs;bctx.font=fnt(fs,fam);return bctx.measureText(t).width}
@@ -82,9 +82,10 @@ function groupsFor(r,m,avail,mode){
 function computePages(l,mode,scale,Hh,ppOverride,v3){
   const so=S.scale;S.scale=scale;const m=sizeFor(l);S.scale=so;const F=m.F;
   let padL,padR,padT,padB,unit,safeSide;
-  const up=Math.max(l.up||F.asc+.25,F.asc+.05),dn=Math.max(l.dn||F.desc+.1,F.desc+.03);
+  let up=Math.max(l.up||F.asc+.25,F.asc+.05);const dn=Math.max(l.dn||F.desc+.1,F.desc+.03);
   if(v3){safeSide=14;padL=14+(l.f?0:m.xh*.35);padR=10;padT=8;padB=4;unit=(up+dn)*m.fs+m.xh*(SCRIPT!=="td"?.6:.35)}
   else{safeSide=W<520?24:18;padL=safeSide+(l.f?0:m.xh*.35);padR=safeSide;padT=Hh<420?50:56;padB=Hh<420?8:20;unit=(up+dn)*m.fs+m.xh*(SCRIPT!=="td"?.68:.44)}
+  if(SCRIPT==="th"){const bd=thBuocDong(m.co);unit=bd.unit*m.fs;up=bd.up}   /* Tiểu học: các dòng 4 ô li nối liền nhau */
   const perPage=ppOverride||Math.max(1,Math.floor((Hh-padT-padB)/unit));
   const avail=Math.max(80,W-padL-padR-6);
   const lay={m,padL,padR,padT,unit,perPage,up,safeSide};

@@ -2,6 +2,7 @@
 function guides(ctx,b,m,x0,x1){
   const gx0=x0!=null?x0:(layout?Math.max(12,layout.safeSide-6):16);
   const gx1=x1!=null?x1:(W-(layout?Math.max(12,layout.safeSide-6):16));
+  if(SCRIPT==="th")return guidesTH(ctx,b,m,gx0,gx1);
   if(S.xBand&&T.xBand){ctx.fillStyle=T.xBand;ctx.fillRect(gx0,b-m.xh,gx1-gx0,m.xh)}
   if(S.gridStyle==="oly4"||SCRIPT==="th"){
     /* Hệ 4 ô ly chuẩn vở tiểu học Việt Nam (1 ly = xh / 2) */

@@ -97,9 +97,11 @@ async function exportPdf(cfg, tuyChon = {}) {
     const lessonJobs = [];
     let totalContentPages = 0;
     for (const l of targetLessons) {
-      const m = sizeFor(l), F = m.F;
-      const up = Math.max(l.up || F.asc + .25, F.asc + .05), dn = Math.max(l.dn || F.desc + .1, F.desc + .03);
-      const unit = (up + dn) * m.fs + m.xh * (SCRIPT !== "td" ? .72 : .48);
+      /* Tiểu học: thân chữ tính theo mm thật (1 ô li = 2 mm), các dòng 4 ô li nối liền nhau */
+      const m = SCRIPT === "th" ? sizeForTHPdf(l, pr.pxW / pr.wMm) : sizeFor(l), F = m.F;
+      let up = Math.max(l.up || F.asc + .25, F.asc + .05), dn = Math.max(l.dn || F.desc + .1, F.desc + .03);
+      let unit = (up + dn) * m.fs + m.xh * (SCRIPT !== "td" ? .72 : .48);
+      if (SCRIPT === "th") { const bd = thBuocDong(m.co); unit = bd.unit * m.fs; up = bd.up; }
       const perPage = Math.max(1, Math.floor((H - padT - padB) / unit));
       const avail = Math.max(200, W - padL - padR - 12);
       const rLayout = { m, padL, padR, padT, unit, perPage, up, safeSide: Math.min(padL, padR) };

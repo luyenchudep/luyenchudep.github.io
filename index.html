@@ -6008,7 +6008,7 @@ if(!ictx)ictx=ink.getContext("2d");
 let W=0,H=0,DPR=1,pages=[],layout=null;
 function fontOf(l){return FONTS[l.f||SC.font]}
 function sizeFor(l){const F=fontOf(l),xh=(XH[l.z]||XH[Z_MAC_DINH]||Object.values(XH)[0])*S.scale,fs=xh/F.x;
-  return {xh,fs,asc:fs*F.asc,desc:fs*F.desc,tan:Math.tan(F.slant*Math.PI/180),fam:F.fam,F}}
+  return {xh,fs,asc:fs*F.asc,desc:fs*F.desc,tan:Math.tan(F.slant*Math.PI/180),fam:F.fam,F,co:SCRIPT==="th"?thCo(l.z):undefined}}
 function traceColor(){return T.trace[S.trace]||T.trace.dark}
 function fnt(fs,fam){const F=FONTS[fam||SC.font];return `${F.wt} ${fs}px '${F.fam}'`}
 function mw(t,fs,fam){if(laPhongTH(fam))return doRongTH(t)*fs;bctx.font=fnt(fs,fam);return bctx.measureText(t).width}
@@ -6083,9 +6083,10 @@ function groupsFor(r,m,avail,mode){
 function computePages(l,mode,scale,Hh,ppOverride,v3){
   const so=S.scale;S.scale=scale;const m=sizeFor(l);S.scale=so;const F=m.F;
   let padL,padR,padT,padB,unit,safeSide;
-  const up=Math.max(l.up||F.asc+.25,F.asc+.05),dn=Math.max(l.dn||F.desc+.1,F.desc+.03);
+  let up=Math.max(l.up||F.asc+.25,F.asc+.05);const dn=Math.max(l.dn||F.desc+.1,F.desc+.03);
   if(v3){safeSide=14;padL=14+(l.f?0:m.xh*.35);padR=10;padT=8;padB=4;unit=(up+dn)*m.fs+m.xh*(SCRIPT!=="td"?.6:.35)}
   else{safeSide=W<520?24:18;padL=safeSide+(l.f?0:m.xh*.35);padR=safeSide;padT=Hh<420?50:56;padB=Hh<420?8:20;unit=(up+dn)*m.fs+m.xh*(SCRIPT!=="td"?.68:.44)}
+  if(SCRIPT==="th"){const bd=thBuocDong(m.co);unit=bd.unit*m.fs;up=bd.up}   /* Tiểu học: các dòng 4 ô li nối liền nhau */
   const perPage=ppOverride||Math.max(1,Math.floor((Hh-padT-padB)/unit));
   const avail=Math.max(80,W-padL-padR-6);
   const lay={m,padL,padR,padT,unit,perPage,up,safeSide};
@@ -6113,6 +6114,7 @@ function buildPages(){
 function guides(ctx,b,m,x0,x1){
   const gx0=x0!=null?x0:(layout?Math.max(12,layout.safeSide-6):16);
   const gx1=x1!=null?x1:(W-(layout?Math.max(12,layout.safeSide-6):16));
+  if(SCRIPT==="th")return guidesTH(ctx,b,m,gx0,gx1);
   if(S.xBand&&T.xBand){ctx.fillStyle=T.xBand;ctx.fillRect(gx0,b-m.xh,gx1-gx0,m.xh)}
   if(S.gridStyle==="oly4"||SCRIPT==="th"){
     /* Hệ 4 ô ly chuẩn vở tiểu học Việt Nam (1 ly = xh / 2) */
@@ -6400,6 +6402,38 @@ function veNetCoBanTH(ctx, kind, x, b, xh, color, dut) {
 }
 function muiTenChuoiTH(ctx, s, x, b, xh) {
   for (const c of danChuoiTH(s).chu) if (!c.dauCau && DUCTUS[c.ch]) drawGuide(ctx, c.ch, x + c.x * xh, b, xh, themeName() === "dark");
+}
+
+/* ================== LƯỚI 4 Ô LI CỦA TIỂU HỌC ==================
+   1 ô li = thân chữ / CO (cỡ Thường: CO = 2, nửa thân chữ; cỡ Nhỏ: CO = 1, bằng thân chữ). Nhờ vậy ô li của hai cỡ
+   bằng nhau, chữ cỡ Nhỏ bằng nửa chữ cỡ Thường, giống vở thật.
+   Mỗi dòng tập chiếm: cỡ Thường 8 ô li (5 trên đường chân, 3 dưới), cỡ Nhỏ 4 ô li (2,5 trên, 1,5 dưới), các dòng nối liền nhau.
+   Đường kẻ ngang đậm cách nhau 4 ô li (một dòng vở), đường chân chữ luôn là đường đậm. */
+const TH_O_LI_MM = 2;   // 1 ô li in ra = 2 mm
+function thCo(z) { return (SC.CO && SC.CO[z]) || 2; }
+function thDongOLi(co) { return co === 1 ? { tren: 2.5, cao: 4 } : { tren: 5, cao: 8 }; }
+/* Khoảng cách hai dòng tập và vị trí đường chân trong dòng, tính theo thân chữ (đơn vị chữ) */
+function thBuocDong(co) { const d = thDongOLi(co); return { unit: d.cao / co, up: d.tren / co }; }
+function guidesTH(ctx, b, m, gx0, gx1) {
+  const co = m.co || 2, ly = m.xh / co, d = thDongOLi(co);
+  const top = b - d.tren * ly, bot = top + d.cao * ly;
+  if (S.xBand && T.xBand) { ctx.fillStyle = T.xBand; ctx.fillRect(gx0, b - m.xh, gx1 - gx0, m.xh); }
+  ctx.save(); ctx.setLineDash([]);
+  ctx.strokeStyle = T.slant; ctx.lineWidth = 0.85; ctx.beginPath();
+  for (let x = gx0; x <= gx1 + .01; x += ly) { ctx.moveTo(x, top); ctx.lineTo(x, bot); }
+  for (let k = Math.ceil(-(d.cao - d.tren)); k <= Math.floor(d.tren); k++) { if (k % 4 === 0) continue; const y = b - k * ly; ctx.moveTo(gx0, y); ctx.lineTo(gx1, y); }
+  ctx.stroke();
+  ctx.strokeStyle = T.asc; ctx.lineWidth = 1.05; ctx.beginPath();
+  for (let x = gx0; x <= gx1 + .01; x += ly * 4) { ctx.moveTo(x, top); ctx.lineTo(x, bot); }
+  ctx.stroke();
+  ctx.strokeStyle = T.base; ctx.lineWidth = 1.6; ctx.beginPath();
+  for (let k = Math.ceil(-(d.cao - d.tren)); k <= Math.floor(d.tren); k++) { if (k % 4 !== 0) continue; const y = b - k * ly; ctx.moveTo(gx0, y); ctx.lineTo(gx1, y); }
+  ctx.stroke(); ctx.restore();
+}
+/* Số đo chữ cho tập viết PDF: thân chữ tính từ mm thật (1 ô li = 2 mm), không theo cỡ màn hình */
+function sizeForTHPdf(l, pxMoiMm) {
+  const co = thCo(l.z), xh = TH_O_LI_MM * co * pxMoiMm, F = FONTS.TH;
+  return { xh, fs: xh, asc: xh * F.asc, desc: xh * F.desc, tan: 0, fam: "TH", F, co };
 }
 
 /* DUCTUS cho Tiểu học: mỗi nét một lượt, lấy điểm cách đều dọc đường tâm nét (samplePath ở draw.js) */
@@ -9050,9 +9084,11 @@ async function exportPdf(cfg, tuyChon = {}) {
     const lessonJobs = [];
     let totalContentPages = 0;
     for (const l of targetLessons) {
-      const m = sizeFor(l), F = m.F;
-      const up = Math.max(l.up || F.asc + .25, F.asc + .05), dn = Math.max(l.dn || F.desc + .1, F.desc + .03);
-      const unit = (up + dn) * m.fs + m.xh * (SCRIPT !== "td" ? .72 : .48);
+      /* Tiểu học: thân chữ tính theo mm thật (1 ô li = 2 mm), các dòng 4 ô li nối liền nhau */
+      const m = SCRIPT === "th" ? sizeForTHPdf(l, pr.pxW / pr.wMm) : sizeFor(l), F = m.F;
+      let up = Math.max(l.up || F.asc + .25, F.asc + .05), dn = Math.max(l.dn || F.desc + .1, F.desc + .03);
+      let unit = (up + dn) * m.fs + m.xh * (SCRIPT !== "td" ? .72 : .48);
+      if (SCRIPT === "th") { const bd = thBuocDong(m.co); unit = bd.unit * m.fs; up = bd.up; }
       const perPage = Math.max(1, Math.floor((H - padT - padB) / unit));
       const avail = Math.max(200, W - padL - padR - 12);
       const rLayout = { m, padL, padR, padT, unit, perPage, up, safeSide: Math.min(padL, padR) };

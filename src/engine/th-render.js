@@ -118,6 +118,38 @@ function muiTenChuoiTH(ctx, s, x, b, xh) {
   for (const c of danChuoiTH(s).chu) if (!c.dauCau && DUCTUS[c.ch]) drawGuide(ctx, c.ch, x + c.x * xh, b, xh, themeName() === "dark");
 }
 
+/* ================== LƯỚI 4 Ô LI CỦA TIỂU HỌC ==================
+   1 ô li = thân chữ / CO (cỡ Thường: CO = 2, nửa thân chữ; cỡ Nhỏ: CO = 1, bằng thân chữ). Nhờ vậy ô li của hai cỡ
+   bằng nhau, chữ cỡ Nhỏ bằng nửa chữ cỡ Thường, giống vở thật.
+   Mỗi dòng tập chiếm: cỡ Thường 8 ô li (5 trên đường chân, 3 dưới), cỡ Nhỏ 4 ô li (2,5 trên, 1,5 dưới), các dòng nối liền nhau.
+   Đường kẻ ngang đậm cách nhau 4 ô li (một dòng vở), đường chân chữ luôn là đường đậm. */
+const TH_O_LI_MM = 2;   // 1 ô li in ra = 2 mm
+function thCo(z) { return (SC.CO && SC.CO[z]) || 2; }
+function thDongOLi(co) { return co === 1 ? { tren: 2.5, cao: 4 } : { tren: 5, cao: 8 }; }
+/* Khoảng cách hai dòng tập và vị trí đường chân trong dòng, tính theo thân chữ (đơn vị chữ) */
+function thBuocDong(co) { const d = thDongOLi(co); return { unit: d.cao / co, up: d.tren / co }; }
+function guidesTH(ctx, b, m, gx0, gx1) {
+  const co = m.co || 2, ly = m.xh / co, d = thDongOLi(co);
+  const top = b - d.tren * ly, bot = top + d.cao * ly;
+  if (S.xBand && T.xBand) { ctx.fillStyle = T.xBand; ctx.fillRect(gx0, b - m.xh, gx1 - gx0, m.xh); }
+  ctx.save(); ctx.setLineDash([]);
+  ctx.strokeStyle = T.slant; ctx.lineWidth = 0.85; ctx.beginPath();
+  for (let x = gx0; x <= gx1 + .01; x += ly) { ctx.moveTo(x, top); ctx.lineTo(x, bot); }
+  for (let k = Math.ceil(-(d.cao - d.tren)); k <= Math.floor(d.tren); k++) { if (k % 4 === 0) continue; const y = b - k * ly; ctx.moveTo(gx0, y); ctx.lineTo(gx1, y); }
+  ctx.stroke();
+  ctx.strokeStyle = T.asc; ctx.lineWidth = 1.05; ctx.beginPath();
+  for (let x = gx0; x <= gx1 + .01; x += ly * 4) { ctx.moveTo(x, top); ctx.lineTo(x, bot); }
+  ctx.stroke();
+  ctx.strokeStyle = T.base; ctx.lineWidth = 1.6; ctx.beginPath();
+  for (let k = Math.ceil(-(d.cao - d.tren)); k <= Math.floor(d.tren); k++) { if (k % 4 !== 0) continue; const y = b - k * ly; ctx.moveTo(gx0, y); ctx.lineTo(gx1, y); }
+  ctx.stroke(); ctx.restore();
+}
+/* Số đo chữ cho tập viết PDF: thân chữ tính từ mm thật (1 ô li = 2 mm), không theo cỡ màn hình */
+function sizeForTHPdf(l, pxMoiMm) {
+  const co = thCo(l.z), xh = TH_O_LI_MM * co * pxMoiMm, F = FONTS.TH;
+  return { xh, fs: xh, asc: xh * F.asc, desc: xh * F.desc, tan: 0, fam: "TH", F, co };
+}
+
 /* DUCTUS cho Tiểu học: mỗi nét một lượt, lấy điểm cách đều dọc đường tâm nét (samplePath ở draw.js) */
 function thLayDiem(d) {
   const p = samplePath(d), o = [p[0]]; let acc = 0;
