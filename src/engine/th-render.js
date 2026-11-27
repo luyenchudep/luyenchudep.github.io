@@ -34,7 +34,7 @@ function hinhChuTH(ch) {
   for (const c of tach) { if (TH_DAU[c]) { dau = TH_DAU[c]; soDau++; } else goc += c; }
   goc = goc.normalize("NFC");
   /* Dấu thanh chỉ đặt trên nguyên âm, mỗi chữ một dấu */
-  const mau = soDau > 1 || (dau && !/^[aăâeêioôơuưy]$/.test(goc)) ? null : SC.CHU && SC.CHU[goc];
+  const mau = soDau > 1 || (dau && !/^[aăâeêioôơuưyAĂÂEÊIOÔƠUƯY]$/.test(goc)) ? null : SC.CHU && SC.CHU[goc];
   if (mau) {
     let nets = mau.cach[0].net.map(n => ({ d: n.d, dau: !!n.dau, lien: !!n.lien, loai: n.loai }));
     if (dau) {
@@ -60,7 +60,7 @@ function baoThieuTH(ch) {
   /* Báo một lần sau khi vẽ xong (không báo lúc đang xuất PDF chạy ngầm) */
   if (typeof toast === "function" && typeof document !== "undefined" && !(typeof exporting !== "undefined" && exporting)) {
     clearTimeout(_thBaoThieu);
-    _thBaoThieu = setTimeout(() => toast(`Kiểu Tiểu học chưa có hình cho: ${[...TH_THIEU].join(" ")} (chữ hoa sẽ có ở bản sau). Các chữ này được bỏ qua.`), 400);
+    _thBaoThieu = setTimeout(() => toast(`Kiểu Tiểu học chưa có hình cho: ${[...TH_THIEU].join(" ")} (f, j, w, z sẽ có ở bản sau). Các chữ này được bỏ qua.`), 400);
   }
 }
 /* ================== NỐI CHỮ TRONG MỘT TIẾNG ==================
