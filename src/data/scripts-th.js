@@ -286,7 +286,129 @@ SCRIPTS.th = {
       ]
     },
     {
-      "part": "Phần 9 · Tự do",
+      "part": "Phần 9 · Chữ hoa",
+      "lessons": [
+        {
+          "id": "th-h0",
+          "t": "Nét cơ bản chữ hoa",
+          "z": "thuong",
+          "note": "Thân chữ hoa cỡ Thường cao 5 ô li. Tập 8 nét mềm trong khung 5 ô li trước khi ghép chữ, đưa viết nhẹ và đều tay.",
+          "rows": [["stroke","luonngang"],["stroke","luondoc"],["stroke","congtren"],["stroke","congduoi"],["stroke","mocnguoctrai"],["stroke","mocnguoclen"],["stroke","mocxuoiphai"],["stroke","mochaidauhoa"],["blank",12]]
+        },
+        {
+          "id": "th-h1",
+          "t": "Chữ hoa: A, Ă, Â",
+          "z": "thuong",
+          "note": "Chữ A cao 5 ô li, viết nét móc ngược lên trước rồi đổi chiều kéo xuống. Xong thân chữ mới viết dấu của Ă, Â.",
+          "rows": [["rep","A"],["rep","Ă"],["rep","Â"],["pair","An Ăn Ân Âu Cơ"],["pair","Ăn quả nhớ kẻ trồng cây."],["blank",12]]
+        },
+        {
+          "id": "th-h2",
+          "t": "Chữ hoa: B, C",
+          "z": "thuong",
+          "note": "Chữ B gồm 2 nét, có vòng xoắn nhỏ giữa thân. Chữ C viết liền 1 nét, uốn tròn vòng xoắn lớn trên đầu.",
+          "rows": [["rep","B"],["rep","C"],["pair","Ba Bình Cà Mau"],["pair","Có công mài sắt, có ngày nên kim."],["blank",12]]
+        },
+        {
+          "id": "th-h3",
+          "t": "Chữ hoa: D, Đ",
+          "z": "thuong",
+          "note": "Chữ D viết liền 1 nét với vòng xoắn nhỏ ở chân chữ. Chữ Đ thêm nét ngang ngắn cắt giữa thân dọc.",
+          "rows": [["rep","D"],["rep","Đ"],["pair","Duy Dung Đà Lạt"],["pair","Đi một ngày đàng, học một sàng khôn."],["blank",12]]
+        },
+        {
+          "id": "th-h4",
+          "t": "Chữ hoa: E, Ê",
+          "z": "thuong",
+          "note": "Chữ E viết liền 1 nét, có vòng xoắn lớn trên đầu và vòng xoắn nhỏ giữa thân. Chữ Ê thêm dấu mũ canh giữa.",
+          "rows": [["rep","E"],["rep","Ê"],["pair","Em bé Ê Đê"],["pair","Em chăm chỉ tập viết mỗi ngày."],["blank",12]]
+        },
+        {
+          "id": "th-h5",
+          "t": "Chữ hoa: G, H",
+          "z": "thuong",
+          "note": "Chữ G cao 8 ô li, kéo khuyết dưới 3 ô li dưới đường chân. Chữ H cao 5 ô li, giữ hai nét khuyết thon gọn.",
+          "rows": [["rep","G"],["rep","H"],["pair","Gia Lai Hà Nội"],["pair","Gần mực thì đen, gần đèn thì rạng."],["blank",12]]
+        },
+        {
+          "id": "th-h6",
+          "t": "Chữ hoa: I, K, L",
+          "z": "thuong",
+          "note": "Chữ I và K dùng chung hai nét đầu. Chữ L viết liền 1 nét, uốn mềm vòng xoắn trên đầu và ở chân chữ.",
+          "rows": [["rep","I"],["rep","K"],["rep","L"],["pair","Ích Kiên Lan"],["pair","Lá lành đùm lá rách."],["blank",12]]
+        },
+        {
+          "id": "th-h7",
+          "t": "Chữ hoa: M, N",
+          "z": "thuong",
+          "note": "Chữ M và N cùng bắt đầu ở đường kẻ 2, viết liền tay qua các điểm đổi chiều gập góc.",
+          "rows": [["rep","M"],["rep","N"],["pair","Mai Nam Nghệ An"],["pair","Một cây làm chẳng nên non."],["blank",12]]
+        },
+        {
+          "id": "th-h8",
+          "t": "Chữ hoa: O, Ô, Ơ",
+          "z": "thuong",
+          "note": "Ba chữ dùng chung nét cong kín cao 5 ô li, cuối nét lượn sâu vào trong bụng chữ. Dấu mũ Ô và dấu râu Ơ thật gọn.",
+          "rows": [["rep","O"],["rep","Ô"],["rep","Ơ"],["pair","Oanh Ông Ơn"],["pair","Ở hiền gặp lành."],["blank",12]]
+        },
+        {
+          "id": "th-h9",
+          "t": "Chữ hoa: P, Q, R",
+          "z": "thuong",
+          "note": "Chữ P và R chung nét móc ngược trái và nét cong trên. Chữ Q giống chữ O thêm nét lượn ngang mềm ở chân chữ.",
+          "rows": [["rep","P"],["rep","Q"],["rep","R"],["pair","Phú Quý Rạch Giá"],["pair","Quê em có dòng sông xanh mát."],["blank",12]]
+        },
+        {
+          "id": "th-h10",
+          "t": "Chữ hoa: S, T",
+          "z": "thuong",
+          "note": "Chữ S và T đều viết liền 1 nét, có vòng xoắn ở đầu chữ và phần cuối uốn cong vào trong.",
+          "rows": [["rep","S"],["rep","T"],["pair","Sa Pa Tây Ninh"],["pair","Thương người như thể thương thân."],["blank",12]]
+        },
+        {
+          "id": "th-h11",
+          "t": "Chữ hoa: U, Ư",
+          "z": "thuong",
+          "note": "Viết nét móc hai đầu rồi rê viết thẳng lên đường kẻ 6 mới kéo xuống. Chữ Ư thêm dấu râu nhỏ từ trên xuống.",
+          "rows": [["rep","U"],["rep","Ư"],["pair","Uyên Ứng Hòa"],["pair","Uống nước nhớ nguồn."],["blank",12]]
+        },
+        {
+          "id": "th-h12",
+          "t": "Chữ hoa: V, X, Y",
+          "z": "thuong",
+          "note": "Chữ V và X cao 5 ô li, viết liền mạch. Chữ Y cao 8 ô li, kéo khuyết dưới 3 ô li dưới đường chân. Sắp xong hết bảng chữ hoa rồi đó nha!",
+          "rows": [["rep","V"],["rep","X"],["rep","Y"],["pair","Vân Xuân Yên Bái"],["pair","Xuân về, trăm hoa đua nở."],["blank",12]]
+        }
+      ]
+    },
+    {
+      "part": "Phần 10 · Chữ hoa cỡ Nhỏ",
+      "lessons": [
+        {
+          "id": "th-hnh1",
+          "t": "Cỡ Nhỏ: Chữ hoa A tới H và câu ứng dụng",
+          "z": "nho",
+          "note": "Chữ hoa cỡ Nhỏ cao 2 ô li rưỡi, riêng chữ G cao 4 ô li. Thân chữ thường đứng sau cao 1 ô li, viết chậm và đều tay.",
+          "rows": [["pair","A Ă Â B C D Đ E Ê G H"],["pair","Bầu ơi thương lấy bí cùng."],["pair","Học ăn, học nói, học gói, học mở."],["blank",12]]
+        },
+        {
+          "id": "th-hnh2",
+          "t": "Cỡ Nhỏ: Chữ hoa I tới R và câu ứng dụng",
+          "z": "nho",
+          "note": "Giữ các chữ hoa cao đúng 2 ô li rưỡi, thẳng hàng trên đường chân. Xong cả tiếng mới đặt dấu phụ và dấu thanh.",
+          "rows": [["pair","I K L M N O Ô Ơ P Q R"],["pair","Kiến tha lâu cũng đầy tổ."],["pair","Nước chảy đá mòn."],["blank",12]]
+        },
+        {
+          "id": "th-hnh3",
+          "t": "Cỡ Nhỏ: Chữ hoa S tới Y và câu ứng dụng",
+          "z": "nho",
+          "note": "Chữ Y cao 4 ô li, kéo khuyết dưới 1 ô li rưỡi dưới đường chân. Viết trọn câu đều nét là giỏi lắm rồi đó nha!",
+          "rows": [["pair","S T U Ư V X Y"],["pair","Tiên học lễ, hậu học văn."],["pair","Vườn nhà bà có nhiều hoa thơm, trái ngọt."],["blank",12]]
+        }
+      ]
+    },
+    {
+      "part": "Phần 11 · Tự do",
       "lessons": [
         {
           "id": "free",
@@ -1613,6 +1735,215 @@ SCRIPTS.th = {
         "Viết cỡ Nhỏ nhưng các tiếng đứng quá sát nhau hoặc khoảng cách không đều.",
         "Dấu thanh viết quá lớn giống cỡ Thường, đè vào chữ hay chạm dòng trên.",
         "Viết nhanh ở cuối dòng làm chữ lớn dần lên hoặc trượt khỏi đường chân."
+      ]
+    ],
+    "th-h0": [
+      "Tám nét cơ bản của chữ hoa cỡ Thường nằm trong khung cao 5 ô li (từ đường chân tới đường kẻ 6), có độ uốn lượn mềm hơn nét chữ thường. Tập quen tay trước khi ghép thành 29 chữ hoa.",
+      [
+        "Xem viết chậm để phân biệt rõ hướng đưa viết của từng nét. Nét lượn ngang đặt bên trái ở khoảng giữa đường kẻ 3 và 4, lượn gợn sóng mềm từ trái qua phải rồi dừng giữa đường kẻ 3 và 4. Nét lượn dọc đặt ở đường kẻ 6, nửa trên lượn nhẹ qua trái, nửa dưới lượn nhẹ qua phải rồi dừng trên đường chân.",
+        "Nét cong trên đặt ở đường kẻ 5, uốn vòm lên chạm đường kẻ 6, lượn rộng qua phải rồi vòng vào dừng khoảng giữa đường kẻ 3 và 4. Nét cong dưới đặt trên đường kẻ 6, lượn võng xuống gần đường kẻ 5 rồi vòng ngược lên dừng ở đường kẻ 6 để mở đầu vòng xoắn lớn.",
+        "Nét móc ngược trái (đi xuống) đặt trên đường kẻ 6, kéo lượn xuống chạm đường chân rồi cuộn qua trái vào trong dừng ở đường kẻ 2. Nét móc ngược trái đi lên đặt ở đường kẻ 2, lượn xuống chạm đường chân rồi kéo nghiêng qua phải lên dừng ở đường kẻ 6.",
+        "Nét móc xuôi phải đặt ở đường chân, đưa hơi nghiêng lên chạm đường kẻ 6 rồi uốn móc qua phải dừng ở đường kẻ 5. Nét móc hai đầu cuộn trong đặt ở đường kẻ 5, cuộn tròn đầu trên chạm đường kẻ 6, kéo xuống chạm đường chân rồi hất lên giữa đường kẻ 2 và 3."
+      ],
+      [
+        "Kéo nét lượn ngang và nét lượn dọc thẳng cứng như nét ngang, nét sổ của chữ thường.",
+        "Nhầm chiều đi xuống của nét móc ngược trái với chiều đi lên của nét móc ngược trái đi lên.",
+        "Đầu nét cong hoặc đầu móc bị nhọn, gãy góc hay kéo chưa chạm đủ đường kẻ 6 và đường chân."
+      ]
+    ],
+    "th-h1": [
+      "Thân ba chữ hoa A, Ă, Â đều cao 5 ô li, rộng khoảng 4 ô li rưỡi. Thân chữ viết liền hai nét móc qua điểm đổi chiều ở đỉnh đường kẻ 6, rồi lia viết kéo nét lượn ngang ở khoảng đường kẻ 3.",
+      [
+        "Chữ A: đặt viết trên đường kẻ 2 một chút, viết nét 1 là nét móc ngược trái đi lên, lượn xuống chạm đường chân rồi kéo nghiêng qua phải dừng ở đường kẻ 6. Không nhấc viết, đổi chiều kéo liền nét 2 là nét móc ngược phải xuống chạm đường chân, uốn lên dừng ở đường kẻ 2. Lia viết lên khoảng đường kẻ 3 bên trái nét 1, kéo nét 3 lượn ngang từ trái qua phải cắt qua hai thân nét, dừng khoảng đường kẻ 3.",
+        "Chữ Ă: viết xong 3 nét chữ A, lia viết lên đường kẻ 7, viết nét 4 là dấu cong dưới nhỏ võng xuống giữa đường kẻ 6 và 7 rồi vòng lên lại đường kẻ 7, canh giữa đỉnh chữ. Chữ Â: viết xong 3 nét chữ A, lia viết lên trên đường kẻ 6 một chút, viết liền nét 4 là dấu mũ gồm hai đoạn xiên ngắn chụm đỉnh chạm đường kẻ 7, canh giữa đỉnh chữ.",
+        "Khi viết An, Ăn, Ân, Âu Cơ và câu ứng dụng: viết gọn chữ hoa rồi lia viết qua chữ thường đứng sau sát điểm dừng đường kẻ 2 của nét 2; viết xong cả tiếng mới đặt dấu thanh."
+      ],
+      [
+        "Hai chân chữ A choãi quá rộng hoặc chụm lại quá hẹp làm chữ mất cân đối.",
+        "Nét lượn ngang kéo thẳng cứng hoặc đặt quá cao, quá thấp so với đường kẻ 3.",
+        "Dấu của Ă và Â viết quá lớn, đặt lệch một bên hay dính sát vào đỉnh chữ A."
+      ]
+    ],
+    "th-h2": [
+      "Chữ B và chữ C đều cao 5 ô li, rộng khoảng 3 ô li rưỡi tới 4 ô li. Chữ B gồm 2 nét có vòng xoắn nhỏ giữa thân, còn chữ C viết liền 1 mạch với vòng xoắn lớn trên đầu.",
+      [
+        "Chữ B: nét 1 đặt viết trên đường kẻ 6, hơi lượn qua trái kéo nét móc ngược trái xuống chạm đường chân, uốn cong qua trái vào trong dừng ở đường kẻ 2. Lia viết lên đường kẻ 5 (bên trái nét 1), viết liền nét 2 gồm nét cong trên vòng qua đường kẻ 6 xuống khoảng giữa đường kẻ 3 và 4, thắt vòng xoắn nhỏ rồi uốn liền nét cong phải lớn hơn chạm đường chân, lượn vào trong dừng khoảng đường kẻ 2.",
+        "Chữ C: viết liền 1 nét, đặt viết trên đường kẻ 6, viết nét cong dưới lượn lên chạm đường kẻ 6 rồi chuyển hướng viết liền nét cong trái lớn xuống chạm đường chân (tạo vòng xoắn lớn trên đầu), cuối nét uốn vòng vào trong dừng ở đường kẻ 2.",
+        "Khi viết Ba, Bình, Cà Mau và câu ứng dụng: sau điểm dừng của B và C, lia viết đặt nét mở đầu chữ thường đứng sau sát gọn, tránh để khe hở lớn giữa chữ hoa và chữ thường."
+      ],
+      [
+        "Bụng trên của chữ B lớn hơn bụng dưới hoặc vòng xoắn giữa thân bị quá lớn.",
+        "Vòng xoắn trên đầu chữ C bị dẹt kín hoặc lưng chữ C gãy khúc, không cong đều.",
+        "Đặt chữ thường đứng sau chữ B, C quá xa làm tiếng bị tách đôi."
+      ]
+    ],
+    "th-h3": [
+      "Chữ D và chữ Đ cao 5 ô li, rộng khoảng 4 ô li. Thân chữ viết liền 1 nét kết hợp nét lượn dọc, vòng xoắn nhỏ ở chân chữ và nét cong phải lượn sâu vào trong.",
+      [
+        "Chữ D: đặt viết trên đường kẻ 6, viết nét lượn dọc xuống sát đường chân, đổi hướng uốn tạo vòng xoắn nhỏ nằm gọn ngay trên đường chân, rồi viết liền nét cong phải lớn vòng lên chạm đường kẻ 6, phần cuối lượn sâu vào trong thân chữ dừng ở đường kẻ 5.",
+        "Chữ Đ: viết nét 1 giống hệt chữ D hoa. Sau đó lia viết xuống khoảng giữa đường kẻ 3 và 4 (bên trái thân dọc), kéo nét 2 thẳng ngang ngắn từ trái qua phải cắt cân đối qua giữa nét lượn dọc.",
+        "Khi viết Duy, Dung, Đà Lạt và câu ứng dụng: viết trọn chữ hoa D hoặc Đ trước, rồi lia viết xuống viết chữ thường đứng sau sát gọn; chừa khoảng bằng một chữ o giữa hai tiếng."
+      ],
+      [
+        "Vòng xoắn ở chân chữ D, Đ quá lớn hoặc tụt xuống dưới đường chân.",
+        "Nét cong phải bị hẹp hoặc phần cuối dừng sớm ở ngoài, không lượn vào trong thân chữ.",
+        "Nét ngang của chữ Đ kéo quá dài, đặt lệch khỏi giữa đường kẻ 3 và 4 hoặc quên gạch ngang."
+      ]
+    ],
+    "th-h4": [
+      "Chữ E và chữ Ê cao 5 ô li, rộng khoảng 3 ô li rưỡi tới 4 ô li. Thân chữ viết liền 1 nét có vòng xoắn lớn trên đầu và vòng xoắn nhỏ giữa thân.",
+      [
+        "Chữ E: viết liền 1 nét, đặt viết trên đường kẻ 6, viết nét cong dưới rồi chuyển hướng viết nét cong trái thứ nhất tạo vòng xoắn lớn trên đầu (gọn hơn chữ C). Tới khoảng giữa đường kẻ 3 và 4, uốn tạo vòng xoắn nhỏ giữa thân rồi viết liền nét cong trái thứ hai chạm đường chân, cuối nét uốn vòng vào trong dừng ở đường kẻ 2.",
+        "Chữ Ê: viết nét 1 giống chữ E hoa. Lia viết lên trên đường kẻ 6 một chút, viết liền nét 2 là dấu mũ gồm hai đoạn xiên ngắn chụm đỉnh chạm đường kẻ 7, canh giữa ngay trên đỉnh chữ.",
+        "Khi viết Em bé, Ê Đê và câu ứng dụng: sau chữ E, Ê thì lia viết gọn qua chữ thường đứng sau; giữ dấu mũ của Ê nhỏ gọn để không chạm dòng trên."
+      ],
+      [
+        "Vòng xoắn giữa thân của E, Ê bị bít kín hoặc tụt thấp xuống gần đường chân.",
+        "Phần cong dưới hẹp hơn phần cong trên làm dáng chữ bị chông chênh.",
+        "Dấu mũ của chữ Ê quá lớn, đặt lệch một bên hoặc chạm dính vào đỉnh chữ."
+      ]
+    ],
+    "th-h5": [
+      "Chữ G cao 8 ô li (5 ô li trên đường chân và 3 ô li dưới đường chân, rộng 4 ô li), còn chữ H cao 5 ô li (rộng khoảng 4 ô li rưỡi). Cả hai chữ đều có nét khuyết nên cần giữ vòng khuyết thon gọn, riêng khuyết dưới của G giao đúng đường chân.",
+      [
+        "Chữ G: nét 1 đặt trên đường kẻ 6, viết nét cong dưới và nét cong trái tạo vòng xoắn lớn trên đầu giống phần trên chữ C, kéo xuống chạm đường chân rồi uốn lên dừng ở đường kẻ 3. Không nhấc viết, đổi chiều kéo liền nét 2 là nét khuyết dưới xuống sâu tới đường kẻ 4 dưới đường chân (3 ô li dưới), vòng qua trái đi lên cắt nét thẳng đúng đường chân, dừng ở đường kẻ 2.",
+        "Chữ H: nét 1 đặt trên đường kẻ 5, viết nét cong trái nhỏ rồi lượn ngang qua phải dừng trên đường kẻ 6. Đổi chiều viết liền nét 2 gồm nét khuyết ngược xuống chạm đường chân, vòng lên viết liền nét khuyết xuôi tới đường kẻ 6, kéo xuống chạm đường chân rồi uốn nét móc ngược phải dừng ở đường kẻ 2. Lia viết lên dưới đường kẻ 4, kéo nét 3 thẳng đứng ngắn cắt giữa đoạn nối hai nét khuyết, dừng khoảng đường kẻ 2.",
+        "Khi viết Gia Lai, Hà Nội và câu ứng dụng: từ điểm dừng đường kẻ 2 của chữ G đưa viết nối mượt qua chữ thường đứng sau; viết xong chữ H (đủ cả nét sổ giữa) thì lia viết đặt chữ thường sát điểm dừng đường kẻ 2 của nét 2, giữ thẳng hàng trên đường chân."
+      ],
+      [
+        "Nét khuyết dưới của chữ G kéo chưa đủ 3 ô li dưới đường chân hoặc chỗ giao nét lệch khỏi đường chân.",
+        "Hai vòng khuyết của chữ H phình quá lớn, chạm dính vào nhau.",
+        "Quên nét thẳng đứng ngắn giữa chữ H hoặc kéo nét đó quá dài chạm đường kẻ 6 hay đường chân."
+      ]
+    ],
+    "th-h6": [
+      "Ba chữ hoa I, K, L đều cao 5 ô li. Chữ I và K dùng chung hoàn toàn hai nét đầu; chữ L viết liền 1 mạch có vòng xoắn lớn trên đỉnh và vòng xoắn nhỏ ở chân chữ.",
+      [
+        "Chữ I: nét 1 đặt trên đường kẻ 5, viết nét cong trái nhỏ rồi lượn ngang qua phải dừng trên đường kẻ 6. Đổi chiều viết liền nét 2 là nét móc ngược trái kéo xuống chạm đường chân, uốn cong qua trái vào trong dừng ở đường kẻ 2.",
+        "Chữ K: viết nét 1 và nét 2 giống hệt chữ I hoa. Lia viết lên đường kẻ 5 (bên phải nét 2), viết liền nét 3: uốn cong đầu móc lên chạm đường kẻ 6 rồi kéo xiên xuống khoảng giữa đường kẻ 3 và 4, lồng vào thân nét 2 tạo vòng xoắn nhỏ, rồi nối liền nét móc ngược phải xuống chạm đường chân, dừng ở đường kẻ 2.",
+        "Chữ L: viết liền 1 nét, đặt trên đường kẻ 6 viết nét cong dưới tạo vòng xoắn lớn trên đầu, đổi hướng viết nét lượn dọc xuống sát đường chân, rồi uốn tạo vòng xoắn nhỏ ngay trên đường chân và kéo nét lượn ngang qua phải dừng ở đường kẻ 2."
+      ],
+      [
+        "Chữ I viết quá rộng (hơn 2 ô li rưỡi) hoặc chân móc không cuộn tròn vào trong.",
+        "Vòng xoắn giữa thân chữ K đặt tách rời khỏi nét 2 làm chữ bị hở.",
+        "Nét lượn ngang ở chân chữ L kéo thẳng cứng hoặc vòng xoắn chân chữ tụt dưới đường chân."
+      ]
+    ],
+    "th-h7": [
+      "Chữ M và chữ N đều cao 5 ô li, cùng bắt đầu ở đường kẻ 2 bằng nét móc ngược trái đi lên đường kẻ 6 và đổi chiều viết liền tay, không nhấc viết.",
+      [
+        "Chữ M: nét 1 đặt trên đường kẻ 2, viết nét móc ngược trái đi lên, lượn xuống chạm đường chân rồi kéo nghiêng qua phải dừng ở đường kẻ 6. Đổi chiều kéo liền nét 2 lượn dọc (gần như thẳng đứng, cuối hơi lượn nhẹ qua trái) xuống chạm đường chân. Đổi chiều đưa liền nét 3 thẳng xiên hơi lượn hai đầu từ đường chân lên qua phải tới đường kẻ 6. Đổi chiều kéo liền nét 4 móc ngược phải xuống chạm đường chân, uốn lên dừng ở đường kẻ 2.",
+        "Chữ N: nét 1 đặt trên đường kẻ 2, viết nét móc ngược trái đi lên chạm đường kẻ 6 giống chữ M. Đổi chiều kéo nét 2 thẳng xiên xuống qua phải chạm đường chân. Đổi chiều đưa nét 3 móc xuôi phải từ dưới lên hơi nghiêng qua phải chạm đường kẻ 6, uốn cong nhẹ đầu móc dừng ở đường kẻ 5.",
+        "Khi viết Mai, Nam, Nghệ An và câu ứng dụng: từ điểm dừng đường kẻ 2 của M nối mượt qua chữ thường; với N dừng trên đường kẻ 5 thì lia viết xuống đặt chữ thường đứng sau sát gọn."
+      ],
+      [
+        "Nhấc viết rời từng nét tại đường kẻ 6 hoặc đường chân thay vì đổi chiều liền tay.",
+        "Các chân của chữ M đứng không đều trên đường chân hoặc thân chữ kéo bè rộng quá 6 ô li.",
+        "Hai thân nét của chữ N quá sát nhau làm chữ hẹp hoặc nét 3 kéo thẳng không có đầu móc."
+      ]
+    ],
+    "th-h8": [
+      "Thân ba chữ hoa O, Ô, Ơ cao 5 ô li, rộng khoảng 4 ô li (chữ Ơ rộng hơn một chút do có dấu râu), cùng dùng nét cong kín hình bầu dục đứng có phần cuối lượn sâu vào trong bụng chữ.",
+      [
+        "Chữ O: viết liền 1 nét, đặt viết trên đường kẻ 6, đưa vòng ngược chiều kim đồng hồ qua trái xuống chạm đường chân, vòng qua phải lên gần điểm đặt viết rồi lượn sâu vào trong bụng chữ; tới khoảng đường kẻ 4 lượn nhẹ lên một chút rồi dừng.",
+        "Chữ Ô: viết nét 1 giống chữ O hoa, rồi lia viết lên trên đường kẻ 6 một chút, viết liền nét 2 là dấu mũ gồm hai đoạn xiên ngắn canh giữa đỉnh chữ, đỉnh mũ chạm đường kẻ 7.",
+        "Chữ Ơ: viết nét 1 giống chữ O hoa, rồi lia viết lên góc trên bên phải (ngay trên đường kẻ 6 một chút), kéo nét 2 là dấu râu cong nhỏ từ trên xuống chạm nhẹ vào lưng phải chữ O ở khoảng giữa đường kẻ 5 và 6."
+      ],
+      [
+        "Vòng nét cong theo chiều kim đồng hồ hoặc viết tròn bè ngang thay vì dáng bầu dục đứng.",
+        "Dừng viết sớm ở mép ngoài mà không lượn sâu vào trong bụng chữ tới khoảng đường kẻ 4.",
+        "Viết dấu râu của chữ Ơ từ dưới lên hoặc viết dấu mũ chữ Ô quá lớn, lệch một bên."
+      ]
+    ],
+    "th-h9": [
+      "Ba chữ hoa P, Q, R đều cao 5 ô li. Chữ P và R dùng chung nét 1 móc ngược trái đi xuống và phần đầu cong trên; chữ Q kết hợp thân chữ O với nét lượn ngang mềm ở chân chữ.",
+      [
+        "Chữ P: nét 1 đặt trên đường kẻ 6, kéo nét móc ngược trái xuống chạm đường chân, uốn vào trong dừng ở đường kẻ 2. Lia viết lên đường kẻ 5 (bên trái nét 1), viết nét 2 cong trên vòng qua đường kẻ 6 lượn rộng qua phải rồi uốn cong vào gần thân nét 1, dừng khoảng giữa đường kẻ 3 và 4.",
+        "Chữ Q: nét 1 viết giống chữ O hoa (đặt trên đường kẻ 6, lượn vào trong bụng chữ dừng khoảng đường kẻ 4). Lia viết xuống gần đường kẻ 2 trong lòng chữ, viết nét 2 lượn ngang mềm như dấu ngã lớn từ trái qua phải cắt qua phần dưới nét cong kín, dừng trên đường kẻ 2 một chút.",
+        "Chữ R: viết nét 1 giống nét 1 của chữ P. Lia viết lên đường kẻ 5 (bên trái nét 1), viết liền nét 2 vòng cong trên qua đường kẻ 6 xuống khoảng giữa đường kẻ 3 và 4, thắt vòng xoắn nhỏ rồi viết liền nét móc ngược phải xuống chạm đường chân, dừng ở đường kẻ 2."
+      ],
+      [
+        "Nét cong trên của chữ P và R bị hẹp hoặc lệch thấp dưới đường kẻ 6.",
+        "Nét lượn ngang của chữ Q kéo thẳng đơ hoặc tụt xuống dưới đường chân.",
+        "Vòng xoắn giữa thân chữ R quá lớn làm bụng trên và chân chữ thiếu gọn gàng."
+      ]
+    ],
+    "th-h10": [
+      "Chữ S và chữ T đều cao 5 ô li và viết liền 1 mạch không nhấc viết. Cả hai có vòng xoắn đặc trưng ở đầu chữ và phần cuối uốn cong vào trong dừng ở đường kẻ 2.",
+      [
+        "Chữ S: viết liền 1 nét, đặt viết trên đường kẻ 6, viết nét cong dưới lượn lên chạm đường kẻ 6, chuyển hướng uốn qua trái tạo vòng xoắn lớn ở đầu chữ rồi lượn mềm qua bụng phải xuống chạm đường chân, cuối nét uốn vòng qua trái vào trong dừng ở đường kẻ 2.",
+        "Chữ T: viết liền 1 nét, đặt viết giữa đường kẻ 4 và 5, viết nét cong trái nhỏ đưa lên nối liền nét lượn ngang từ trái qua phải ở khoảng giữa đường kẻ 5 và 6; vòng lên chạm đường kẻ 6 rồi quay ngược lại cắt qua nét lượn ngang tạo vòng xoắn nhỏ trên đầu, kéo nét cong trái lớn xuống chạm đường chân rồi uốn vào trong dừng ở đường kẻ 2.",
+        "Khi viết Sa Pa, Tây Ninh và câu ứng dụng: sau khi dừng ở đường kẻ 2 trong lòng chữ S, T, lia viết đặt nét mở đầu chữ thường đứng sau sát gọn và giữ đều khoảng cách giữa các tiếng."
+      ],
+      [
+        "Thân chữ S kéo thẳng đơ, thiếu độ lượn mềm hoặc bị nghiêng đổ qua một bên.",
+        "Nét lượn ngang trên đầu chữ T kéo quá dài làm đầu chữ bè rộng.",
+        "Vòng xoắn đầu chữ S hay chữ T bị bít kín, mất rõ nét."
+      ]
+    ],
+    "th-h11": [
+      "Chữ U và chữ Ư đều cao 5 ô li, rộng khoảng 4 tới 4 ô li rưỡi. Điểm quan trọng nhất là thao tác rê viết thẳng từ giữa đường kẻ 2 và 3 lên đường kẻ 6 trước khi kéo nét móc ngược phải xuống đường chân.",
+      [
+        "Chữ U: nét 1 đặt trên đường kẻ 5, viết nét móc hai đầu (đầu trái cuộn tròn lên chạm đường kẻ 6, thân kéo xuống chạm đường chân rồi hất lên dừng ở giữa đường kẻ 2 và 3). Giữ đầu viết chạm giấy rê thẳng lên đường kẻ 6, rồi đổi chiều kéo thẳng xuống chạm đường chân viết nét 2 móc ngược phải, dừng ở đường kẻ 2.",
+        "Chữ Ư: viết nét 1 và nét 2 giống hệt chữ U hoa. Lia viết lên ngay trên đường kẻ 6 một chút (phía trên bên phải đầu nét 2), kéo nét 3 là dấu râu cong nhỏ từ trên xuống chạm nhẹ vào gần đầu nét 2.",
+        "Khi viết Uyên, Ứng Hòa và câu ứng dụng: từ điểm dừng đường kẻ 2 của U, Ư, đưa viết nối mượt qua chữ thường đứng sau; viết xong cả tiếng mới đặt dấu râu (nếu chưa đặt) và dấu thanh."
+      ],
+      [
+        "Không rê viết thẳng lên đường kẻ 6 mà tách sớm làm hở khe giữa hai nét.",
+        "Thân nét 1 và nét 2 không song song, bị choãi rộng hoặc chụm đáy vào nhau.",
+        "Viết dấu râu của chữ Ư từ dưới lên hoặc đặt rời xa đầu nét 2."
+      ]
+    ],
+    "th-h12": [
+      "Chữ V và X cao 5 ô li, còn chữ Y cao 8 ô li (5 ô li trên đường chân và 3 ô li dưới đường chân). Cả ba chữ đều viết liền mạch, không nhấc viết giữa chừng.",
+      [
+        "Chữ V: nét 1 đặt trên đường kẻ 5, viết nét cong trái nhỏ rồi lượn ngang qua phải dừng trên đường kẻ 6. Đổi chiều kéo nét 2 thẳng đứng hơi lượn hai đầu xuống chạm đường chân. Đổi chiều lượn lên viết nét 3 móc xuôi phải chạm đường kẻ 6, uốn nhẹ qua phải dừng ở đường kẻ 5.",
+        "Chữ X: viết liền 1 nét, đặt trên đường kẻ 5 viết nét móc hai đầu trái vòng qua đường kẻ 6 xuống chạm đường chân, lượn vòng lên viết liền nét thẳng xiên cắt chéo qua phải lên chạm đường kẻ 6; đổi hướng viết tiếp nét móc hai đầu phải xuống chạm đường chân rồi uốn lên qua phải dừng ở đường kẻ 2.",
+        "Chữ Y: nét 1 đặt trên đường kẻ 5, viết nét móc hai đầu giống chữ U dừng giữa đường kẻ 2 và 3. Rê viết thẳng lên đường kẻ 6 rồi đổi chiều kéo nét khuyết dưới xuống sâu tới đường kẻ 4 dưới đường chân (3 ô li dưới), vòng qua trái đi lên cắt nét thẳng đúng đường chân, dừng ở đường kẻ 2."
+      ],
+      [
+        "Hai bên của chữ V hoặc chữ X mở quá rộng, thiếu cân đối hai nửa trái phải.",
+        "Nhấc viết tách chữ X thành hai nét chéo rời nhau thay vì viết liền mạch.",
+        "Nét khuyết dưới của chữ Y kéo chưa đủ 3 ô li dưới đường chân hoặc hai nét không giao nhau đúng đường chân."
+      ]
+    ],
+    "th-hnh1": [
+      "Ở cỡ Nhỏ, chiều cao mọi chữ giảm còn một nửa so với cỡ Thường: chữ hoa cao 2 ô li rưỡi (chạm giữa đường kẻ 3 và 4), riêng chữ G cao 4 ô li (2 ô li rưỡi trên và 1 ô li rưỡi dưới đường chân), còn thân chữ thường cao 1 ô li.",
+      [
+        "Viết chậm lại để tay quen khung nhỏ khi tập nhóm A, Ă, Â, B, C, D, Đ, E, Ê, G, H. Giữ các vòng xoắn của B, C, D, Đ, E, Ê và nét khuyết của G, H thon gọn, rõ khe sáng.",
+        "Khi chép hai câu ứng dụng: đọc nhẩm trọn câu trước khi đặt viết. Viết chữ hoa đầu câu cao đúng 2 ô li rưỡi, thân chữ thường đứng sau cao 1 ô li (chữ b, h, l, g, y cao 2 ô li rưỡi; d, đ cao 2 ô li; t cao 1 ô li rưỡi).",
+        "Viết trọn từng tiếng rồi mới lia viết đặt dấu phụ và dấu thanh nhỏ gọn, chừa khoảng trống rộng bằng một chữ o cỡ Nhỏ giữa hai tiếng và ghi rõ dấu phẩy, dấu chấm."
+      ],
+      [
+        "Quen tay viết chữ hoa cỡ Nhỏ quá lớn lên tới đường kẻ 5 hay đường kẻ 6.",
+        "Bóp viết chặt làm vòng xoắn của B, D, Đ, E, Ê bị bít kín, nét bị run.",
+        "Khoảng cách giữa các tiếng không đều hoặc quên dấu phẩy, dấu chấm cuối câu."
+      ]
+    ],
+    "th-hnh2": [
+      "Luyện thu gọn 11 chữ hoa từ I tới R ở cỡ Nhỏ (cao 2 ô li rưỡi) và giữ đều nhịp tay khi chép trọn câu tục ngữ trên một dòng.",
+      [
+        "Viết đều các chữ I, K, L, M, N, O, Ô, Ơ, P, Q, R chạm đúng giữa đường kẻ 3 và 4. Giữ bề rộng gọn khoảng 2 ô li (riêng chữ I gọn khoảng 1 ô li và chữ M rộng hơn một chút khoảng 2 ô li rưỡi tới 3 ô li).",
+        "Chú ý dấu mũ của Ô, dấu râu của Ơ, vòng xoắn giữa thân K, R, vòng xoắn chân L và nét lượn chân Q viết thật gọn, không chạm dòng trên hay tụt xuống dưới đường chân.",
+        "Khi chép câu ứng dụng: giữ thẳng hàng mọi chữ trên đường chân từ đầu tới cuối câu, viết xong từng tiếng mới lia viết đặt dấu phụ và dấu thanh."
+      ],
+      [
+        "Viết chữ M, N kéo bè ngang làm dòng chữ chật chội, mất cân đối.",
+        "Dấu mũ của Ô hoặc dấu thanh cỡ Nhỏ viết quá lớn, đè vào chữ hay chạm dòng trên.",
+        "Càng về cuối câu chữ càng nghiêng, nhỏ dần hoặc trượt khỏi đường chân."
+      ]
+    ],
+    "th-hnh3": [
+      "Hoàn thiện 7 chữ hoa cuối bảng S, T, U, Ư, V, X, Y ở cỡ Nhỏ (cao 2 ô li rưỡi, riêng Y cao 4 ô li) và chép trọn vẹn câu ứng dụng dài có dấu phẩy, dấu chấm.",
+      [
+        "Viết liền mạch S, T, V, X trong khung cao 2 ô li rưỡi; với U, Ư, Y, giữ thao tác rê viết thẳng lên giữa đường kẻ 3 và 4 rồi kéo xuống thẳng đứng. Riêng nét khuyết dưới của Y kéo xuống 1 ô li rưỡi dưới đường chân, giao nhau đúng đường chân.",
+        "Khi chép câu ứng dụng: canh đều chữ hoa đầu câu với hàng chữ thường 1 ô li đứng sau, chừa khoảng trống bằng một chữ o cỡ Nhỏ giữa các tiếng và đặt dấu phẩy, dấu chấm gọn rõ.",
+        "Viết xong cả câu thì đọc dò lại một lượt: kiểm tra độ cao chữ hoa, nét khuyết, dấu phụ, dấu thanh và dấu câu."
+      ],
+      [
+        "Nét khuyết dưới của chữ Y kéo quá sâu chạm dòng dưới hoặc giao nhau lệch khỏi đường chân.",
+        "Thu nhỏ chữ S, T, X bị gãy nét, mất độ cong lượn mềm.",
+        "Viết vội ở cuối câu dài làm sót dấu thanh, thiếu nét hoặc quên dấu chấm."
       ]
     ]
   },

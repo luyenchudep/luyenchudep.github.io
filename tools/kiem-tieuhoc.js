@@ -5,7 +5,7 @@
   Cách chạy (từ thư mục gốc của repo):
     node tools/kiem-tieuhoc.js
 
-  Công cụ đọc các file nguồn, chạy trong một ngữ cảnh vm tách biệt và thực hiện 11 phép kiểm:
+  Công cụ đọc các file nguồn, chạy trong một ngữ cảnh vm tách biệt và thực hiện 12 phép kiểm:
     1. Cấu trúc nét vẽ và tham số lệnh M/L/C trong SC.CHU.
     2. Tính hợp lệ của mã loại nét (loai) trong SC.CHU.
     3. Hình chữ và vị trí dấu thanh qua hinhChuTH (29 chữ thường, 10 chữ số, 60 chữ có dấu thanh).
@@ -17,6 +17,7 @@
     9. Nối chữ qua danChuoiTH cho toàn bộ chuỗi rep, pair trong SC.COURSE và các từ trong SC.WORDS.
    10. Kiểu nối chữ (nối liền hoặc lia viết) của các cặp mẫu.
    11. Chữ hoa Tiểu học (29 chữ hoa trong SC.CHU, chiều cao thân chữ, 60 chữ hoa có dấu thanh và dàn chuỗi mẫu).
+   12. Các bài chữ hoa trong SC.COURSE và SC.SOTAY (8 nét cơ bản ở th-h0, phủ đủ và đúng thứ tự 29 chữ hoa A → Y, cỡ chữ, sổ tay, dàn chuỗi và phần Tự do ở cuối).
 
   Mỗi phép kiểm in một dòng "ĐẠT ..." hoặc "HỎNG ..." kèm chi tiết; thoát với mã 1 nếu có phép hỏng.
 */
@@ -989,6 +990,210 @@ function main() {
     return {
       dat: true,
       chiTiet: `đủ ${CHU_HOA_29.length} chữ hoa (đỉnh/đáy và nét lien đúng), ${CHU_HOA_CO_DAU_60.length} chữ hoa có dấu thanh và ${CHUOI_HOA_MAU.length} chuỗi mẫu (${tongCap} cặp trong tiếng, ${tongNetNoi} nét nối)`,
+    };
+  });
+
+  // Phép kiểm 12: các bài chữ hoa trong SC.COURSE và SC.SOTAY
+  kiem(12, 'Các bài chữ hoa trong SC.COURSE và SC.SOTAY', () => {
+    const NET_CO_BAN_HOA_8 = [
+      'luonngang', 'luondoc', 'congtren', 'congduoi',
+      'mocnguoctrai', 'mocnguoclen', 'mocxuoiphai', 'mochaidauhoa',
+    ];
+    const TAP_NET_HOA_8 = new Set(NET_CO_BAN_HOA_8);
+    const TAP_CHU_HOA_29 = new Set(CHU_HOA_29);
+    const VI_TRI_CHU_HOA = new Map(CHU_HOA_29.map((ch, idx) => [ch, idx]));
+
+    const course = Array.isArray(SC.COURSE) ? SC.COURSE : [];
+    const dsBaiH0 = [];
+    const dsBaiHoa = [];
+    const dsBaiHoaSo = [];
+    let soBaiHoaThuong = 0;
+    let soBaiHoaNho = 0;
+
+    for (const phan of course) {
+      for (const bai of (phan && Array.isArray(phan.lessons) ? phan.lessons : [])) {
+        if (!bai || typeof bai.id !== 'string') continue;
+        if (bai.id === 'th-h0') dsBaiH0.push(bai);
+        if (bai.id.startsWith('th-h')) {
+          dsBaiHoa.push(bai);
+          if (bai.id.startsWith('th-hnh')) soBaiHoaNho++;
+          else soBaiHoaThuong++;
+        }
+        if (/^th-h\d+$/.test(bai.id)) dsBaiHoaSo.push(bai);
+      }
+    }
+
+    if (dsBaiH0.length === 0 && dsBaiHoa.length === 0) {
+      return {
+        dat: false,
+        chiTiet: 'chưa có bài "th-h0" trong SC.COURSE (các bài chữ hoa chưa có trong giáo trình)',
+      };
+    }
+
+    const loi = [];
+    const strokes = SC.STROKES && typeof SC.STROKES === 'object' ? SC.STROKES : {};
+
+    // 1. Bài th-h0: đúng 8 dòng stroke, đủ 8 mã nét cơ bản chữ hoa và mỗi mã có trong SC.STROKES
+    if (dsBaiH0.length === 0) {
+      loi.push('chưa có bài "th-h0" trong SC.COURSE');
+    } else {
+      if (dsBaiH0.length > 1) {
+        loi.push(`có ${dsBaiH0.length} bài mang mã "th-h0" trong SC.COURSE (chỉ được có đúng 1 bài)`);
+      }
+      const baiH0 = dsBaiH0[0];
+      const dongStroke = (Array.isArray(baiH0.rows) ? baiH0.rows : [])
+        .filter(d => Array.isArray(d) && d[0] === 'stroke');
+      if (dongStroke.length !== NET_CO_BAN_HOA_8.length) {
+        loi.push(`bài "th-h0": cần có đúng ${NET_CO_BAN_HOA_8.length} dòng stroke, hiện có ${dongStroke.length}`);
+      }
+      const maNetH0 = dongStroke.map(d => d[1]);
+      const tapMaNetH0 = new Set(maNetH0);
+      const thieuNet = NET_CO_BAN_HOA_8.filter(m => !tapMaNetH0.has(m));
+      if (thieuNet.length > 0) {
+        loi.push(`bài "th-h0": thiếu mã nét cơ bản chữ hoa (${thieuNet.join(', ')})`);
+      }
+      const netLa = maNetH0.filter(m => !TAP_NET_HOA_8.has(m));
+      if (netLa.length > 0) {
+        loi.push(`bài "th-h0": có mã nét không thuộc 8 nét cơ bản chữ hoa (${netLa.map(m => `"${m}"`).join(', ')})`);
+      }
+      for (const ma of NET_CO_BAN_HOA_8) {
+        if (!Object.prototype.hasOwnProperty.call(strokes, ma)) {
+          loi.push(`SC.STROKES: thiếu mã nét cơ bản chữ hoa "${ma}"`);
+        }
+      }
+      for (const ma of maNetH0) {
+        if (typeof ma !== 'string' || (!TAP_NET_HOA_8.has(ma) && !Object.prototype.hasOwnProperty.call(strokes, ma))) {
+          loi.push(`bài "th-h0": mã nét "${ma}" không có trong SC.STROKES`);
+        }
+      }
+    }
+
+    // 2. Phủ đủ 29 chữ hoa trong dòng rep của đúng 1 bài th-h<số> và đúng thứ tự A → Y
+    const xuatHienHoa = new Map(CHU_HOA_29.map(ch => [ch, new Set()]));
+    const thuTuXuatHien = [];
+    const daThayHoa = new Set();
+
+    for (const bai of dsBaiHoaSo) {
+      for (const dong of bai.rows || []) {
+        if (Array.isArray(dong) && dong[0] === 'rep' && typeof dong[1] === 'string') {
+          for (const ch of dong[1].normalize('NFC')) {
+            if (ch === ' ') continue;
+            if (TAP_CHU_HOA_29.has(ch)) {
+              xuatHienHoa.get(ch).add(bai.id);
+              if (!daThayHoa.has(ch)) {
+                daThayHoa.add(ch);
+                thuTuXuatHien.push({ ch, baiId: bai.id });
+              }
+            }
+          }
+        }
+      }
+    }
+
+    let du29 = true;
+    for (const ch of CHU_HOA_29) {
+      const dsBai = Array.from(xuatHienHoa.get(ch));
+      if (dsBai.length === 0) {
+        du29 = false;
+        loi.push(`chữ hoa "${ch}": không xuất hiện trong dòng rep của bài th-h<số> nào`);
+      } else if (dsBai.length > 1) {
+        loi.push(`chữ hoa "${ch}": xuất hiện trong dòng rep ở ${dsBai.length} bài (${dsBai.join(', ')})`);
+      }
+    }
+
+    if (du29) {
+      for (let i = 0; i < CHU_HOA_29.length; i++) {
+        if (thuTuXuatHien[i].ch !== CHU_HOA_29[i]) {
+          loi.push(
+            `thứ tự chữ hoa sai tại vị trí ${i + 1}: gặp "${thuTuXuatHien[i].ch}" (bài "${thuTuXuatHien[i].baiId}") thay vì "${CHU_HOA_29[i]}"`
+          );
+          break;
+        }
+      }
+    } else {
+      let idxTruoc = -1;
+      let mucTruoc = null;
+      for (const muc of thuTuXuatHien) {
+        const idx = VI_TRI_CHU_HOA.get(muc.ch);
+        if (idx < idxTruoc) {
+          loi.push(
+            `thứ tự chữ hoa bị đảo: "${muc.ch}" (bài "${muc.baiId}") đứng sau "${mucTruoc.ch}" (bài "${mucTruoc.baiId}")`
+          );
+          break;
+        }
+        idxTruoc = idx;
+        mucTruoc = muc;
+      }
+    }
+
+    // 3. Cỡ chữ (th-hnh…: "nho", các bài th-h… khác: "thuong") và sổ tay trong SC.SOTAY
+    const sotay = SC.SOTAY && typeof SC.SOTAY === 'object' ? SC.SOTAY : null;
+    for (const bai of dsBaiHoa) {
+      const coMongDoi = bai.id.startsWith('th-hnh') ? 'nho' : 'thuong';
+      if (bai.z !== coMongDoi) {
+        loi.push(`bài "${bai.id}": cỡ chữ z="${bai.z}" (phải là "${coMongDoi}")`);
+      }
+      const mucSoTay = sotay && Object.prototype.hasOwnProperty.call(sotay, bai.id) ? sotay[bai.id] : undefined;
+      if (!mucSoTay) {
+        loi.push(`bài "${bai.id}": thiếu sổ tay trong SC.SOTAY`);
+      } else if (
+        !Array.isArray(mucSoTay) ||
+        mucSoTay.length !== 3 ||
+        typeof mucSoTay[0] !== 'string' ||
+        mucSoTay[0].trim().length === 0 ||
+        !Array.isArray(mucSoTay[1]) ||
+        mucSoTay[1].length === 0 ||
+        !mucSoTay[1].every(s => typeof s === 'string' && s.trim().length > 0) ||
+        !Array.isArray(mucSoTay[2]) ||
+        mucSoTay[2].length === 0 ||
+        !mucSoTay[2].every(s => typeof s === 'string' && s.trim().length > 0)
+      ) {
+        loi.push(`bài "${bai.id}": sổ tay trong SC.SOTAY không đúng khuôn [chuỗi, mảng, mảng]`);
+      }
+    }
+
+    // 4. Mọi chuỗi rep, pair trong các bài chữ hoa dàn sạch qua danChuoiTH và không chứa f, j, w, z
+    let soChuoiHoa = 0;
+    for (const bai of dsBaiHoa) {
+      for (const dong of bai.rows || []) {
+        if (!Array.isArray(dong) || (dong[0] !== 'rep' && dong[0] !== 'pair')) continue;
+        if (typeof dong[1] !== 'string') {
+          loi.push(`bài "${bai.id}": dòng ${dong[0]} không có chuỗi hợp lệ`);
+          continue;
+        }
+        const chuoi = dong[1];
+        soChuoiHoa++;
+        const kyTuCam = chuoi.match(/[fjwz]/gi);
+        if (kyTuCam) {
+          const dsCam = Array.from(new Set(kyTuCam));
+          loi.push(`bài "${bai.id}" ("${chuoi}"): chứa ký tự không dùng (${dsCam.map(c => `"${c}"`).join(', ')})`);
+        }
+        TH_THIEU.clear();
+        const kq = ctx.danChuoiTH(chuoi);
+        if (!kq || !Array.isArray(kq.chu) || !Array.isArray(kq.noi) || typeof kq.rong !== 'number' || !Number.isFinite(kq.rong)) {
+          loi.push(`bài "${bai.id}" ("${chuoi}"): kết quả danChuoiTH không hợp lệ`);
+        }
+        if (TH_THIEU.size > 0) {
+          loi.push(`bài "${bai.id}" ("${chuoi}"): thiếu ký tự khi dàn (${Array.from(TH_THIEU).map(c => `"${c}"`).join(', ')})`);
+        }
+      }
+    }
+
+    // 5. Phần cuối cùng của SC.COURSE vẫn chứa bài free
+    if (course.length === 0) {
+      loi.push('SC.COURSE rỗng hoặc không hợp lệ');
+    } else {
+      const phanCuoi = course[course.length - 1];
+      const coFree = phanCuoi && Array.isArray(phanCuoi.lessons) && phanCuoi.lessons.some(b => b && b.id === 'free');
+      if (!coFree) {
+        loi.push(`phần cuối cùng của SC.COURSE ("${phanCuoi && phanCuoi.part}") không chứa bài "free"`);
+      }
+    }
+
+    if (loi.length) return { dat: false, chiTiet: tomTatLoi(loi, 30) };
+    return {
+      dat: true,
+      chiTiet: `bài th-h0 đủ 8 nét cơ bản, ${dsBaiHoaSo.length} bài th-h<số> phủ đủ 29 chữ hoa đúng thứ tự A → Y, ${dsBaiHoa.length} bài (${soBaiHoaThuong} cỡ Thường, ${soBaiHoaNho} cỡ Nhỏ) đúng cỡ và đủ sổ tay, ${soChuoiHoa} chuỗi rep/pair dàn sạch không chứa f/j/w/z, phần cuối chứa bài free`,
     };
   });
 
