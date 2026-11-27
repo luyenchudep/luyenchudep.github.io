@@ -125,23 +125,29 @@ function muiTenChuoiTH(ctx, s, x, b, xh) {
    Đường kẻ ngang đậm cách nhau 4 ô li (một dòng vở), đường chân chữ luôn là đường đậm. */
 const TH_O_LI_MM = 2;   // 1 ô li in ra = 2 mm
 function thCo(z) { return (SC.CO && SC.CO[z]) || 2; }
+/* Cỡ của bài đang mở (dùng cho bảng Xem, Xem viết chậm, Tự tô); hai kiểu chữ kia trả undefined */
+function thCoBaiDangMo() { return SCRIPT === "th" && typeof cur !== "undefined" && LESSONS[cur.li] ? thCo(LESSONS[cur.li].z) : undefined; }
 function thDongOLi(co) { return co === 1 ? { tren: 2.5, cao: 4 } : { tren: 5, cao: 8 }; }
 /* Khoảng cách hai dòng tập và vị trí đường chân trong dòng, tính theo thân chữ (đơn vị chữ) */
 function thBuocDong(co) { const d = thDongOLi(co); return { unit: d.cao / co, up: d.tren / co }; }
-function guidesTH(ctx, b, m, gx0, gx1) {
-  const co = m.co || 2, ly = m.xh / co, d = thDongOLi(co);
-  const top = b - d.tren * ly, bot = top + d.cao * ly;
+/* vien: { dau, cuoi } cho biết dòng này là dòng đầu hay dòng cuối của trang (khung đơn lẻ: cả hai). */
+function guidesTH(ctx, b, m, gx0, gx1, vien) {
+  const co = m.co || 2, ly = m.xh / co, d = thDongOLi(co), dau = !vien || vien.dau, cuoi = !vien || vien.cuoi;
+  /* Cỡ Nhỏ: mép dòng rơi giữa ô li, nên ở mép trang thêm nửa ô li cho lưới đóng khung tròn ô */
+  const them = co === 1 ? 0.5 : 0;
+  const top = b - (d.tren + (dau ? them : 0)) * ly, bot = b + (d.cao - d.tren + (cuoi ? them : 0)) * ly;
+  const kMin = Math.ceil((b - bot) / ly - 1e-9), kMax = Math.floor((b - top) / ly + 1e-9) - (dau ? 0 : (Math.abs((b - top) / ly % 1) < 1e-9 ? 1 : 0));
   if (S.xBand && T.xBand) { ctx.fillStyle = T.xBand; ctx.fillRect(gx0, b - m.xh, gx1 - gx0, m.xh); }
   ctx.save(); ctx.setLineDash([]);
   ctx.strokeStyle = T.slant; ctx.lineWidth = 0.85; ctx.beginPath();
   for (let x = gx0; x <= gx1 + .01; x += ly) { ctx.moveTo(x, top); ctx.lineTo(x, bot); }
-  for (let k = Math.ceil(-(d.cao - d.tren)); k <= Math.floor(d.tren); k++) { if (k % 4 === 0) continue; const y = b - k * ly; ctx.moveTo(gx0, y); ctx.lineTo(gx1, y); }
+  for (let k = kMin; k <= kMax; k++) { if (k % 4 === 0) continue; const y = b - k * ly; ctx.moveTo(gx0, y); ctx.lineTo(gx1, y); }
   ctx.stroke();
   ctx.strokeStyle = T.asc; ctx.lineWidth = 1.05; ctx.beginPath();
   for (let x = gx0; x <= gx1 + .01; x += ly * 4) { ctx.moveTo(x, top); ctx.lineTo(x, bot); }
   ctx.stroke();
   ctx.strokeStyle = T.base; ctx.lineWidth = 1.6; ctx.beginPath();
-  for (let k = Math.ceil(-(d.cao - d.tren)); k <= Math.floor(d.tren); k++) { if (k % 4 !== 0) continue; const y = b - k * ly; ctx.moveTo(gx0, y); ctx.lineTo(gx1, y); }
+  for (let k = kMin; k <= kMax; k++) { if (k % 4 !== 0) continue; const y = b - k * ly; ctx.moveTo(gx0, y); ctx.lineTo(gx1, y); }
   ctx.stroke(); ctx.restore();
 }
 /* Số đo chữ cho tập viết PDF: thân chữ tính từ mm thật (1 ô li = 2 mm), không theo cỡ màn hình */

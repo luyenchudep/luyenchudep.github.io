@@ -192,7 +192,11 @@ async function exportPdf(cfg, tuyChon = {}) {
 
         /* Vẽ dòng kẻ + chữ mẫu / tô / dấu chấm */
         const rows = job.pages[pi];
-        rows.forEach((row, ri) => {
+        /* Vẽ hết lưới trước rồi mới vẽ chữ: lưới dòng dưới không đè lên đuôi chữ, mũi tên dòng trên */
+        if (SCRIPT === "th") {
+          rows.forEach((row, ri) => guides(ctx, padT + ri * unit + up * m.fs, m, padL - 10, W - padR + 10, { dau: ri === 0, cuoi: ri === rows.length - 1 }));
+          rows.forEach((row, ri) => drawRow(ctx, row, padT + ri * unit + up * m.fs, m, job.lesson.id === "review" ? "nho" : c.mode));
+        } else rows.forEach((row, ri) => {
           const b = padT + ri * unit + up * m.fs;
           guides(ctx, b, m, padL - 10, W - padR + 10);
           drawRow(ctx, row, b, m, job.lesson.id === "review" ? "nho" : c.mode);

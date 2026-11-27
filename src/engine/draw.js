@@ -1,8 +1,8 @@
 /* ================== VẼ NỀN (DỊU MẮT & DẢI THÂN CHỮ) ================== */
-function guides(ctx,b,m,x0,x1){
+function guides(ctx,b,m,x0,x1,vien){
   const gx0=x0!=null?x0:(layout?Math.max(12,layout.safeSide-6):16);
   const gx1=x1!=null?x1:(W-(layout?Math.max(12,layout.safeSide-6):16));
-  if(SCRIPT==="th")return guidesTH(ctx,b,m,gx0,gx1);
+  if(SCRIPT==="th")return guidesTH(ctx,b,m,gx0,gx1,vien);
   if(S.xBand&&T.xBand){ctx.fillStyle=T.xBand;ctx.fillRect(gx0,b-m.xh,gx1-gx0,m.xh)}
   if(S.gridStyle==="oly4"||SCRIPT==="th"){
     /* Hệ 4 ô ly chuẩn vở tiểu học Việt Nam (1 ly = xh / 2) */
@@ -155,7 +155,10 @@ function drawRow(ctx,row,b,m,mode){
 function drawBgTo(ctx){
   ctx.fillStyle=T.paper;ctx.fillRect(0,0,W,H);
   const {m,padT,unit,up,padL}=layout;const rows=pages[cur.page],l=LESSONS[cur.li];
-  rows.forEach((row,i)=>{const b=padT+i*unit+up*m.fs;guides(ctx,b,m);drawRow(ctx,row,b,m,cur.mode)});
+  if(SCRIPT==="th"){   /* Tiểu học: lưới liền nhau, vẽ hết lưới trước rồi mới vẽ chữ */
+    rows.forEach((row,i)=>guides(ctx,padT+i*unit+up*m.fs,m,null,null,{dau:i===0,cuoi:i===rows.length-1}));
+    rows.forEach((row,i)=>drawRow(ctx,row,padT+i*unit+up*m.fs,m,cur.mode));
+  }else rows.forEach((row,i)=>{const b=padT+i*unit+up*m.fs;guides(ctx,b,m);drawRow(ctx,row,b,m,cur.mode)});
   if(l.id==="luyen"&&!WEAK.length){
     ctx.font="600 16px 'QS',sans-serif";ctx.fillStyle=T.hint;
     const msg="Chưa có chữ nào cần luyện thêm. Ở chế độ ③ Chép hoặc Bài ôn, chạm So sánh rồi chấm “Luyện thêm”.";
