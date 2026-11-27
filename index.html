@@ -4777,6 +4777,18 @@ SCRIPTS.th = {
           "rows": [["pair","con rùa quyển vở"],["pair","xe đạp cái bàn"],["pair","bé đi học"],["blank",12]]
         }
       ]
+    },
+    {
+      "part": "Phần 9 · Tự do",
+      "lessons": [
+        {
+          "id": "free",
+          "t": "Bài tự do",
+          "z": "thuong",
+          "note": "Mở Danh mục, chọn thẻ Công cụ rồi Bài tự do để gõ nội dung muốn tập.",
+          "rows": null
+        }
+      ]
     }
   ],
   "STROKES": {
@@ -5886,9 +5898,10 @@ function setScript(v){if(v===SCRIPT)return;GS.set("script",v);location.reload()}
 function drawGuide(ctx,ch,x,b,xh,dark){(S.arrowStyle==="full"?drawArrows:drawSimple)(ctx,ch,x,b,xh,dark)}
 const LESSONS=[];COURSE.forEach(p=>p.lessons.forEach(l=>{l.part=p.part;LESSONS.push(l)}));
 const NREAL=LESSONS.length,REVIEW_I=NREAL,LUYEN_I=NREAL+1;
-const REVIEW={id:"review",t:"Bài ôn",part:"Ôn tập",z:"L",note:"Không có chữ mẫu · đọc tên chữ ở cuối dòng, viết theo trí nhớ rồi chạm So sánh.",rows:[]};
+const Z_MAC_DINH=SCRIPT==="th"?"thuong":"L";
+const REVIEW={id:"review",t:"Bài ôn",part:"Ôn tập",z:Z_MAC_DINH,note:"Không có chữ mẫu · đọc tên chữ ở cuối dòng, viết theo trí nhớ rồi chạm So sánh.",rows:[]};
 LESSONS.push(REVIEW);
-const LUYEN={id:"luyen",t:"Luyện thêm",part:"Ôn tập",z:"L",note:"Những chữ bạn tự chấm “Luyện thêm”. Hết trang cuối, chạm Sau › để thêm một vòng.",rows:[]};
+const LUYEN={id:"luyen",t:"Luyện thêm",part:"Ôn tập",z:Z_MAC_DINH,note:"Những chữ bạn tự chấm “Luyện thêm”. Hết trang cuối, chạm Sau › để thêm một vòng.",rows:[]};
 LESSONS.push(LUYEN);
 const STROKE_NAME={up:"nét lên mảnh",down:"nét xuống đậm",updown:"lên mảnh – xuống đậm",under:"móc dưới",over:"móc trên",compound:"móc hai đầu",oval:"vòng bầu dục",c:"nét cong",asc:"khuyết trên",desc:"khuyết dưới",
   tall:"nét sổ dài",short:"nét sổ ngắn",flat:"nét ngang",slash:"nét xiên trái",back:"nét xiên phải",v:"nét xiên chữ v",o:"vòng tròn",rc:"nét cong phải",u:"nét móc dưới",n:"nét móc trên",hook:"nét móc đuôi"};
@@ -5994,7 +6007,7 @@ let ictx;try{ictx=ink.getContext("2d",S.lowLat?{alpha:false,desynchronized:true}
 if(!ictx)ictx=ink.getContext("2d");
 let W=0,H=0,DPR=1,pages=[],layout=null;
 function fontOf(l){return FONTS[l.f||SC.font]}
-function sizeFor(l){const F=fontOf(l),xh=XH[l.z]*S.scale,fs=xh/F.x;
+function sizeFor(l){const F=fontOf(l),xh=(XH[l.z]||XH[Z_MAC_DINH]||Object.values(XH)[0])*S.scale,fs=xh/F.x;
   return {xh,fs,asc:fs*F.asc,desc:fs*F.desc,tan:Math.tan(F.slant*Math.PI/180),fam:F.fam,F}}
 function traceColor(){return T.trace[S.trace]||T.trace.dark}
 function fnt(fs,fam){const F=FONTS[fam||SC.font];return `${F.wt} ${fs}px '${F.fam}'`}
@@ -6277,13 +6290,14 @@ function drawCompare(ctx){
    Các chỗ nối vào app: text(), mw(), arrowsOnText(), drawBasic() trong draw.js và layout.js gọi các hàm ở đây
    khi phông là "TH". DUCTUS (mũi tên, chấm đặt viết, So sánh) được dựng từ CHU lúc khởi động. */
 
-/* Phông giả "TH": đơn vị chữ = cỡ chữ (x = 1); phần trên đường chân tới 2,6 đơn vị (chữ cao 2,5 và dấu), phần dưới 1,6 */
-FONTS.TH = { x: 1, asc: 2.6, desc: 1.6, slant: 0, fam: "TH", wt: 500 };
+/* Phông giả "TH": đơn vị chữ = cỡ chữ (x = 1); phần trên đường chân 2,5 đơn vị, phần dưới 1,5 */
+FONTS.TH = { x: 1, asc: 2.5, desc: 1.5, slant: 0, fam: "TH", wt: 500 };   // trùng đường kẻ 5 ô li trên, 3 ô li dưới (cỡ Thường)
 const TH_LA = () => SCRIPT === "th";
 const laPhongTH = fam => (fam || SC.font) === "TH";
 
 const TH_KHOANG_CHU = 0.3;   // khoảng giữa hai chữ trong một tiếng (đơn vị chữ); khi có nối chữ sẽ thay bằng nét nối
 const TH_KHOANG_TIENG = 0.8; // khoảng giữa hai tiếng: rộng bằng một chữ o
+const TH_DY_NANG = -0.5;   // dời ô dấu nặng xuống nửa đơn vị: chấm nằm khoảng 0,25 dưới đường chân
 const TH_DAU = { "́": "dausac", "̀": "dauhuyen", "̉": "dauhoi", "̃": "daunga", "̣": "daunang" };
 /* Vị trí ngang của âm chính để đặt dấu thanh (đơn vị chữ, tính từ mép trái chữ) */
 const TH_TAM_DAU = { a: .4, "ă": .4, "â": .4, e: .38, "ê": .36, i: .28, o: .4, "ô": .4, "ơ": .4, u: .57, "ư": .57, y: .57 };
@@ -6300,16 +6314,17 @@ function hinhChuTH(ch) {
   if (_thHinh.has(ch)) return _thHinh.get(ch);
   let kq = null;
   const tach = ch.normalize("NFD");
-  let dau = null, goc = "";
-  for (const c of tach) { if (TH_DAU[c]) dau = TH_DAU[c]; else goc += c; }
+  let dau = null, goc = "", soDau = 0;
+  for (const c of tach) { if (TH_DAU[c]) { dau = TH_DAU[c]; soDau++; } else goc += c; }
   goc = goc.normalize("NFC");
-  const mau = SC.CHU && SC.CHU[goc];
+  /* Dấu thanh chỉ đặt trên nguyên âm, mỗi chữ một dấu */
+  const mau = soDau > 1 || (dau && !/^[aăâeêioôơuưy]$/.test(goc)) ? null : SC.CHU && SC.CHU[goc];
   if (mau) {
     let nets = mau.cach[0].net.map(n => ({ d: n.d, dau: !!n.dau, lien: !!n.lien, loai: n.loai }));
     if (dau) {
-      if (goc === "i") nets = nets.filter(n => n.loai !== "cham");   // ì, í, ỉ, ĩ, ị: dấu thanh thay cho chấm
+      if (goc === "i" && dau !== "daunang") nets = nets.filter(n => n.loai !== "cham");   // ì, í, ỉ, ĩ: dấu thanh thay cho chấm; ị vẫn giữ chấm
       const nd = SC.STROKES[dau], tam = TH_TAM_DAU[goc] ?? mau.rong / 2;
-      const dy = dau === "daunang" ? -0.65 : thDinh(nets) + 0.1;
+      const dy = dau === "daunang" ? TH_DY_NANG : thDinh(nets) + 0.1;
       nets = nets.concat([{ d: thDoi(nd.d, tam - 0.25, dy), dau: true, lien: false, loai: dau }]);
     }
     kq = { rong: mau.rong, nets };
@@ -6320,12 +6335,26 @@ function hinhChuTH(ch) {
 
 /* Dàn một chuỗi: vị trí mép trái từng chữ (đơn vị chữ) và tổng bề rộng. Chữ chưa có hình được ghi vào TH_THIEU. */
 const TH_THIEU = new Set();
+const TH_DAU_CAU = ".,;:!?-–()\"'…";   // dấu câu: vẽ bằng phông giao diện, không có đường tâm nét
+const TH_RONG_DAU_CAU = 0.35;
+let _thBaoThieu = 0;
+function baoThieuTH(ch) {
+  if (TH_THIEU.has(ch)) return;
+  TH_THIEU.add(ch);
+  /* Báo một lần sau khi vẽ xong (không báo lúc đang xuất PDF chạy ngầm) */
+  if (typeof toast === "function" && typeof document !== "undefined") {
+    clearTimeout(_thBaoThieu);
+    _thBaoThieu = setTimeout(() => toast(`Kiểu Tiểu học chưa có hình cho: ${[...TH_THIEU].join(" ")} (chữ hoa sẽ có ở bản sau). Các chữ này được bỏ qua.`), 400);
+  }
+}
 function danChuoiTH(s) {
   const o = []; let x = 0, truoc = null;
-  for (const ch of String(s).normalize("NFC")) {
-    if (ch === " ") { x += TH_KHOANG_TIENG; truoc = null; continue; }
+  for (const ch of String(s ?? "").normalize("NFC")) {
+    if (ch === "\r") continue;
+    if (ch === " " || ch === "\u00A0" || ch === "\t" || ch === "\n") { x += TH_KHOANG_TIENG; truoc = null; continue; }
+    if (TH_DAU_CAU.includes(ch)) { o.push({ ch, x, h: null, dauCau: true }); x += TH_RONG_DAU_CAU; truoc = null; continue; }
     const h = hinhChuTH(ch);
-    if (!h) { TH_THIEU.add(ch); x += 0.5; truoc = null; continue; }
+    if (!h) { baoThieuTH(ch); truoc = null; continue; }
     if (truoc) x += TH_KHOANG_CHU;
     o.push({ ch, x, h }); x += h.rong; truoc = h;
   }
@@ -6352,7 +6381,9 @@ function datNetTH(ctx, xh, color, dut) {
 }
 function veChuoiTH(ctx, s, x, b, xh, color, dut) {
   ctx.save(); datNetTH(ctx, xh, color, dut);
-  for (const c of danChuoiTH(s).chu) for (const n of c.h.nets) {
+  for (const c of danChuoiTH(s).chu) if (c.dauCau) {
+    ctx.save(); ctx.setLineDash([]); ctx.fillStyle = color; ctx.font = `600 ${xh * .9}px 'QS',sans-serif`; ctx.textBaseline = "alphabetic"; ctx.fillText(c.ch, x + c.x * xh, b); ctx.restore();
+  } else for (const n of c.h.nets) {
     if (dut && thNgan(n.d)) { ctx.setLineDash([]); veDuongTH(ctx, n.d, x + c.x * xh, b, xh); ctx.setLineDash([Math.max(3, xh * .16), Math.max(3, xh * .12)]); }
     else veDuongTH(ctx, n.d, x + c.x * xh, b, xh);
   }
@@ -6361,14 +6392,14 @@ function veChuoiTH(ctx, s, x, b, xh, color, dut) {
 /* Nét cơ bản; riêng dấu thanh khi tập riêng thì đặt ở chỗ dấu nằm trên chữ (cao hơn thân chữ), dấu nặng dưới đường chân */
 function duongNetCoBanTH(kind) {
   const st = SC.STROKES[kind]; if (!st) return null;
-  return st.dau ? thDoi(st.d, 0, kind === "daunang" ? -0.65 : 1.1) : st.d;
+  return st.dau ? thDoi(st.d, 0, kind === "daunang" ? TH_DY_NANG : 1.1) : st.d;
 }
 function veNetCoBanTH(ctx, kind, x, b, xh, color, dut) {
   const d = duongNetCoBanTH(kind); if (!d) return;
   ctx.save(); datNetTH(ctx, xh, color, dut); veDuongTH(ctx, d, x, b, xh); ctx.restore();
 }
 function muiTenChuoiTH(ctx, s, x, b, xh) {
-  for (const c of danChuoiTH(s).chu) if (DUCTUS[c.ch]) drawGuide(ctx, c.ch, x + c.x * xh, b, xh, themeName() === "dark");
+  for (const c of danChuoiTH(s).chu) if (!c.dauCau && DUCTUS[c.ch]) drawGuide(ctx, c.ch, x + c.x * xh, b, xh, themeName() === "dark");
 }
 
 /* DUCTUS cho Tiểu học: mỗi nét một lượt, lấy điểm cách đều dọc đường tâm nét (samplePath ở draw.js) */
@@ -6779,6 +6810,7 @@ function modelAt(e){
   const x=q[0]-padL;if(x<-m.xh*.3)return null;
   const stk=row.k==="stroke"?row.s:(row.src&&row.src.k==="stroke"?row.src.s:null);
   if(stk)return x<m.xh*3&&DUCTUS["~"+stk]?"~"+stk:null;
+  if(laPhongTH(m.fam)){const xu=x/m.fs;for(const c of danChuoiTH(row.s).chu)if(!c.dauCau&&xu<=c.x+c.h.rong+TH_KHOANG_CHU/2)return DUCTUS[c.ch]?c.ch:null;return null}
   const chars=[...row.s];let acc=0;
   for(const ch of chars){const w=mw(ch,m.fs,m.fam);if(x<=acc+w+m.xh*.1)return DUCTUS[ch]?ch:null;acc+=w}
   return null;
@@ -7108,14 +7140,15 @@ function measure(){
   const totalScore=geo&&geo.shapeScore?Math.round(geo.shapeScore*0.45+slantScore*0.35+fluency*0.2):Math.round(slantScore*0.65+fluency*0.35);
   lastMetrics={ang,target:Math.round(target),diff,sd:Math.round(sd*10)/10,ratio,avgP,fluency,geo,slantScore,totalScore};
   const sdTxt=`±${lastMetrics.sd}°`;
-  el.innerHTML=`${ic("chart")}<b>${totalScore}đ</b> · Nghiêng ${ang}° (${sdTxt})${Math.abs(diff)<=5&&sd<=6?" ✓":diff>5?" · đứng":diff<-5?" · ngả":" · chưa đều"}`+(ratio?` · ${ratio.toFixed(1).replace(".",",")}×`:"");
+  el.innerHTML=`${ic("chart")}<b>${totalScore}đ</b> · Nghiêng ${ang}° (${sdTxt})${Math.abs(diff)<=5&&sd<=6?" ✓":diff>5?(SCRIPT==="th"?" · ngả trái":" · đứng"):diff<-5?(SCRIPT==="th"?" · ngả phải":" · ngả"):" · chưa đều"}`+(ratio?` · ${ratio.toFixed(1).replace(".",",")}×`:"");
   el.classList.add("on");
 }
 function openScoreReport(){
   if(!lastMetrics){toast("Bạn viết vài chữ trước để ứng dụng phân tích nha");return}
   const m=lastMetrics,box=document.getElementById("genBox");
   const tips=[];
-  if(Math.abs(m.diff)>5)tips.push(m.diff>0?`Độ nghiêng trung bình đang đứng hơn mẫu (${m.ang}° so với ${m.target}°) — thử xoay nhẹ máy qua trái.`:`Nét đang nghiêng nhiều hơn mẫu (${m.ang}° so với ${m.target}°).`);
+  if(Math.abs(m.diff)>5&&SCRIPT==="th")tips.push(m.diff>0?`Nét đang ngả qua trái (${m.ang}° so với ${m.target}°): giữ thân chữ thẳng đứng theo đường kẻ dọc.`:`Nét đang ngả qua phải (${m.ang}° so với ${m.target}°): giữ thân chữ thẳng đứng theo đường kẻ dọc.`);
+  else if(Math.abs(m.diff)>5)tips.push(m.diff>0?`Độ nghiêng trung bình đang đứng hơn mẫu (${m.ang}° so với ${m.target}°) — thử xoay nhẹ máy qua trái.`:`Nét đang nghiêng nhiều hơn mẫu (${m.ang}° so với ${m.target}°).`);
   if(m.sd>6.5)tips.push(`Góc nghiêng các nét chênh nhau ±${m.sd}° (nên trong khoảng 5°): có nét đứng, có nét nghiêng. Bạn để mắt canh theo các đường xiên mờ.`);
   if(m.avgP>1)tips.push(`Bạn đang nhấn mạnh hơn mức cần để ra nét đậm (${Math.round(m.avgP*100)}% mức vừa tay). Nhấn nhẹ lại cho đỡ mỏi tay và đỡ mòn ngòi viết.`);
   if(m.fluency<72)tips.push(`Nét viết hơi khựng (${m.fluency}/100) — bạn đưa tay đều hơn thay vì “vẽ” chậm từng đoạn ngắn.`);
@@ -7361,7 +7394,7 @@ function applyNameLab(){
   store.set("myName",nm);store.set("nameLabTxt",txt);
   store.set("custom",txt);
   closeSheets();
-  openLesson(LESSONS.findIndex(l=>l.id==="free"),"to");
+  {const i=LESSONS.findIndex(l=>l.id==="free");if(i>=0)openLesson(i,"to")}
   toast("Đã tạo bài luyện tên và chữ ký!");
 }
 
@@ -7587,7 +7620,7 @@ async function idbDumpStore(name){
 }
 async function backup(){
   flushSave();toast("Đang gom dữ liệu sao lưu đầy đủ…");
-  const o={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k.startsWith("td1:")||k.startsWith("qs1:"))o[k]=localStorage.getItem(k)}
+  const o={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(KIEU_CHU.some(s=>k.startsWith(s+"1:")))o[k]=localStorage.getItem(k)}
   const jData=await idbDumpStore("j"),inkData=await idbDumpStore("ink");
   const blob=new Blob([JSON.stringify({app:"tap-viet",v:4,date:today(),data:o,idb:{j:jData,ink:inkData}})],{type:"application/json"});
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`tap-viet-saoluu-${today()}.json`;a.click();
@@ -7637,7 +7670,7 @@ function partBlock(p,openSet,setName,liStyle){
   const n=p.lessons.length,k=p.lessons.filter(l=>done.has(l.id)).length,isCur=cur.li<NREAL&&LESSONS[cur.li].part===p.part;
   let h=`<details class="part ${isCur?"cur":""}" data-p="${p.part}" ${openSet.has(p.part)?"open":""} ontoggle="${setName}[this.open?'add':'delete'](this.dataset.p)"><summary><span class="pn">${p.part}</span><span class="pc ${k===n?"full":""}">${k}/${n}</span></summary>`;
   for(const l of p.lessons){const idx=LESSONS.indexOf(l);
-    h+=`<div class="li ${idx===cur.li?"cur":""}" onclick="openLesson(${idx})">${ckIcon(l.id)}<span>${idx+1}. ${l.t}</span>${liStyle?"":`<span class="sz">${{L:"cỡ lớn",M:"cỡ vừa",S:"cỡ nhỏ"}[l.z]}</span>`}</div>`}
+    h+=`<div class="li ${idx===cur.li?"cur":""}" onclick="openLesson(${idx})">${ckIcon(l.id)}<span>${idx+1}. ${l.t}</span>${liStyle?"":`<span class="sz">${({L:"cỡ lớn",M:"cỡ vừa",S:"cỡ nhỏ",thuong:"cỡ thường",nho:"cỡ nhỏ"}[l.z]||"")}</span>`}</div>`}
   return h+`</details>`}
 function setMenuTab(t){menuTab=t;openMenu(true);const b=document.getElementById("menuBox");if(b)b.scrollTop=0}
 function openMenu(keepScroll=false){
@@ -7669,7 +7702,7 @@ function openMenu(keepScroll=false){
       `<div class="row"><span>Màu giấy</span><div class="seg">${[["sepia","Ấm"],["light","Sáng"],["dark","Tối"],["eink","Trắng đen"]].map(([v,t])=>`<button class="${S.theme===v?"on":""}" onclick="setTheme('${v}');openMenu(true)">${t}</button>`).join("")}</div></div>`+
       seg("Màu nhấn","accent",[["blue","Xanh mực"],["black","Đen"]])+
       `<div class="row"><span>Cỡ dòng kẻ</span><div class="stepRow" style="min-width:190px"><button onclick="stepScale(-1);openMenu(true)" aria-label="Thu nhỏ cỡ dòng">${ic("minus")}</button><b>${Math.round(S.scale*100)}%</b><button onclick="stepScale(1);openMenu(true)" aria-label="Phóng to cỡ dòng">${ic("plus")}</button></div></div>`+
-      seg("Kiểu dòng kẻ","gridStyle",[["french","Lưới xiên Pháp"],["oly4","4 ô li Việt Nam"]])+
+      (SCRIPT==="th"?"":seg("Kiểu dòng kẻ","gridStyle",[["french","Lưới xiên Pháp"],["oly4","4 ô li Việt Nam"]]))+
       seg("Tô dải màu thân chữ","xBand",[[true,"Bật"],[false,"Tắt"]])+
       seg("Độ đậm chữ tô","trace",[["normal","Vừa"],["dark","Đậm"]])+
       seg("Kiểu mũi tên","arrowStyle",[["simple","Đơn giản"],["full","Chi tiết"]])+
@@ -7706,7 +7739,7 @@ function openCustom(){closeSheets();document.getElementById("customText").value=
   const pb=document.getElementById("customPrevBtn");if(pb)pb.style.display=store.get("customPrev","").trim()?"block":"none";
   document.getElementById("custom").classList.add("open")}
 function restoreCustomPrev(){document.getElementById("customText").value=store.get("customPrev","");toast("Đã lấy lại nội dung trước — chạm “Lưu và tập” để dùng")}
-function saveCustom(){store.set("custom",document.getElementById("customText").value);closeSheets();openLesson(LESSONS.findIndex(l=>l.id==="free"))}
+function saveCustom(){store.set("custom",document.getElementById("customText").value);closeSheets();const i=LESSONS.findIndex(l=>l.id==="free");if(i>=0)openLesson(i)}
 
 /* ================== SỔ TAY, HOẠT ẢNH BÚT VIẾT MẪU & NHẬP MÔN ================== */
 const LEGEND_FULL=`<div class="leg"><span><i class="dot">1</i>đặt viết, thứ tự nét</span><span><i class="ln"></i>kéo xuống, nhấn</span><span><i class="ln d"></i>đưa lên, nhẹ tay</span></div>`;
@@ -8982,7 +9015,7 @@ function chonBaiPdf(c) {
     /* Bài tạm từ nội dung tự gõ: mỗi dòng một dòng tập, dùng cỡ chữ và khoảng dòng của Bài tự do */
     const mau = LESSONS.find(l => l.id === "free") || {};
     const rows = c.text.split("\n").map(s => s.trim()).filter(Boolean).map(s => ["pair", s]);
-    return [{ id: "tugo", t: "Nội dung tự gõ", part: "Tự gõ", z: mau.z || "M", up: mau.up, dn: mau.dn, note: "", rows }];
+    return [{ id: "tugo", t: "Nội dung tự gõ", part: "Tự gõ", z: mau.z || (SCRIPT === "th" ? "thuong" : "M"), up: mau.up, dn: mau.dn, note: "", rows }];
   }
   return [LESSONS.find(l => l.id === "free") || LESSONS[0]];   // "tudo"
 }
@@ -9019,7 +9052,7 @@ async function exportPdf(cfg, tuyChon = {}) {
     for (const l of targetLessons) {
       const m = sizeFor(l), F = m.F;
       const up = Math.max(l.up || F.asc + .25, F.asc + .05), dn = Math.max(l.dn || F.desc + .1, F.desc + .03);
-      const unit = (up + dn) * m.fs + m.xh * (SCRIPT === "qs" ? .72 : .48);
+      const unit = (up + dn) * m.fs + m.xh * (SCRIPT !== "td" ? .72 : .48);
       const perPage = Math.max(1, Math.floor((H - padT - padB) / unit));
       const avail = Math.max(200, W - padL - padR - 12);
       const rLayout = { m, padL, padR, padT, unit, perPage, up, safeSide: Math.min(padL, padR) };
@@ -9200,7 +9233,7 @@ async function apDungCfgTuLink() {
   try { cfg = await giaiMaCfg(m[1]); }
   catch (e) { boLink(); toast(e.message); return; }
   if (cfg.script && cfg.script !== SCRIPT) {
-    if (cfg.script === "td" || cfg.script === "qs") { GS.set("script", cfg.script); location.reload(); return; }
+    if (KIEU_CHU.includes(cfg.script)) { if (cfg.script === "th") GS.set("hienTieuHoc", true); GS.set("script", cfg.script); location.reload(); return; }
     boLink(); toast(`Bản này chưa có kiểu chữ "${cfg.script}"`); return;
   }
   boLink();

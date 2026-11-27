@@ -6,7 +6,7 @@ let ictx;try{ictx=ink.getContext("2d",S.lowLat?{alpha:false,desynchronized:true}
 if(!ictx)ictx=ink.getContext("2d");
 let W=0,H=0,DPR=1,pages=[],layout=null;
 function fontOf(l){return FONTS[l.f||SC.font]}
-function sizeFor(l){const F=fontOf(l),xh=XH[l.z]*S.scale,fs=xh/F.x;
+function sizeFor(l){const F=fontOf(l),xh=(XH[l.z]||XH[Z_MAC_DINH]||Object.values(XH)[0])*S.scale,fs=xh/F.x;
   return {xh,fs,asc:fs*F.asc,desc:fs*F.desc,tan:Math.tan(F.slant*Math.PI/180),fam:F.fam,F}}
 function traceColor(){return T.trace[S.trace]||T.trace.dark}
 function fnt(fs,fam){const F=FONTS[fam||SC.font];return `${F.wt} ${fs}px '${F.fam}'`}

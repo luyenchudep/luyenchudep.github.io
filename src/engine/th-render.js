@@ -6,13 +6,14 @@
    Các chỗ nối vào app: text(), mw(), arrowsOnText(), drawBasic() trong draw.js và layout.js gọi các hàm ở đây
    khi phông là "TH". DUCTUS (mũi tên, chấm đặt viết, So sánh) được dựng từ CHU lúc khởi động. */
 
-/* Phông giả "TH": đơn vị chữ = cỡ chữ (x = 1); phần trên đường chân tới 2,6 đơn vị (chữ cao 2,5 và dấu), phần dưới 1,6 */
-FONTS.TH = { x: 1, asc: 2.6, desc: 1.6, slant: 0, fam: "TH", wt: 500 };
+/* Phông giả "TH": đơn vị chữ = cỡ chữ (x = 1); phần trên đường chân 2,5 đơn vị, phần dưới 1,5 */
+FONTS.TH = { x: 1, asc: 2.5, desc: 1.5, slant: 0, fam: "TH", wt: 500 };   // trùng đường kẻ 5 ô li trên, 3 ô li dưới (cỡ Thường)
 const TH_LA = () => SCRIPT === "th";
 const laPhongTH = fam => (fam || SC.font) === "TH";
 
 const TH_KHOANG_CHU = 0.3;   // khoảng giữa hai chữ trong một tiếng (đơn vị chữ); khi có nối chữ sẽ thay bằng nét nối
 const TH_KHOANG_TIENG = 0.8; // khoảng giữa hai tiếng: rộng bằng một chữ o
+const TH_DY_NANG = -0.5;   // dời ô dấu nặng xuống nửa đơn vị: chấm nằm khoảng 0,25 dưới đường chân
 const TH_DAU = { "́": "dausac", "̀": "dauhuyen", "̉": "dauhoi", "̃": "daunga", "̣": "daunang" };
 /* Vị trí ngang của âm chính để đặt dấu thanh (đơn vị chữ, tính từ mép trái chữ) */
 const TH_TAM_DAU = { a: .4, "ă": .4, "â": .4, e: .38, "ê": .36, i: .28, o: .4, "ô": .4, "ơ": .4, u: .57, "ư": .57, y: .57 };
@@ -29,16 +30,17 @@ function hinhChuTH(ch) {
   if (_thHinh.has(ch)) return _thHinh.get(ch);
   let kq = null;
   const tach = ch.normalize("NFD");
-  let dau = null, goc = "";
-  for (const c of tach) { if (TH_DAU[c]) dau = TH_DAU[c]; else goc += c; }
+  let dau = null, goc = "", soDau = 0;
+  for (const c of tach) { if (TH_DAU[c]) { dau = TH_DAU[c]; soDau++; } else goc += c; }
   goc = goc.normalize("NFC");
-  const mau = SC.CHU && SC.CHU[goc];
+  /* Dấu thanh chỉ đặt trên nguyên âm, mỗi chữ một dấu */
+  const mau = soDau > 1 || (dau && !/^[aăâeêioôơuưy]$/.test(goc)) ? null : SC.CHU && SC.CHU[goc];
   if (mau) {
     let nets = mau.cach[0].net.map(n => ({ d: n.d, dau: !!n.dau, lien: !!n.lien, loai: n.loai }));
     if (dau) {
-      if (goc === "i") nets = nets.filter(n => n.loai !== "cham");   // ì, í, ỉ, ĩ, ị: dấu thanh thay cho chấm
+      if (goc === "i" && dau !== "daunang") nets = nets.filter(n => n.loai !== "cham");   // ì, í, ỉ, ĩ: dấu thanh thay cho chấm; ị vẫn giữ chấm
       const nd = SC.STROKES[dau], tam = TH_TAM_DAU[goc] ?? mau.rong / 2;
-      const dy = dau === "daunang" ? -0.65 : thDinh(nets) + 0.1;
+      const dy = dau === "daunang" ? TH_DY_NANG : thDinh(nets) + 0.1;
       nets = nets.concat([{ d: thDoi(nd.d, tam - 0.25, dy), dau: true, lien: false, loai: dau }]);
     }
     kq = { rong: mau.rong, nets };
@@ -49,12 +51,26 @@ function hinhChuTH(ch) {
 
 /* Dàn một chuỗi: vị trí mép trái từng chữ (đơn vị chữ) và tổng bề rộng. Chữ chưa có hình được ghi vào TH_THIEU. */
 const TH_THIEU = new Set();
+const TH_DAU_CAU = ".,;:!?-–()\"'…";   // dấu câu: vẽ bằng phông giao diện, không có đường tâm nét
+const TH_RONG_DAU_CAU = 0.35;
+let _thBaoThieu = 0;
+function baoThieuTH(ch) {
+  if (TH_THIEU.has(ch)) return;
+  TH_THIEU.add(ch);
+  /* Báo một lần sau khi vẽ xong (không báo lúc đang xuất PDF chạy ngầm) */
+  if (typeof toast === "function" && typeof document !== "undefined") {
+    clearTimeout(_thBaoThieu);
+    _thBaoThieu = setTimeout(() => toast(`Kiểu Tiểu học chưa có hình cho: ${[...TH_THIEU].join(" ")} (chữ hoa sẽ có ở bản sau). Các chữ này được bỏ qua.`), 400);
+  }
+}
 function danChuoiTH(s) {
   const o = []; let x = 0, truoc = null;
-  for (const ch of String(s).normalize("NFC")) {
-    if (ch === " ") { x += TH_KHOANG_TIENG; truoc = null; continue; }
+  for (const ch of String(s ?? "").normalize("NFC")) {
+    if (ch === "\r") continue;
+    if (ch === " " || ch === "\u00A0" || ch === "\t" || ch === "\n") { x += TH_KHOANG_TIENG; truoc = null; continue; }
+    if (TH_DAU_CAU.includes(ch)) { o.push({ ch, x, h: null, dauCau: true }); x += TH_RONG_DAU_CAU; truoc = null; continue; }
     const h = hinhChuTH(ch);
-    if (!h) { TH_THIEU.add(ch); x += 0.5; truoc = null; continue; }
+    if (!h) { baoThieuTH(ch); truoc = null; continue; }
     if (truoc) x += TH_KHOANG_CHU;
     o.push({ ch, x, h }); x += h.rong; truoc = h;
   }
@@ -81,7 +97,9 @@ function datNetTH(ctx, xh, color, dut) {
 }
 function veChuoiTH(ctx, s, x, b, xh, color, dut) {
   ctx.save(); datNetTH(ctx, xh, color, dut);
-  for (const c of danChuoiTH(s).chu) for (const n of c.h.nets) {
+  for (const c of danChuoiTH(s).chu) if (c.dauCau) {
+    ctx.save(); ctx.setLineDash([]); ctx.fillStyle = color; ctx.font = `600 ${xh * .9}px 'QS',sans-serif`; ctx.textBaseline = "alphabetic"; ctx.fillText(c.ch, x + c.x * xh, b); ctx.restore();
+  } else for (const n of c.h.nets) {
     if (dut && thNgan(n.d)) { ctx.setLineDash([]); veDuongTH(ctx, n.d, x + c.x * xh, b, xh); ctx.setLineDash([Math.max(3, xh * .16), Math.max(3, xh * .12)]); }
     else veDuongTH(ctx, n.d, x + c.x * xh, b, xh);
   }
@@ -90,14 +108,14 @@ function veChuoiTH(ctx, s, x, b, xh, color, dut) {
 /* Nét cơ bản; riêng dấu thanh khi tập riêng thì đặt ở chỗ dấu nằm trên chữ (cao hơn thân chữ), dấu nặng dưới đường chân */
 function duongNetCoBanTH(kind) {
   const st = SC.STROKES[kind]; if (!st) return null;
-  return st.dau ? thDoi(st.d, 0, kind === "daunang" ? -0.65 : 1.1) : st.d;
+  return st.dau ? thDoi(st.d, 0, kind === "daunang" ? TH_DY_NANG : 1.1) : st.d;
 }
 function veNetCoBanTH(ctx, kind, x, b, xh, color, dut) {
   const d = duongNetCoBanTH(kind); if (!d) return;
   ctx.save(); datNetTH(ctx, xh, color, dut); veDuongTH(ctx, d, x, b, xh); ctx.restore();
 }
 function muiTenChuoiTH(ctx, s, x, b, xh) {
-  for (const c of danChuoiTH(s).chu) if (DUCTUS[c.ch]) drawGuide(ctx, c.ch, x + c.x * xh, b, xh, themeName() === "dark");
+  for (const c of danChuoiTH(s).chu) if (!c.dauCau && DUCTUS[c.ch]) drawGuide(ctx, c.ch, x + c.x * xh, b, xh, themeName() === "dark");
 }
 
 /* DUCTUS cho Tiểu học: mỗi nét một lượt, lấy điểm cách đều dọc đường tâm nét (samplePath ở draw.js) */

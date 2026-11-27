@@ -284,6 +284,18 @@ SCRIPTS.th = {
           "rows": [["pair","con rùa quyển vở"],["pair","xe đạp cái bàn"],["pair","bé đi học"],["blank",12]]
         }
       ]
+    },
+    {
+      "part": "Phần 9 · Tự do",
+      "lessons": [
+        {
+          "id": "free",
+          "t": "Bài tự do",
+          "z": "thuong",
+          "note": "Mở Danh mục, chọn thẻ Công cụ rồi Bài tự do để gõ nội dung muốn tập.",
+          "rows": null
+        }
+      ]
     }
   ],
   "STROKES": {

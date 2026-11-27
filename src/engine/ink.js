@@ -389,6 +389,7 @@ function modelAt(e){
   const x=q[0]-padL;if(x<-m.xh*.3)return null;
   const stk=row.k==="stroke"?row.s:(row.src&&row.src.k==="stroke"?row.src.s:null);
   if(stk)return x<m.xh*3&&DUCTUS["~"+stk]?"~"+stk:null;
+  if(laPhongTH(m.fam)){const xu=x/m.fs;for(const c of danChuoiTH(row.s).chu)if(!c.dauCau&&xu<=c.x+c.h.rong+TH_KHOANG_CHU/2)return DUCTUS[c.ch]?c.ch:null;return null}
   const chars=[...row.s];let acc=0;
   for(const ch of chars){const w=mw(ch,m.fs,m.fam);if(x<=acc+w+m.xh*.1)return DUCTUS[ch]?ch:null;acc+=w}
   return null;

@@ -24,7 +24,7 @@ function partBlock(p,openSet,setName,liStyle){
   const n=p.lessons.length,k=p.lessons.filter(l=>done.has(l.id)).length,isCur=cur.li<NREAL&&LESSONS[cur.li].part===p.part;
   let h=`<details class="part ${isCur?"cur":""}" data-p="${p.part}" ${openSet.has(p.part)?"open":""} ontoggle="${setName}[this.open?'add':'delete'](this.dataset.p)"><summary><span class="pn">${p.part}</span><span class="pc ${k===n?"full":""}">${k}/${n}</span></summary>`;
   for(const l of p.lessons){const idx=LESSONS.indexOf(l);
-    h+=`<div class="li ${idx===cur.li?"cur":""}" onclick="openLesson(${idx})">${ckIcon(l.id)}<span>${idx+1}. ${l.t}</span>${liStyle?"":`<span class="sz">${{L:"cỡ lớn",M:"cỡ vừa",S:"cỡ nhỏ"}[l.z]}</span>`}</div>`}
+    h+=`<div class="li ${idx===cur.li?"cur":""}" onclick="openLesson(${idx})">${ckIcon(l.id)}<span>${idx+1}. ${l.t}</span>${liStyle?"":`<span class="sz">${({L:"cỡ lớn",M:"cỡ vừa",S:"cỡ nhỏ",thuong:"cỡ thường",nho:"cỡ nhỏ"}[l.z]||"")}</span>`}</div>`}
   return h+`</details>`}
 function setMenuTab(t){menuTab=t;openMenu(true);const b=document.getElementById("menuBox");if(b)b.scrollTop=0}
 function openMenu(keepScroll=false){
@@ -56,7 +56,7 @@ function openMenu(keepScroll=false){
       `<div class="row"><span>Màu giấy</span><div class="seg">${[["sepia","Ấm"],["light","Sáng"],["dark","Tối"],["eink","Trắng đen"]].map(([v,t])=>`<button class="${S.theme===v?"on":""}" onclick="setTheme('${v}');openMenu(true)">${t}</button>`).join("")}</div></div>`+
       seg("Màu nhấn","accent",[["blue","Xanh mực"],["black","Đen"]])+
       `<div class="row"><span>Cỡ dòng kẻ</span><div class="stepRow" style="min-width:190px"><button onclick="stepScale(-1);openMenu(true)" aria-label="Thu nhỏ cỡ dòng">${ic("minus")}</button><b>${Math.round(S.scale*100)}%</b><button onclick="stepScale(1);openMenu(true)" aria-label="Phóng to cỡ dòng">${ic("plus")}</button></div></div>`+
-      seg("Kiểu dòng kẻ","gridStyle",[["french","Lưới xiên Pháp"],["oly4","4 ô li Việt Nam"]])+
+      (SCRIPT==="th"?"":seg("Kiểu dòng kẻ","gridStyle",[["french","Lưới xiên Pháp"],["oly4","4 ô li Việt Nam"]]))+
       seg("Tô dải màu thân chữ","xBand",[[true,"Bật"],[false,"Tắt"]])+
       seg("Độ đậm chữ tô","trace",[["normal","Vừa"],["dark","Đậm"]])+
       seg("Kiểu mũi tên","arrowStyle",[["simple","Đơn giản"],["full","Chi tiết"]])+
@@ -93,5 +93,5 @@ function openCustom(){closeSheets();document.getElementById("customText").value=
   const pb=document.getElementById("customPrevBtn");if(pb)pb.style.display=store.get("customPrev","").trim()?"block":"none";
   document.getElementById("custom").classList.add("open")}
 function restoreCustomPrev(){document.getElementById("customText").value=store.get("customPrev","");toast("Đã lấy lại nội dung trước — chạm “Lưu và tập” để dùng")}
-function saveCustom(){store.set("custom",document.getElementById("customText").value);closeSheets();openLesson(LESSONS.findIndex(l=>l.id==="free"))}
+function saveCustom(){store.set("custom",document.getElementById("customText").value);closeSheets();const i=LESSONS.findIndex(l=>l.id==="free");if(i>=0)openLesson(i)}
 

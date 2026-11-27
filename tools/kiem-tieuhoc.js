@@ -292,8 +292,12 @@ function main() {
       } else if (!(maxYDau < 0)) {
         loi.push(`"${ch}": dấu nặng không nằm hoàn toàn dưới đường chân (maxY=${maxYDau.toFixed(3)})`);
       }
-      if (goc === 'i' && nets.some(n => n.loai === 'cham')) {
-        loi.push(`"${ch}": chữ i có dấu thanh nhưng vẫn còn nét cham`);
+      // Dấu thanh nằm trên (ì, í, ỉ, ĩ) thay cho chấm chữ i; dấu nặng nằm dưới chân nên ị vẫn giữ chấm
+      if (goc === 'i' && dau.tren && nets.some(n => n.loai === 'cham')) {
+        loi.push(`"${ch}": chữ i có dấu thanh ở trên nhưng vẫn còn nét cham`);
+      }
+      if (goc === 'i' && !dau.tren && !nets.some(n => n.loai === 'cham')) {
+        loi.push(`"${ch}": chữ ị mất chấm trên đầu`);
       }
     }
     if (loi.length) return { dat: false, chiTiet: tomTatLoi(loi) };

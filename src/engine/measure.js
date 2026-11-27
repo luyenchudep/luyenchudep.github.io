@@ -105,14 +105,15 @@ function measure(){
   const totalScore=geo&&geo.shapeScore?Math.round(geo.shapeScore*0.45+slantScore*0.35+fluency*0.2):Math.round(slantScore*0.65+fluency*0.35);
   lastMetrics={ang,target:Math.round(target),diff,sd:Math.round(sd*10)/10,ratio,avgP,fluency,geo,slantScore,totalScore};
   const sdTxt=`±${lastMetrics.sd}°`;
-  el.innerHTML=`${ic("chart")}<b>${totalScore}đ</b> · Nghiêng ${ang}° (${sdTxt})${Math.abs(diff)<=5&&sd<=6?" ✓":diff>5?" · đứng":diff<-5?" · ngả":" · chưa đều"}`+(ratio?` · ${ratio.toFixed(1).replace(".",",")}×`:"");
+  el.innerHTML=`${ic("chart")}<b>${totalScore}đ</b> · Nghiêng ${ang}° (${sdTxt})${Math.abs(diff)<=5&&sd<=6?" ✓":diff>5?(SCRIPT==="th"?" · ngả trái":" · đứng"):diff<-5?(SCRIPT==="th"?" · ngả phải":" · ngả"):" · chưa đều"}`+(ratio?` · ${ratio.toFixed(1).replace(".",",")}×`:"");
   el.classList.add("on");
 }
 function openScoreReport(){
   if(!lastMetrics){toast("Bạn viết vài chữ trước để ứng dụng phân tích nha");return}
   const m=lastMetrics,box=document.getElementById("genBox");
   const tips=[];
-  if(Math.abs(m.diff)>5)tips.push(m.diff>0?`Độ nghiêng trung bình đang đứng hơn mẫu (${m.ang}° so với ${m.target}°) — thử xoay nhẹ máy qua trái.`:`Nét đang nghiêng nhiều hơn mẫu (${m.ang}° so với ${m.target}°).`);
+  if(Math.abs(m.diff)>5&&SCRIPT==="th")tips.push(m.diff>0?`Nét đang ngả qua trái (${m.ang}° so với ${m.target}°): giữ thân chữ thẳng đứng theo đường kẻ dọc.`:`Nét đang ngả qua phải (${m.ang}° so với ${m.target}°): giữ thân chữ thẳng đứng theo đường kẻ dọc.`);
+  else if(Math.abs(m.diff)>5)tips.push(m.diff>0?`Độ nghiêng trung bình đang đứng hơn mẫu (${m.ang}° so với ${m.target}°) — thử xoay nhẹ máy qua trái.`:`Nét đang nghiêng nhiều hơn mẫu (${m.ang}° so với ${m.target}°).`);
   if(m.sd>6.5)tips.push(`Góc nghiêng các nét chênh nhau ±${m.sd}° (nên trong khoảng 5°): có nét đứng, có nét nghiêng. Bạn để mắt canh theo các đường xiên mờ.`);
   if(m.avgP>1)tips.push(`Bạn đang nhấn mạnh hơn mức cần để ra nét đậm (${Math.round(m.avgP*100)}% mức vừa tay). Nhấn nhẹ lại cho đỡ mỏi tay và đỡ mòn ngòi viết.`);
   if(m.fluency<72)tips.push(`Nét viết hơi khựng (${m.fluency}/100) — bạn đưa tay đều hơn thay vì “vẽ” chậm từng đoạn ngắn.`);

@@ -91,7 +91,7 @@ async function idbDumpStore(name){
 }
 async function backup(){
   flushSave();toast("Đang gom dữ liệu sao lưu đầy đủ…");
-  const o={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k.startsWith("td1:")||k.startsWith("qs1:"))o[k]=localStorage.getItem(k)}
+  const o={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(KIEU_CHU.some(s=>k.startsWith(s+"1:")))o[k]=localStorage.getItem(k)}
   const jData=await idbDumpStore("j"),inkData=await idbDumpStore("ink");
   const blob=new Blob([JSON.stringify({app:"tap-viet",v:4,date:today(),data:o,idb:{j:jData,ink:inkData}})],{type:"application/json"});
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`tap-viet-saoluu-${today()}.json`;a.click();

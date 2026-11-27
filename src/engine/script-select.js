@@ -14,9 +14,10 @@ function setScript(v){if(v===SCRIPT)return;GS.set("script",v);location.reload()}
 function drawGuide(ctx,ch,x,b,xh,dark){(S.arrowStyle==="full"?drawArrows:drawSimple)(ctx,ch,x,b,xh,dark)}
 const LESSONS=[];COURSE.forEach(p=>p.lessons.forEach(l=>{l.part=p.part;LESSONS.push(l)}));
 const NREAL=LESSONS.length,REVIEW_I=NREAL,LUYEN_I=NREAL+1;
-const REVIEW={id:"review",t:"Bài ôn",part:"Ôn tập",z:"L",note:"Không có chữ mẫu · đọc tên chữ ở cuối dòng, viết theo trí nhớ rồi chạm So sánh.",rows:[]};
+const Z_MAC_DINH=SCRIPT==="th"?"thuong":"L";
+const REVIEW={id:"review",t:"Bài ôn",part:"Ôn tập",z:Z_MAC_DINH,note:"Không có chữ mẫu · đọc tên chữ ở cuối dòng, viết theo trí nhớ rồi chạm So sánh.",rows:[]};
 LESSONS.push(REVIEW);
-const LUYEN={id:"luyen",t:"Luyện thêm",part:"Ôn tập",z:"L",note:"Những chữ bạn tự chấm “Luyện thêm”. Hết trang cuối, chạm Sau › để thêm một vòng.",rows:[]};
+const LUYEN={id:"luyen",t:"Luyện thêm",part:"Ôn tập",z:Z_MAC_DINH,note:"Những chữ bạn tự chấm “Luyện thêm”. Hết trang cuối, chạm Sau › để thêm một vòng.",rows:[]};
 LESSONS.push(LUYEN);
 const STROKE_NAME={up:"nét lên mảnh",down:"nét xuống đậm",updown:"lên mảnh – xuống đậm",under:"móc dưới",over:"móc trên",compound:"móc hai đầu",oval:"vòng bầu dục",c:"nét cong",asc:"khuyết trên",desc:"khuyết dưới",
   tall:"nét sổ dài",short:"nét sổ ngắn",flat:"nét ngang",slash:"nét xiên trái",back:"nét xiên phải",v:"nét xiên chữ v",o:"vòng tròn",rc:"nét cong phải",u:"nét móc dưới",n:"nét móc trên",hook:"nét móc đuôi"};

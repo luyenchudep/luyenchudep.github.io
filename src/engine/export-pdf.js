@@ -62,7 +62,7 @@ function chonBaiPdf(c) {
     /* Bài tạm từ nội dung tự gõ: mỗi dòng một dòng tập, dùng cỡ chữ và khoảng dòng của Bài tự do */
     const mau = LESSONS.find(l => l.id === "free") || {};
     const rows = c.text.split("\n").map(s => s.trim()).filter(Boolean).map(s => ["pair", s]);
-    return [{ id: "tugo", t: "Nội dung tự gõ", part: "Tự gõ", z: mau.z || "M", up: mau.up, dn: mau.dn, note: "", rows }];
+    return [{ id: "tugo", t: "Nội dung tự gõ", part: "Tự gõ", z: mau.z || (SCRIPT === "th" ? "thuong" : "M"), up: mau.up, dn: mau.dn, note: "", rows }];
   }
   return [LESSONS.find(l => l.id === "free") || LESSONS[0]];   // "tudo"
 }
@@ -99,7 +99,7 @@ async function exportPdf(cfg, tuyChon = {}) {
     for (const l of targetLessons) {
       const m = sizeFor(l), F = m.F;
       const up = Math.max(l.up || F.asc + .25, F.asc + .05), dn = Math.max(l.dn || F.desc + .1, F.desc + .03);
-      const unit = (up + dn) * m.fs + m.xh * (SCRIPT === "qs" ? .72 : .48);
+      const unit = (up + dn) * m.fs + m.xh * (SCRIPT !== "td" ? .72 : .48);
       const perPage = Math.max(1, Math.floor((H - padT - padB) / unit));
       const avail = Math.max(200, W - padL - padR - 12);
       const rLayout = { m, padL, padR, padT, unit, perPage, up, safeSide: Math.min(padL, padR) };

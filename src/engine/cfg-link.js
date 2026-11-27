@@ -52,7 +52,7 @@ async function apDungCfgTuLink() {
   try { cfg = await giaiMaCfg(m[1]); }
   catch (e) { boLink(); toast(e.message); return; }
   if (cfg.script && cfg.script !== SCRIPT) {
-    if (cfg.script === "td" || cfg.script === "qs") { GS.set("script", cfg.script); location.reload(); return; }
+    if (KIEU_CHU.includes(cfg.script)) { if (cfg.script === "th") GS.set("hienTieuHoc", true); GS.set("script", cfg.script); location.reload(); return; }
     boLink(); toast(`Bản này chưa có kiểu chữ "${cfg.script}"`); return;
   }
   boLink();
