@@ -5,7 +5,7 @@
   Cách chạy (từ thư mục gốc của repo):
     node tools/kiem-tieuhoc.js
 
-  Công cụ đọc các file nguồn, chạy trong một ngữ cảnh vm tách biệt và thực hiện 10 phép kiểm:
+  Công cụ đọc các file nguồn, chạy trong một ngữ cảnh vm tách biệt và thực hiện 11 phép kiểm:
     1. Cấu trúc nét vẽ và tham số lệnh M/L/C trong SC.CHU.
     2. Tính hợp lệ của mã loại nét (loai) trong SC.CHU.
     3. Hình chữ và vị trí dấu thanh qua hinhChuTH (29 chữ thường, 10 chữ số, 60 chữ có dấu thanh).
@@ -16,6 +16,7 @@
     8. Phủ đủ 29 chữ thường trong dòng rep của đúng một bài có mã bắt đầu th-c.
     9. Nối chữ qua danChuoiTH cho toàn bộ chuỗi rep, pair trong SC.COURSE và các từ trong SC.WORDS.
    10. Kiểu nối chữ (nối liền hoặc lia viết) của các cặp mẫu.
+   11. Chữ hoa Tiểu học (29 chữ hoa trong SC.CHU, chiều cao thân chữ, 60 chữ hoa có dấu thanh và dàn chuỗi mẫu).
 
   Mỗi phép kiểm in một dòng "ĐẠT ..." hoặc "HỎNG ..." kèm chi tiết; thoát với mã 1 nếu có phép hỏng.
 */
@@ -146,6 +147,25 @@ const TAP_CHU_MUC_3 = [
   ...CHU_SO_10,
   ...CHU_CO_DAU_60.map(x => x.ch),
 ];
+
+const CHU_HOA_29 = [...'AĂÂBCDĐEÊGHIKLMNOÔƠPQRSTUƯVXY'].map(c => c.normalize('NFC'));
+
+const NGUYEN_AM_HOA_12 = [...'AĂÂEÊIOÔƠUƯY'].map(c => c.normalize('NFC'));
+
+const CHU_HOA_CO_DAU_60 = [];
+for (const na of NGUYEN_AM_HOA_12) {
+  for (const d of DAU_THANH_5) {
+    CHU_HOA_CO_DAU_60.push({
+      ch: (na + d.kyTu).normalize('NFC'),
+      goc: na,
+      dau: d,
+    });
+  }
+}
+
+const LOAI_DAU_THANH = new Set(DAU_THANH_5.map(d => d.loai));
+
+const CHUOI_HOA_MAU = ['Ánh', 'Ân', 'An', 'Bà', 'Hà', 'Cà Mau', 'Hà Nội', 'Ẩn'];
 
 const SO_THAM_SO = { M: 2, L: 2, C: 6 };
 const LOAI_PHU = new Set(['cham', 'mu', 'trang', 'rau']);
@@ -674,6 +694,301 @@ function main() {
     return {
       dat: true,
       chiTiet: `${CAP_NOI_LIEN.length} cặp nối liền (${CAP_NOI_LIEN.join(', ')}) và ${CAP_LIA_VIET.length} cặp lia viết (${CAP_LIA_VIET.join(', ')}) đều đúng quy tắc`,
+    };
+  });
+
+  // Phép kiểm 11: chữ hoa (29 chữ hoa trong SC.CHU, chiều cao thân chữ, 60 chữ hoa có dấu thanh và dàn chuỗi mẫu)
+  kiem(11, 'Chữ hoa Tiểu học', () => {
+    const chuMap = SC.CHU || {};
+    const loi = [];
+
+    // 1. Có đủ 29 chữ hoa trong SC.CHU, mọi tọa độ hữu hạn, nét lien nối đúng điểm cuối nét trước (sai lệch < 0,01)
+    //    và thân chữ (bỏ nét dau) có đỉnh 2,4–2,6; đáy -0,05–0,05 (riêng G, Y: -1,6–-1,4)
+    for (const ch of CHU_HOA_29) {
+      if (!Object.prototype.hasOwnProperty.call(chuMap, ch)) {
+        loi.push(`"${ch}": thiếu trong SC.CHU`);
+        continue;
+      }
+      const muc = chuMap[ch];
+      const nets = muc && Array.isArray(muc.cach) && muc.cach[0] && muc.cach[0].net;
+      if (!Array.isArray(nets) || nets.length === 0) {
+        loi.push(`"${ch}": cach[0].net rỗng hoặc thiếu`);
+        continue;
+      }
+      if (typeof muc.rong !== 'number' || !Number.isFinite(muc.rong) || !(muc.rong > 0)) {
+        loi.push(`"${ch}": rong không hợp lệ (${muc.rong})`);
+      }
+
+      let tatCaHuuHan = true;
+      for (let ni = 0; ni < nets.length; ni++) {
+        const n = nets[ni];
+        if (!n || !Array.isArray(n.d) || n.d.length === 0) {
+          loi.push(`"${ch}" nét ${ni}: thiếu danh sách lệnh d`);
+          tatCaHuuHan = false;
+          continue;
+        }
+        let netHuuHan = true;
+        for (let gi = 0; gi < n.d.length; gi++) {
+          const g = n.d[gi];
+          const can = Array.isArray(g) && SO_THAM_SO[g[0]];
+          if (!can || g.length !== can + 1) {
+            loi.push(`"${ch}" nét ${ni} lệnh ${gi}: cú pháp lệnh không hợp lệ`);
+            netHuuHan = false;
+            tatCaHuuHan = false;
+            continue;
+          }
+          for (let pi = 1; pi < g.length; pi++) {
+            if (typeof g[pi] !== 'number' || !Number.isFinite(g[pi])) {
+              loi.push(`"${ch}" nét ${ni} lệnh ${gi} tham số ${pi}: không phải số hữu hạn (${g[pi]})`);
+              netHuuHan = false;
+              tatCaHuuHan = false;
+            }
+          }
+        }
+        if (n.lien) {
+          if (ni === 0) {
+            loi.push(`"${ch}" nét 0: có lien nhưng không có nét trước`);
+          } else if (netHuuHan) {
+            const truoc = nets[ni - 1];
+            const dTruoc = truoc && Array.isArray(truoc.d) ? truoc.d : null;
+            if (!dTruoc || dTruoc.length === 0 || n.d[0][0] !== 'M') {
+              loi.push(`"${ch}" nét ${ni}: nét lien không bắt đầu bằng lệnh M hoặc nét trước rỗng`);
+            } else {
+              const gCuoi = dTruoc[dTruoc.length - 1];
+              const px = Array.isArray(gCuoi) ? gCuoi[gCuoi.length - 2] : NaN;
+              const py = Array.isArray(gCuoi) ? gCuoi[gCuoi.length - 1] : NaN;
+              const sx = n.d[0][1];
+              const sy = n.d[0][2];
+              if (!Number.isFinite(px) || !Number.isFinite(py)) {
+                loi.push(`"${ch}" nét ${ni}: điểm cuối nét trước không hữu hạn`);
+              } else {
+                const lech = Math.hypot(sx - px, sy - py);
+                if (!(lech < 0.01)) {
+                  loi.push(`"${ch}" nét ${ni}: điểm đầu nét lien (${sx.toFixed(3)}, ${sy.toFixed(3)}) lệch điểm cuối nét trước (${px.toFixed(3)}, ${py.toFixed(3)}) là ${lech.toFixed(4)} (>= 0,01)`);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      if (tatCaHuuHan) {
+        const netsThan = nets.filter(n => !n.dau);
+        if (netsThan.length === 0) {
+          loi.push(`"${ch}": không có nét thân chữ nào (mọi nét đều gắn dau)`);
+        } else {
+          let minY = Infinity;
+          let maxY = -Infinity;
+          for (const n of netsThan) {
+            const ky = khoangY(n.d);
+            if (ky.minY < minY) minY = ky.minY;
+            if (ky.maxY > maxY) maxY = ky.maxY;
+          }
+          if (!(maxY >= 2.4 && maxY <= 2.6)) {
+            loi.push(`"${ch}": đỉnh thân chữ = ${maxY.toFixed(3)} (phải trong khoảng 2,4–2,6)`);
+          }
+          const coKhuyetDuoi = ch === 'G' || ch === 'Y';
+          const dayMin = coKhuyetDuoi ? -1.6 : -0.05;
+          const dayMax = coKhuyetDuoi ? -1.4 : 0.05;
+          if (!(minY >= dayMin && minY <= dayMax)) {
+            loi.push(`"${ch}": đáy thân chữ = ${minY.toFixed(3)} (phải trong khoảng ${dayMin}–${dayMax})`);
+          }
+        }
+      }
+    }
+
+    // 2. hinhChuTH ghép được 5 dấu thanh cho 12 nguyên âm hoa AĂÂEÊIOÔƠUƯY (60 chữ)
+    for (const { ch, goc, dau } of CHU_HOA_CO_DAU_60) {
+      const h = ctx.hinhChuTH(ch);
+      if (!h || !Array.isArray(h.nets) || h.nets.length === 0) {
+        loi.push(`"${ch}": hinhChuTH trả về rỗng/null`);
+        continue;
+      }
+      const nets = h.nets;
+      const netDauThanh = nets.filter(n => n && LOAI_DAU_THANH.has(n.loai));
+      if (netDauThanh.length !== 1) {
+        loi.push(`"${ch}": cần có đúng 1 nét dấu thanh, nhưng có ${netDauThanh.length}`);
+        continue;
+      }
+      const netDau = netDauThanh[0];
+      if (netDau.dau !== true || netDau.loai !== dau.loai) {
+        loi.push(`"${ch}": nét dấu thanh không khớp (loai="${netDau.loai}", dau=${netDau.dau})`);
+        continue;
+      }
+      const { minY: minYDau, maxY: maxYDau } = khoangY(netDau.d);
+      if (!Number.isFinite(minYDau) || !Number.isFinite(maxYDau)) {
+        loi.push(`"${ch}": tọa độ nét dấu ${dau.ten} không hữu hạn`);
+        continue;
+      }
+      if (dau.tren) {
+        let maxYChuGoc = -Infinity;
+        for (const n of nets) {
+          if (n === netDau) continue;
+          const { maxY } = khoangY(n.d);
+          if (maxY > maxYChuGoc) maxYChuGoc = maxY;
+        }
+        if (!(minYDau > maxYChuGoc)) {
+          loi.push(`"${ch}": dấu ${dau.ten} (minY=${minYDau.toFixed(3)}) không nằm hẳn trên đỉnh chữ gốc (maxY=${maxYChuGoc.toFixed(3)})`);
+        }
+      } else if (goc !== 'G' && goc !== 'Y') {
+        if (!(maxYDau < 0)) {
+          loi.push(`"${ch}": dấu nặng không nằm dưới đường chân (maxY=${maxYDau.toFixed(3)})`);
+        }
+      }
+    }
+
+    // 3. danChuoiTH cho các chuỗi mẫu có chữ hoa: tọa độ hữu hạn, không chồng chữ (cùng điều kiện như phép kiểm 9)
+    TH_THIEU.clear();
+    let tongCap = 0;
+    let tongNetNoi = 0;
+    for (const chuoi of CHUOI_HOA_MAU) {
+      const kq = ctx.danChuoiTH(chuoi);
+      if (!kq || !Array.isArray(kq.chu) || !Array.isArray(kq.noi) || typeof kq.rong !== 'number' || !Number.isFinite(kq.rong)) {
+        loi.push(`chuỗi "${chuoi}": kết quả danChuoiTH không hợp lệ`);
+        continue;
+      }
+
+      for (const c of kq.chu) {
+        if (typeof c.x !== 'number' || !Number.isFinite(c.x)) {
+          loi.push(`chuỗi "${chuoi}", chữ "${c.ch}": tọa độ x không hữu hạn (${c.x})`);
+        }
+        if (c.h && Array.isArray(c.h.nets)) {
+          for (let ni = 0; ni < c.h.nets.length; ni++) {
+            const n = c.h.nets[ni];
+            if (!n || !Array.isArray(n.d)) continue;
+            for (let gi = 0; gi < n.d.length; gi++) {
+              const g = n.d[gi];
+              if (!Array.isArray(g)) continue;
+              for (let pi = 1; pi < g.length; pi++) {
+                if (typeof g[pi] !== 'number' || !Number.isFinite(g[pi])) {
+                  loi.push(`chuỗi "${chuoi}", chữ "${c.ch}" nét ${ni} lệnh ${gi}: tọa độ không hữu hạn (${g[pi]})`);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Xác định các cặp chỉ số liền nhau trong cùng một tiếng (không xen dấu cách, dấu câu hay chữ thiếu)
+      const capTrongTieng = [];
+      let idxChu = 0;
+      let truocTrongTieng = false;
+      for (const ch of chuoi.normalize('NFC')) {
+        if (ch === '\r') continue;
+        if (ch === ' ' || ch === '\u00A0' || ch === '\t' || ch === '\n') {
+          truocTrongTieng = false;
+          continue;
+        }
+        if (TH_DAU_CAU.includes(ch)) {
+          idxChu++;
+          truocTrongTieng = false;
+          continue;
+        }
+        const h = ctx.hinhChuTH(ch);
+        if (!h) {
+          loi.push(`chuỗi "${chuoi}": thiếu hình cho ký tự "${ch}"`);
+          truocTrongTieng = false;
+          continue;
+        }
+        if (truocTrongTieng) capTrongTieng.push(idxChu - 1);
+        idxChu++;
+        truocTrongTieng = true;
+      }
+
+      // Kiểm không chồng chữ trong cùng một tiếng
+      for (const i of capTrongTieng) {
+        tongCap++;
+        const c1 = kq.chu[i];
+        const c2 = kq.chu[i + 1];
+        if (!c1 || !c2 || !c1.h || !c2.h) continue;
+        const A = ctx.thDauCuoi(c1.h);
+        const B = ctx.thDauCuoi(c2.h);
+        const diemDung = c1.x + A.dung[0];
+        const diemDat = c2.x + B.dat[0];
+        if (diemDat < diemDung - 0.001) {
+          loi.push(`chuỗi "${chuoi}", cặp "${c1.ch}${c2.ch}": điểm đặt chữ sau (${diemDat.toFixed(4)}) lùi quá điểm dừng chữ trước (${diemDung.toFixed(4)})`);
+        }
+      }
+
+      // Kiểm mọi nét nối trong noi[].d: số hữu hạn và đúng điểm dừng chữ trước → điểm đặt chữ liền sau
+      const daKhop = new Set();
+      for (let ni = 0; ni < kq.noi.length; ni++) {
+        tongNetNoi++;
+        const n = kq.noi[ni];
+        if (!n || !Array.isArray(n.d) || n.d.length < 2) {
+          loi.push(`chuỗi "${chuoi}" nét nối ${ni}: danh sách lệnh d rỗng hoặc thiếu`);
+          continue;
+        }
+        let hopLeSo = true;
+        for (let gi = 0; gi < n.d.length; gi++) {
+          const g = n.d[gi];
+          const can = Array.isArray(g) && SO_THAM_SO[g[0]];
+          if (!can || g.length !== can + 1) {
+            loi.push(`chuỗi "${chuoi}" nét nối ${ni} lệnh ${gi}: cú pháp lệnh không hợp lệ`);
+            hopLeSo = false;
+            continue;
+          }
+          for (let pi = 1; pi < g.length; pi++) {
+            if (typeof g[pi] !== 'number' || !Number.isFinite(g[pi])) {
+              loi.push(`chuỗi "${chuoi}" nét nối ${ni} lệnh ${gi} tham số ${pi}: không phải số hữu hạn (${g[pi]})`);
+              hopLeSo = false;
+            }
+          }
+        }
+        if (!hopLeSo) continue;
+        if (n.d[0][0] !== 'M') {
+          loi.push(`chuỗi "${chuoi}" nét nối ${ni}: lệnh đầu không phải M`);
+          continue;
+        }
+        const sx = n.d[0][1];
+        const sy = n.d[0][2];
+        const gl = n.d[n.d.length - 1];
+        const ex = gl[gl.length - 2];
+        const ey = gl[gl.length - 1];
+
+        let timThay = false;
+        for (const i of capTrongTieng) {
+          if (daKhop.has(i)) continue;
+          const c1 = kq.chu[i];
+          const c2 = kq.chu[i + 1];
+          if (!c1 || !c2 || !c1.h || !c2.h) continue;
+          const A = ctx.thDauCuoi(c1.h);
+          const B = ctx.thDauCuoi(c2.h);
+          const pAx = c1.x + A.dung[0];
+          const pAy = A.dung[1];
+          const pBx = c2.x + B.dat[0];
+          const pBy = B.dat[1];
+          if (Math.hypot(sx - pAx, sy - pAy) < 0.001 && Math.hypot(ex - pBx, ey - pBy) < 0.001) {
+            daKhop.add(i);
+            timThay = true;
+            break;
+          }
+        }
+        if (!timThay) {
+          loi.push(`chuỗi "${chuoi}" nét nối ${ni}: điểm đầu (${sx.toFixed(3)}, ${sy.toFixed(3)}) → cuối (${ex.toFixed(3)}, ${ey.toFixed(3)}) không khớp cặp chữ liền kề nào`);
+        }
+      }
+
+      // Kiểm rong bằng mép phải chữ cuối
+      if (kq.chu.length > 0) {
+        const chuCuoi = kq.chu[kq.chu.length - 1];
+        if (!chuCuoi.dauCau && chuCuoi.h) {
+          const mepPhai = chuCuoi.x + chuCuoi.h.rong;
+          if (Math.abs(kq.rong - mepPhai) >= 0.001) {
+            loi.push(`chuỗi "${chuoi}": rong=${kq.rong.toFixed(4)} khác mép phải chữ cuối (${mepPhai.toFixed(4)})`);
+          }
+        }
+      }
+    }
+
+    if (TH_THIEU.size > 0) {
+      loi.push(`danChuoiTH báo thiếu ký tự: ${Array.from(TH_THIEU).map(c => `"${c}"`).join(', ')}`);
+    }
+
+    if (loi.length) return { dat: false, chiTiet: tomTatLoi(loi, 30) };
+    return {
+      dat: true,
+      chiTiet: `đủ ${CHU_HOA_29.length} chữ hoa (đỉnh/đáy và nét lien đúng), ${CHU_HOA_CO_DAU_60.length} chữ hoa có dấu thanh và ${CHUOI_HOA_MAU.length} chuỗi mẫu (${tongCap} cặp trong tiếng, ${tongNetNoi} nét nối)`,
     };
   });
 

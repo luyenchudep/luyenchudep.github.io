@@ -28,7 +28,7 @@ function zboxViewRect(){
   const ri=Math.min(Math.max(0,zbox.row),Math.max(0,rows.length-1));
   const {m,padT,unit,up}=layout;
   const b=padT+ri*unit+up*m.fs;
-  const th=SCRIPT==="th",cy=th?b-m.xh*0.5:b-m.xh*0.35;   /* Tiểu học: giữa dòng 4 ô li */
+  const th=SCRIPT==="th",cy=th?b-thTamDong(up,unit,m.fs):b-m.xh*0.35;   /* Tiểu học: giữa dải dòng (có chữ hoa thì dải cao hơn) */
   const sy=Math.max(0,Math.min(Math.max(0,H-srcH),cy-srcH*(th?0.5:0.54)));
   const sx=Math.max(0,Math.min(Math.max(0,W-srcW),zbox.x));
   return {sx,sy,srcW,srcH,zw,zh,ri};

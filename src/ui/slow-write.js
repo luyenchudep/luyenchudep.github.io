@@ -14,8 +14,13 @@ function cardItems(l){
     if(out.length>=3)break}
   return out}
 function drawCard(cv,items,fam){
-  const Wc=cv.parentElement.clientWidth-2,d=Math.min(devicePixelRatio||1,3),F=FONTS[fam||SC.font],xh=Math.min(44,Wc/7.5),fs=xh/F.x;
-  const th=SCRIPT==="th",up=(th?2.5:2.3)*xh,dn=(th?1.5:1.3)*xh,pitch=up+dn+(th?12:10),ctx=cv.getContext("2d");
+  const Wc=cv.parentElement.clientWidth-2,d=Math.min(devicePixelRatio||1,3),F=FONTS[fam||SC.font],th=SCRIPT==="th";
+  let xh=Math.min(44,Wc/7.5);
+  /* Tiểu học: từ dài (tên riêng) thì thu nhỏ cho vừa khung; có chữ hoa thì dòng cao hơn cho dấu mũ, dấu thanh */
+  const hoa=th&&items.some(it=>it[0]!=="~"&&/\p{Lu}/u.test(it)),coTH=th?thCoBaiDangMo()||2:0;
+  if(th){const r=Math.max(0,...items.filter(it=>it[0]!=="~").map(doRongTH));if(r)xh=Math.min(xh,(Wc-24)/(r+1.6))}
+  const fs=xh/F.x,dTH=th?thDongOLi(coTH,hoa):null;
+  const up=(th?dTH.tren/coTH:2.3)*xh,dn=(th?(dTH.cao-dTH.tren)/coTH:1.3)*xh,pitch=up+dn+(th?12:10),ctx=cv.getContext("2d");
   ctx.font=fnt(fs,F.fam);
   const widths=items.map(it=>it[0]==="~"?(STROKES[it.slice(1)].w+1.3)*xh:mw(it,fs,F.fam)+xh*1.2);
   const rows=[];let row=[],x=0;
@@ -24,7 +29,7 @@ function drawCard(cv,items,fam){
   const dark=themeName()==="dark";
   const cardTheme=THEMES[themeName()]||THEMES.sepia;
   ctx.fillStyle=cardTheme.paper;ctx.fillRect(0,0,Wc,Hc);
-  const m={xh,fs,asc:fs*F.asc,desc:fs*F.desc,tan:Math.tan(F.slant*Math.PI/180),co:thCoBaiDangMo()},save=T,saveL=layout;T=cardTheme;layout={padL:12,safeSide:12};
+  const m={xh,fs,asc:fs*F.asc,desc:fs*F.desc,tan:Math.tan(F.slant*Math.PI/180),co:thCoBaiDangMo(),hoa},save=T,saveL=layout;T=cardTheme;layout={padL:12,safeSide:12};
   rows.forEach((r,i)=>{const b=6+up+i*pitch;guides(ctx,b,m,6,Wc-6);
     for(const[it,x0]of r){const x=x0+xh*.9+(it==="g"||it[0]==="j"?xh*.5:0);
       if(it[0]==="~"){drawBasic(ctx,it.slice(1),x,b,xh,cardTheme.model,m.tan);drawGuide(ctx,it,x,b,xh,dark)}
