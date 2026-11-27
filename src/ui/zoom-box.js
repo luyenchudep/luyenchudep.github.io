@@ -13,17 +13,23 @@ function toggleZBox(){
   zboxCancelAdv();
   setTimeout(()=>{resize();if(zbox.on)toast("Hộp viết phóng to: viết vào vùng xanh bên phải để tự trượt")},60);
 }
+/* Mức phóng đang dùng. Tiểu học: hạ mức phóng nếu cần để hộp chứa trọn một dòng 4 ô li (chữ cao 5 ô li, đuôi 3 ô li) */
+function zboxZoom(){
+  if(SCRIPT!=="th"||!layout)return zbox.zoom;
+  const zh=Math.max(80,zboxStageRect().height);
+  return Math.min(zbox.zoom,zh/(layout.unit*1.04));
+}
 function zboxStageRect(){const st=document.getElementById("zboxStage");return(st||zboxCv).getBoundingClientRect()}
 function zboxViewRect(){
   const r=zboxStageRect();
   const zw=Math.max(120,r.width),zh=Math.max(80,r.height);
-  const srcW=zw/zbox.zoom,srcH=zh/zbox.zoom;
+  const srcW=zw/zboxZoom(),srcH=zh/zboxZoom();
   const rows=pages[cur.page]||[];
   const ri=Math.min(Math.max(0,zbox.row),Math.max(0,rows.length-1));
   const {m,padT,unit,up}=layout;
   const b=padT+ri*unit+up*m.fs;
-  const cy=b-m.xh*0.35;
-  const sy=Math.max(0,Math.min(Math.max(0,H-srcH),cy-srcH*0.54));
+  const th=SCRIPT==="th",cy=th?b-m.xh*0.5:b-m.xh*0.35;   /* Tiểu học: giữa dòng 4 ô li */
+  const sy=Math.max(0,Math.min(Math.max(0,H-srcH),cy-srcH*(th?0.5:0.54)));
   const sx=Math.max(0,Math.min(Math.max(0,W-srcW),zbox.x));
   return {sx,sy,srcW,srcH,zw,zh,ri};
 }
@@ -48,7 +54,7 @@ function renderZBox(){
   }
   const {sx,sy,srcW,zw,zh,ri}=zboxViewRect();
   zbCtx.setTransform(1,0,0,1,0,0);zbCtx.fillStyle=T.paper;zbCtx.fillRect(0,0,cw,ch);
-  zbCtx.setTransform(d*zbox.zoom,0,0,d*zbox.zoom,-sx*d*zbox.zoom,-sy*d*zbox.zoom);
+  zbCtx.setTransform(d*zboxZoom(),0,0,d*zboxZoom(),-sx*d*zboxZoom(),-sy*d*zboxZoom());
   drawBgTo(zbCtx);
   for(const s of strokes)drawStroke(zbCtx,s);
   if(comparing)drawCompare(zbCtx);
@@ -62,7 +68,7 @@ function renderZBox(){
     zbCtx.beginPath();zbCtx.moveTo(advX,0);zbCtx.lineTo(advX,zh);zbCtx.stroke();zbCtx.setLineDash([]);
   }
   const ttl=document.getElementById("zbTitle");
-  if(ttl)ttl.innerHTML=ic("zbox")+`Dòng ${ri+1}/${(pages[cur.page]||[]).length} · ${zbox.zoom.toFixed(1).replace(".",",")}×`;
+  if(ttl)ttl.innerHTML=ic("zbox")+`Dòng ${ri+1}/${(pages[cur.page]||[]).length} · ${zboxZoom().toFixed(1).replace(".",",")}×`;
 }
 function zboxCancelAdv(){clearTimeout(zbox.advTimer);zbox.advArmed=false}
 function zboxMove(dir,auto){
@@ -88,7 +94,7 @@ function zboxScale(delta){
 function zboxPos(e){
   const r=zboxCv.getBoundingClientRect(),{sx,sy}=zboxViewRect();
   const p=rawP(e);
-  const px=sx+(e.clientX-r.left)/zbox.zoom,py=sy+(e.clientY-r.top)/zbox.zoom;
+  const px=sx+(e.clientX-r.left)/zboxZoom(),py=sy+(e.clientY-r.top)/zboxZoom();
   return [Math.round(px*10)/10,Math.round(py*10)/10,Math.round(p*1000)/1000,tiltMagOf(e)];
 }
 function clearZBFx(){zbfCtx.setTransform(1,0,0,1,0,0);zbfCtx.clearRect(0,0,zboxFx.width,zboxFx.height)}
@@ -103,23 +109,23 @@ zboxCv.addEventListener("pointerdown",e=>{
   if(sideBtn&&S.sideBtn==="undo"){undo();toast("Hoàn tác");return}
   if(sideBtn&&S.sideBtn==="fav"){cycleFavPen();return}
   const erase=tool==="eraser"||(sideBtn&&S.sideBtn==="eraser");
-  if(erase){zbox.live={erase:true,changed:false,pid:e.pointerId,redo0:redoStack.slice()};snapshot();eraseAt(zboxPos(e),zbox.zoom);return}
+  if(erase){zbox.live={erase:true,changed:false,pid:e.pointerId,redo0:redoStack.slice()};snapshot();eraseAt(zboxPos(e),zboxZoom());return}
   snapshot();
   const q=zboxPos(e);q[2]=Math.min(q[2],(S.pFull||.38)*.45);
   zbox.live={tp:S.penType,c:S.color,w:S.width,pr:S.pressure,ct:S.contrast,na:S.nibAngle,tl:S.tiltOn,pf:S.pFull||.38,p:[q],pid:e.pointerId};
   const d=Math.min(devicePixelRatio||1,3),{sx,sy}=zboxViewRect();
-  zbfCtx.setTransform(d*zbox.zoom,0,0,d*zbox.zoom,-sx*d*zbox.zoom,-sy*d*zbox.zoom);
+  zbfCtx.setTransform(d*zboxZoom(),0,0,d*zboxZoom(),-sx*d*zboxZoom(),-sy*d*zboxZoom());
   drawStroke(zbfCtx,zbox.live,true);
 },{passive:false});
 zboxCv.addEventListener("pointermove",e=>{
   if(!zbox.live||e.pointerId!==zbox.live.pid)return;
   e.preventDefault();
   let evs=e.getCoalescedEvents?e.getCoalescedEvents():[];if(!evs.length)evs=[e];
-  if(zbox.live.erase){for(const ev of evs)eraseAt(zboxPos(ev),zbox.zoom);return}
-  const minStep=0.45/zbox.zoom,stb=Math.min(0.75,Math.max(0,S.stab||0));
+  if(zbox.live.erase){for(const ev of evs)eraseAt(zboxPos(ev),zboxZoom());return}
+  const minStep=0.45/zboxZoom(),stb=Math.min(0.75,Math.max(0,S.stab||0));
   const ztp=strokeType(zbox.live),zinc=ztp!=="marker"&&ztp!=="pencil";
   const zd=Math.min(devicePixelRatio||1,3),zvr=zboxViewRect();
-  zbfCtx.setTransform(zd*zbox.zoom,0,0,zd*zbox.zoom,-zvr.sx*zd*zbox.zoom,-zvr.sy*zd*zbox.zoom);
+  zbfCtx.setTransform(zd*zboxZoom(),0,0,zd*zboxZoom(),-zvr.sx*zd*zboxZoom(),-zvr.sy*zd*zboxZoom());
   for(const ev of evs){
     const raw=zboxPos(ev),p=zbox.live.p[zbox.live.p.length-1];
     const q=stb>0?[
@@ -132,7 +138,7 @@ zboxCv.addEventListener("pointermove",e=>{
     zbox.live.p.push(q);paperSoundStep(p,q);
     if(zinc)drawSegOn(zbfCtx,p,q,zbox.live);
   }
-  if(!zinc){clearZBFx();zbfCtx.setTransform(zd*zbox.zoom,0,0,zd*zbox.zoom,-zvr.sx*zd*zbox.zoom,-zvr.sy*zd*zbox.zoom);drawStroke(zbfCtx,zbox.live,true)}
+  if(!zinc){clearZBFx();zbfCtx.setTransform(zd*zboxZoom(),0,0,zd*zboxZoom(),-zvr.sx*zd*zboxZoom(),-zvr.sy*zd*zboxZoom());drawStroke(zbfCtx,zbox.live,true)}
 },{passive:false});
 function endZBoxStroke(e){
   if(!zbox.live)return;

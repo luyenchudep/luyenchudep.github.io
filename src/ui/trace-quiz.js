@@ -34,12 +34,14 @@ function drawQuizFrame(nowTs){
   const xh=Math.min(animState.big?170:130,(Hc-topBar-18)/spanY,(Wc-padX*2)/spanX);
   const fs=xh/F.x,tan=Math.tan(F.slant*Math.PI/180);
   const b=topBar+((Hc-topBar-12)-(B.maxY-B.minY)*xh)/2+B.maxY*xh;
-  const m={xh,fs,asc:fs*F.asc,desc:fs*F.desc,tan};
+  const m={xh,fs,asc:fs*F.asc,desc:fs*F.desc,tan,co:thCoBaiDangMo()};
   const ch=animState.ch,xC=Wc/2-((B.minX+B.maxX)/2)*xh;
   const Tp=p=>[xC+p[0]*xh,b-p[1]*xh];
   quiz.geom={x0:xC,b,xh,Wc,Hc};
 
-  const saveT=T,saveL=layout;T=ct;layout={padL:14,safeSide:14};guides(ctx,b,m,10,Wc-10);T=saveT;layout=saveL;
+  const saveT=T,saveL=layout;T=ct;layout={padL:14,safeSide:14};
+  ctx.save();ctx.beginPath();ctx.rect(0,topBar,Wc,Hc-topBar);ctx.clip();guides(ctx,b,m,10,Wc-10);ctx.restore();   /* lưới không tràn lên dòng tiêu đề */
+  T=saveT;layout=saveL;
 
   const total=animState.strokes.length,doneAll=quiz.idx>=total&&total>0;
   ctx.save();ctx.font="700 13.5px 'QS',sans-serif";ctx.textAlign="center";ctx.textBaseline="top";

@@ -97,9 +97,11 @@ async function exportPdf(cfg, tuyChon = {}) {
     const lessonJobs = [];
     let totalContentPages = 0;
     for (const l of targetLessons) {
-      const m = sizeFor(l), F = m.F;
-      const up = Math.max(l.up || F.asc + .25, F.asc + .05), dn = Math.max(l.dn || F.desc + .1, F.desc + .03);
-      const unit = (up + dn) * m.fs + m.xh * (SCRIPT !== "td" ? .72 : .48);
+      /* Tiểu học: thân chữ tính theo mm thật (1 ô li = 2 mm), các dòng 4 ô li nối liền nhau */
+      const m = SCRIPT === "th" ? sizeForTHPdf(l, pr.pxW / pr.wMm) : sizeFor(l), F = m.F;
+      let up = Math.max(l.up || F.asc + .25, F.asc + .05), dn = Math.max(l.dn || F.desc + .1, F.desc + .03);
+      let unit = (up + dn) * m.fs + m.xh * (SCRIPT !== "td" ? .72 : .48);
+      if (SCRIPT === "th") { const bd = thBuocDong(m.co); unit = bd.unit * m.fs; up = bd.up; }
       const perPage = Math.max(1, Math.floor((H - padT - padB) / unit));
       const avail = Math.max(200, W - padL - padR - 12);
       const rLayout = { m, padL, padR, padT, unit, perPage, up, safeSide: Math.min(padL, padR) };
@@ -190,7 +192,11 @@ async function exportPdf(cfg, tuyChon = {}) {
 
         /* Vẽ dòng kẻ + chữ mẫu / tô / dấu chấm */
         const rows = job.pages[pi];
-        rows.forEach((row, ri) => {
+        /* Vẽ hết lưới trước rồi mới vẽ chữ: lưới dòng dưới không đè lên đuôi chữ, mũi tên dòng trên */
+        if (SCRIPT === "th") {
+          rows.forEach((row, ri) => guides(ctx, padT + ri * unit + up * m.fs, m, padL - 10, W - padR + 10, { dau: ri === 0, cuoi: ri === rows.length - 1 }));
+          rows.forEach((row, ri) => drawRow(ctx, row, padT + ri * unit + up * m.fs, m, job.lesson.id === "review" ? "nho" : c.mode));
+        } else rows.forEach((row, ri) => {
           const b = padT + ri * unit + up * m.fs;
           guides(ctx, b, m, padL - 10, W - padR + 10);
           drawRow(ctx, row, b, m, job.lesson.id === "review" ? "nho" : c.mode);

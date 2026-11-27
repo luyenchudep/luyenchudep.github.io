@@ -15,7 +15,7 @@ function cardItems(l){
   return out}
 function drawCard(cv,items,fam){
   const Wc=cv.parentElement.clientWidth-2,d=Math.min(devicePixelRatio||1,3),F=FONTS[fam||SC.font],xh=Math.min(44,Wc/7.5),fs=xh/F.x;
-  const up=2.3*xh,dn=1.3*xh,pitch=up+dn+10,ctx=cv.getContext("2d");
+  const th=SCRIPT==="th",up=(th?2.5:2.3)*xh,dn=(th?1.5:1.3)*xh,pitch=up+dn+(th?12:10),ctx=cv.getContext("2d");
   ctx.font=fnt(fs,F.fam);
   const widths=items.map(it=>it[0]==="~"?(STROKES[it.slice(1)].w+1.3)*xh:ctx.measureText(it).width+xh*1.2);
   const rows=[];let row=[],x=0;
@@ -24,7 +24,7 @@ function drawCard(cv,items,fam){
   const dark=themeName()==="dark";
   const cardTheme=THEMES[themeName()]||THEMES.sepia;
   ctx.fillStyle=cardTheme.paper;ctx.fillRect(0,0,Wc,Hc);
-  const m={xh,fs,asc:fs*F.asc,desc:fs*F.desc,tan:Math.tan(F.slant*Math.PI/180)},save=T,saveL=layout;T=cardTheme;layout={padL:12,safeSide:12};
+  const m={xh,fs,asc:fs*F.asc,desc:fs*F.desc,tan:Math.tan(F.slant*Math.PI/180),co:thCoBaiDangMo()},save=T,saveL=layout;T=cardTheme;layout={padL:12,safeSide:12};
   rows.forEach((r,i)=>{const b=6+up+i*pitch;guides(ctx,b,m,6,Wc-6);
     for(const[it,x0]of r){const x=x0+xh*.9+(it==="g"||it[0]==="j"?xh*.5:0);
       if(it[0]==="~"){drawBasic(ctx,it.slice(1),x,b,xh,cardTheme.model,m.tan);drawGuide(ctx,it,x,b,xh,dark)}
@@ -246,11 +246,13 @@ function drawAnimFrame(){
   const xh=Math.min(animState.big?62:44,(Hc-topBar-16)/spanY,(halfW-14)/spanX);
   const fs=xh/F.x,tan=Math.tan(F.slant*Math.PI/180);
   const b=topBar+((Hc-topBar-10)-(B.maxY-B.minY)*xh)/2+B.maxY*xh;
-  const m={xh,fs,asc:fs*F.asc,desc:fs*F.desc,tan};
+  const m={xh,fs,asc:fs*F.asc,desc:fs*F.desc,tan,co:thCoBaiDangMo()};
 
   const saveT=T,saveL=layout;T=ct;
+  ctx.save();ctx.beginPath();ctx.rect(0,topBar,Wc,Hc-topBar);ctx.clip();   /* lưới không tràn lên dòng tiêu đề */
   layout={padL:12,safeSide:12};guides(ctx,b,m,8,midX-8);
   layout={padL:midX+12,safeSide:12};guides(ctx,b,m,midX+8,Wc-8);
+  ctx.restore();
   T=saveT;layout=saveL;
 
   ctx.save();
