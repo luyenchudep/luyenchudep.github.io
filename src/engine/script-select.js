@@ -5,9 +5,7 @@ const GS={get(k,d){try{const v=localStorage.getItem("td1:"+k);return v==null?d:J
 const KIEU_CHU=["td","qs","th"];
 const SCRIPT=(v=>KIEU_CHU.includes(v)?v:"td")(GS.get("script","td")),SC=SCRIPTS[SCRIPT],PFX=SCRIPT+"1:";
 /* Tiểu học đang làm (bản 0.12): chỉ hiện ở chỗ chọn kiểu chữ khi mở app bằng link có ?tieuhoc (nhớ luôn cho lần sau) hoặc đang ở kiểu này */
-if(/[?&]tieuhoc\b/.test(location.search))GS.set("hienTieuHoc",true);
-const HIEN_TIEU_HOC=SCRIPT==="th"||GS.get("hienTieuHoc",false);
-const DS_KIEU_CHU=[["td","Thanh đậm"],["qs","Nét đều 10°"]].concat(HIEN_TIEU_HOC?[["th","Tiểu học"]]:[]);
+const DS_KIEU_CHU=[["td","Thanh đậm"],["qs","Nét đều 10°"]].concat([["th","Tiểu học"]]);
 /* Tiểu học: tạm ẩn bài ghép tiếng, từ ngữ, cỡ Nhỏ cho tới khi có nối chữ (TH_DU_BAI trong scripts-th.js) */
 const COURSE=SCRIPT==="th"&&!TH_DU_BAI?SC.COURSE.map(p=>({...p,lessons:p.lessons.filter(l=>!/^th-(g|v|nh)\d/.test(l.id))})).filter(p=>p.lessons.length):SC.COURSE,STROKES=SC.STROKES,DUCTUS=SC.DUCTUS,SOTAY=SC.SOTAY,NHAPMON=SC.NHAPMON,WORDS=SC.WORDS;
 function setScript(v){if(v===SCRIPT)return;GS.set("script",v);location.reload()}

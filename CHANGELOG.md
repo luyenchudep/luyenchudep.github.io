@@ -1,5 +1,40 @@
 # Những thay đổi qua từng bản
 
+## Bản 0.12.0 (27/11/2026): thêm kiểu chữ Tiểu học, lưới 4 ô li và nối chữ theo mẫu
+
+Bản này bổ sung kiểu chữ thứ ba là **Tiểu học** — chữ viết thường đứng, nét đều theo mẫu chữ dạy ở trường tiểu học — đứng ngang hàng với **Thanh đậm** và **Nét đều 10°** ngay ở mục đổi kiểu chữ. Từ bản này, mọi người dùng đều mở được trực tiếp mà không cần đường link thử nghiệm.
+
+### Giáo trình Tiểu học 32 bài, 9 phần
+
+- Đủ **29 chữ thường**, **10 chữ số**, **5 dấu thanh** và **14 nét cơ bản**, chia làm 9 phần theo đúng trình tự học: Làm quen (1 bài), Nét cơ bản (5 bài), Chữ số (3 bài), Chữ thường (12 bài), Dấu thanh (2 bài), Ghép tiếng (3 bài), Từ ngữ (2 bài), Chuyển sang cỡ Nhỏ (3 bài) và Bài tự do (1 bài).
+- Kèm phần **Nhập môn** (tư thế ngồi, cách cầm viết ba ngón tay, cách nhìn lưới 4 ô li, gợi ý đồng hành cho ba mẹ) và **Sổ tay** hướng dẫn điểm đặt viết, chiều đưa viết và lỗi hay gặp cho từng bài.
+- **Bài ôn** của kiểu Tiểu học chỉ dùng chữ tiếng Việt.
+
+### Lưới 4 ô li, cỡ Thường, cỡ Nhỏ và tập viết PDF đúng 2 mm mỗi ô li
+
+- **Lưới 4 ô li riêng** cho Tiểu học: các dòng nối liền nhau như vở thật, đường chân luôn là đường kẻ đậm.
+- Hỗ trợ cả **cỡ Thường** (thân chữ 2 ô li) và **cỡ Nhỏ** (thân chữ 1 ô li). Ô li của hai cỡ bằng nhau, chữ cỡ Nhỏ bằng nửa cỡ Thường để bé chuyển cỡ dễ dàng.
+- Chữ mẫu vẽ trực tiếp từ đường tâm nét: dòng mẫu là nét liền, dòng **Tô** là nét đứt mờ dần đúng kiểu vở tiểu học.
+- **Tập viết PDF** của Tiểu học là nét vectơ sắc nét (cả nét liền lẫn nét đứt), giữ đúng **1 ô li = 2 mm** ở mọi khổ giấy (A4, A5, Samsung Notes…).
+
+### Nối chữ trong tiếng, Xem viết chậm và tiện ích dùng chung
+
+- **Nối chữ trong một tiếng** theo mẫu chữ tiểu học: nối liền mạch từ điểm dừng của chữ trước qua chữ sau (VD: *in, mi, tu, đi, nhà, chim, mẹ*); nối gọn sau chữ *b, v* (*bi, bé, vịt, vẽ*); hoặc **lia viết** hở nhẹ khi gặp chữ bắt đầu bằng nét cong kín hay dừng trong lòng chữ (*ba, ca, on, su, ra*). Viết xong thân chữ cả tiếng mới đặt dấu phụ và dấu thanh; giữa hai tiếng chừa khoảng rộng bằng một chữ *o*.
+- **Xem viết chậm**, **Tự tô từng nét**, **mũi tên thứ tự nét**, chấm đặt viết và sơ đồ thứ tự nét trong bảng Xem đều hoạt động với kiểu Tiểu học. **Hộp viết phóng to** tự chỉnh mức phóng để luôn chứa trọn chữ cao 5 ô li và đuôi chữ xuống 3 ô li.
+- **Đường link cấu hình** mở đúng kiểu Tiểu học khi chia sẻ tập viết.
+- **Tiến độ, nhật ký luyện chữ và file sao lưu** được lưu riêng cho từng kiểu chữ, không lẫn giữa Thanh đậm, Nét đều 10° và Tiểu học.
+- Hai kiểu **Thanh đậm** và **Nét đều 10°** giữ nguyên không đổi; tập viết PDF của hai kiểu này ra giống hệt bản 0.11.0.
+
+### Chưa có ở bản này
+
+- Chưa có **chữ hoa** và các chữ **f, j, w, z**. Khi gõ hoặc dán gặp những chữ này, ứng dụng báo rõ và bỏ qua (chữ hoa Tiểu học dự kiến có ở bản 0.13).
+- **Xem viết chậm** và **mũi tên thứ tự nét** hiện còn chạy theo từng chữ, chưa nối liền cả tiếng.
+
+### Dành cho người góp mã
+
+- Dữ liệu giáo trình và đường tâm nét của kiểu Tiểu học nằm ở `src/data/scripts-th.js`; bộ vẽ chữ mẫu, ghép dấu thanh và nối chữ nằm ở `src/engine/th-render.js`.
+- Thêm bộ phép thử tự động `node tools/kiem-tieuhoc.js` (10 phép kiểm dữ liệu, bộ vẽ và nối chữ), chạy tự động trên GitHub Actions.
+
 ## Bản 0.11.0 (26/11/2026): tạo tập viết PDF linh hoạt hơn, chia sẻ cấu hình qua đường link
 
 ### Màn Tạo tập viết PDF mới và thêm khổ giấy
