@@ -4,6 +4,13 @@ const MM_SANG_PT = 72 / 25.4;
 function khoPdf(k) {
   return { name: k.ten, ptW: k.wMm * MM_SANG_PT, ptH: k.hMm * MM_SANG_PT, pxW: k.pxW, pxH: k.pxH, bar: k.barPx, mono: k.mono, links: k.links, desc: k.moTa, wMm: k.wMm, hMm: k.hMm };
 }
+/* Chia khổ trang thành nhóm cho màn Tạo tập viết PDF; khổ chưa xếp nhóm thì vào nhóm cuối */
+const NHOM_KHO = [["Giấy in", ["a4", "a5", "b5", "letter"]], ["Máy đọc sách", ["rm2", "rmpp", "rmppm", "boox103", "boox133", "boox7", "scribe102", "scribe11", "manta", "nomad"]], ["Máy tính bảng", ["sn", "ipad11", "ipad13", "tab11", "tab146"]]];
+function nhomKho() {
+  const da = new Set(), kq = NHOM_KHO.map(([ten, ds]) => [ten, ds.filter(v => KHO_TRANG[v] && !da.has(v) && da.add(v))]);
+  kq[kq.length - 1][1].push(...Object.keys(KHO_TRANG).filter(v => !da.has(v)));
+  return kq.filter(([, ds]) => ds.length);
+}
 const PDF_PRESETS = Object.fromEntries(Object.entries(KHO_TRANG).map(([ma, k]) => [ma, khoPdf(k)]));
 /* Khổ tự nhập: rộng × cao (mm), vẽ theo PX_MOI_MM */
 function khoTuNhap(wMm, hMm) {
@@ -46,7 +53,7 @@ function openPdfModal(keepScroll=false){
   <div class="prog">Tạo tập viết PDF ngay trên máy, không cần mạng. Chọn nội dung và khổ giấy, rồi tạo file hoặc chép đường link để gửi cho người khác.</div>
   <div class="row"><span>Nội dung</span><div class="seg">${nutChon([["cur","Bài này"],["pick","Chọn bài"],["part","Cả phần"],["all","Cả giáo trình"],["weak","Luyện thêm"],["free","Bài tự do"],["type","Tự gõ"]],nd,v=>`pdfOpt.scope='${v}'`)}</div></div>
   <div class="prog" style="margin:4px 0 8px">${moTaNd}</div>${dsBai}${oTuGo}
-  <div class="row"><span>Khổ giấy hoặc máy</span><div class="seg">${nutChon(Object.entries(KHO_TRANG).map(([v,k])=>[v,k.ngan]),pdfOpt.preset,v=>`pdfOpt.preset='${v}'`)}<button class="${pdfOpt.preset==="tunhap"?"on":""}" onclick="chonKhoTuNhap();openPdfModal(true)">Tự nhập</button></div></div>
+  ${nhomKho().map(([ten,ds],i)=>`<div class="row"><span>${i?ten:"Khổ giấy hoặc máy · "+ten}</span><div class="seg">${nutChon(ds.map(v=>[v,KHO_TRANG[v].ngan]),pdfOpt.preset,v=>`pdfOpt.preset='${v}'`)}${i?"":`<button class="${pdfOpt.preset==="tunhap"?"on":""}" onclick="chonKhoTuNhap();openPdfModal(true)">Tự nhập</button>`}</div></div>`).join("")}
   ${oKho}<div class="prog" id="pdfKhoMoTa" style="margin:4px 0 8px">${pr?`<b>${escHtml(pr.name)}:</b> ${escHtml(pr.desc)}`:escHtml(loiKho)}</div>
   <div class="row"><span>Cách tập trên dòng</span><div class="seg">${nutChon([["to","② Tô"],["nho","③ Chép"]],pdfOpt.mode,v=>`pdfOpt.mode='${v}'`)}</div></div>
   ${SCRIPT==="th"?"":`<div class="row"><span>Kiểu dòng kẻ</span><div class="seg">${nutChon([["french","Lưới xiên Pháp"],["oly4","4 ô li Việt Nam"]],pdfOpt.grid,v=>`pdfOpt.grid='${v}'`)}</div></div>`}
