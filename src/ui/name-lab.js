@@ -24,7 +24,7 @@ function applyNameLab(){
   store.set("myName",nm);store.set("nameLabTxt",txt);
   store.set("custom",txt);
   closeSheets();
-  openLesson(LESSONS.findIndex(l=>l.id==="free"),"to");
+  {const i=LESSONS.findIndex(l=>l.id==="free");if(i>=0)openLesson(i,"to")}
   toast("Đã tạo bài luyện tên và chữ ký!");
 }
 

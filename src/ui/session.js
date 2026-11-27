@@ -42,7 +42,7 @@ async function journalSnap(snap){
   const l=LESSONS[li],w=360,h=Math.max(120,Math.round(H/Math.max(1,W)*w)),c=document.createElement("canvas");c.width=w;c.height=h;
   const full=renderFullExport();
   c.getContext("2d").drawImage(full,0,0,w,h);
-  const rec={d:today(),t:(SCRIPT==="qs"?"Nét đều · ":"")+(li>=NREAL?l.t:`Bài ${li+1} · ${l.t}`),p:pg+1,m:md,img:c.toDataURL("image/jpeg",.62)};
+  const rec={d:today(),t:(SCRIPT==="td"?"":SC.name+" · ")+(li>=NREAL?l.t:`Bài ${li+1} · ${l.t}`),p:pg+1,m:md,img:c.toDataURL("image/jpeg",.62)};
   try{idb.transaction("j","readwrite").objectStore("j").put(rec,`${rec.d}|${SCRIPT}|${k}`)}catch(e){}
 }
 async function openJournal(){
@@ -91,7 +91,7 @@ async function idbDumpStore(name){
 }
 async function backup(){
   flushSave();toast("Đang gom dữ liệu sao lưu đầy đủ…");
-  const o={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k.startsWith("td1:")||k.startsWith("qs1:"))o[k]=localStorage.getItem(k)}
+  const o={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(KIEU_CHU.some(s=>k.startsWith(s+"1:")))o[k]=localStorage.getItem(k)}
   const jData=await idbDumpStore("j"),inkData=await idbDumpStore("ink");
   const blob=new Blob([JSON.stringify({app:"tap-viet",v:4,date:today(),data:o,idb:{j:jData,ink:inkData}})],{type:"application/json"});
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`tap-viet-saoluu-${today()}.json`;a.click();

@@ -64,8 +64,9 @@ function buildAnimData(ch){
     if(runs.length)list.push({runs,totalLen:totalLen||0.001,mark:!!st.mark,side});
   }
   const F=FONTS[SC.font];
-  minY=Math.min(minY,-F.desc/F.x);
-  maxY=Math.max(maxY,F.asc/F.x);
+  /* Tiểu học: khung bám sát chữ (tối thiểu thân chữ và một chút trên dưới) để chữ thấp như a, o không bị nhỏ; hai kiểu kia giữ khung theo phông */
+  minY=Math.min(minY,SCRIPT==="th"?-0.3:-F.desc/F.x);
+  maxY=Math.max(maxY,SCRIPT==="th"?1.3:F.asc/F.x);
   if(minX>maxX){minX=0;maxX=1}
   return {list,bounds:{minX,maxX,minY,maxY}};
 }

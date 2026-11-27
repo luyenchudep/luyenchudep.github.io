@@ -3,7 +3,7 @@ function guides(ctx,b,m,x0,x1){
   const gx0=x0!=null?x0:(layout?Math.max(12,layout.safeSide-6):16);
   const gx1=x1!=null?x1:(W-(layout?Math.max(12,layout.safeSide-6):16));
   if(S.xBand&&T.xBand){ctx.fillStyle=T.xBand;ctx.fillRect(gx0,b-m.xh,gx1-gx0,m.xh)}
-  if(S.gridStyle==="oly4"){
+  if(S.gridStyle==="oly4"||SCRIPT==="th"){
     /* Hệ 4 ô ly chuẩn vở tiểu học Việt Nam (1 ly = xh / 2) */
     const ly=m.xh/2,topY=b-Math.max(m.asc,ly*5),botY=b+Math.max(m.desc,ly*3);
     ctx.strokeStyle=T.slant;ctx.lineWidth=0.85;ctx.setLineDash([]);
@@ -30,13 +30,13 @@ function guides(ctx,b,m,x0,x1){
   ctx.lineWidth=1;ctx.strokeStyle=T.desc;ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(gx0,b+m.desc);ctx.lineTo(gx1,b+m.desc);ctx.stroke();
   ctx.setLineDash([]);
 }
-function text(ctx,s,x,b,fs,color,fam){const F=FONTS[fam||SC.font];ctx.font=fnt(fs,fam);ctx.fillStyle=color;ctx.textBaseline="alphabetic";
+function text(ctx,s,x,b,fs,color,fam){if(laPhongTH(fam))return veChuoiTH(ctx,s,x,b,fs,color,color===traceColor());const F=FONTS[fam||SC.font];ctx.font=fnt(fs,fam);ctx.fillStyle=color;ctx.textBaseline="alphabetic";
   if(F.skew){const tn=Math.tan(F.slant*Math.PI/180);ctx.save();ctx.transform(1,0,-tn,1,tn*b,0);ctx.fillText(s,x,b);ctx.restore()}else ctx.fillText(s,x,b)}
 function hint(ctx,s,x,b,m){const sz=Math.max(14,m.xh*.62);ctx.font=`600 ${sz}px 'QS',sans-serif`;ctx.fillStyle=T.hint;ctx.textBaseline="alphabetic";
   const t=s.length>36?s.slice(0,35)+"…":s;ctx.fillText(t,x,b-m.asc*.98+sz)}
 /* mũi tên trên cả một chuỗi chữ: mỗi chữ đặt theo vị trí đo được */
 function arrowsOnText(ctx,s,x,b,fs,xh,fam){
-  if(fam==="AL")return;ctx.font=fnt(fs,fam);const chars=[...s];let pre="";
+  if(fam==="AL")return;if(laPhongTH(fam))return muiTenChuoiTH(ctx,s,x,b,xh);ctx.font=fnt(fs,fam);const chars=[...s];let pre="";
   for(const ch of chars){const x0=x+ctx.measureText(pre).width;if(DUCTUS[ch])drawGuide(ctx,ch,x0,b,xh,themeName()==="dark");pre+=ch}}
 /* nét cơ bản thanh đậm — bề rộng theo hướng viết xuống */
 function samplePath(d){
@@ -68,6 +68,7 @@ function drawBasicQS(ctx,kind,x,b,xh,color,tan){
   ctx.stroke();ctx.restore()}
 function drawBasic(ctx,kind,x0,b,xh,color,tan){
   if(SCRIPT==="qs")return drawBasicQS(ctx,kind,x0,b,xh,color,tan);
+  if(SCRIPT==="th")return veNetCoBanTH(ctx,kind,x0,b,xh,color,color===traceColor());
   if(!STROKES[kind])return;
   const pts=samplePath(STROKES[kind].d),n=pts.length,thick=.24*xh,thin=Math.max(.05*xh,1.1);
   let ws=pts.map((p,i)=>{const a=pts[Math.max(0,i-1)],c=pts[Math.min(n-1,i+1)];const dx=c[0]-a[0],dy=c[1]-a[1];

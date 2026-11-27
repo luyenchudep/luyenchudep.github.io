@@ -200,7 +200,7 @@ function bindQuizCanvas(){
     quiz.hint=null;quiz.failPts=null;quiz.failUntil=0;
     const q=ptOf(e);q[2]=Math.min(q[2],(S.pFull||.38)*.45);
     const col=themeName()==="dark"?"#82B4FF":themeName()==="eink"?"#333333":"#184E9E";
-    const w=Math.max(2.8,Math.min(6.5,quiz.geom.xh*(SCRIPT==="qs"?0.11:0.085)));
+    const w=Math.max(2.8,Math.min(6.5,quiz.geom.xh*(SCRIPT!=="td"?0.11:0.085)));
     quiz.live={tp:SCRIPT==="td"?"fountain":"gel",c:col,w,pr:SCRIPT==="td",ct:"med",na:38,tl:false,pf:S.pFull||.38,p:[q],pid:e.pointerId};
     drawQuizFrame();
   };
@@ -329,7 +329,7 @@ function openCard(focusCh,startMode){stopAnim();LEGEND=S.arrowStyle==="full"?LEG
   }
 }
 function openNhapMon(){LEGEND=S.arrowStyle==="full"?LEGEND_FULL:LEGEND_SIMPLE;
-  let h=`<h3>${SC.nmTitle}</h3><div class="prog">${SCRIPT==="td"?"Tóm tắt từ giáo trình viết chữ của trường Pháp xưa và các nghiên cứu hiện đại về học viết.":"Tóm tắt nguyên tắc viết chữ in rõ ràng và các nghiên cứu hiện đại về học viết."}</div>`;
+  let h=`<h3>${SC.nmTitle}</h3><div class="prog">${SCRIPT==="td"?"Tóm tắt từ giáo trình viết chữ của trường Pháp xưa và các nghiên cứu hiện đại về học viết.":SCRIPT==="th"?"Theo mẫu chữ viết trong trường tiểu học (Quyết định 31/2002/QĐ-BGD&ĐT). Phần cuối dành cho ba mẹ.":"Tóm tắt nguyên tắc viết chữ in rõ ràng và các nghiên cứu hiện đại về học viết."}</div>`;
   NHAPMON.forEach((c,i)=>{h+=`<h4>${i+1}. ${c.t}</h4>`+c.p.map(p=>`<p>${p}</p>`).join("");if(c.demo)h+=LEGEND+`<canvas id="nmCv${i}"></canvas>`});
   h+=`<button class="btn primary" onclick="closeSheets()">Bắt đầu tập viết</button>`;
   document.getElementById("genBox").innerHTML=h;openSheet("gen");
