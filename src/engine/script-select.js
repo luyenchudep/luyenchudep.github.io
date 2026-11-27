@@ -1,12 +1,11 @@
 /* ================== KIỂU CHỮ ================== */
 const GS={get(k,d){try{const v=localStorage.getItem("td1:"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
  set(k,v){try{localStorage.setItem("td1:"+k,JSON.stringify(v));return true}catch(e){return false}}};
-/* Ba kiểu chữ: td (Thanh đậm), qs (Nét đều), th (Tiểu học). Mỗi kiểu lưu bài và tiến độ riêng theo tiền tố PFX. */
+/* Ba kiểu chữ: td (Thanh đậm), qs (Nét đều), th (Sao Mai Tập Viết, chữ tiểu học). Mỗi kiểu lưu bài và tiến độ riêng theo tiền tố PFX. */
 const KIEU_CHU=["td","qs","th"];
 const SCRIPT=(v=>KIEU_CHU.includes(v)?v:"td")(GS.get("script","td")),SC=SCRIPTS[SCRIPT],PFX=SCRIPT+"1:";
-/* Tiểu học đang làm (bản 0.12): chỉ hiện ở chỗ chọn kiểu chữ khi mở app bằng link có ?tieuhoc (nhớ luôn cho lần sau) hoặc đang ở kiểu này */
-const DS_KIEU_CHU=[["td","Thanh đậm"],["qs","Nét đều 10°"]].concat([["th","Tiểu học"]]);
-/* Tiểu học: tạm ẩn bài ghép tiếng, từ ngữ, cỡ Nhỏ cho tới khi có nối chữ (TH_DU_BAI trong scripts-th.js) */
+/* [mã, tên trên nút, mô tả hiện khi đưa chuột vào nút và dưới nút khi đang chọn] */
+const DS_KIEU_CHU=[["td","Thanh đậm"],["qs","Nét đều 10°"],["th","Sao Mai","Sao Mai Tập Viết · chữ tiểu học theo mẫu của Bộ Giáo dục"]];
 const COURSE=SCRIPT==="th"&&!TH_DU_BAI?SC.COURSE.map(p=>({...p,lessons:p.lessons.filter(l=>!/^th-(g|v|nh)\d/.test(l.id))})).filter(p=>p.lessons.length):SC.COURSE,STROKES=SC.STROKES,DUCTUS=SC.DUCTUS,SOTAY=SC.SOTAY,NHAPMON=SC.NHAPMON,WORDS=SC.WORDS;
 function setScript(v){if(v===SCRIPT)return;GS.set("script",v);location.reload()}
 function drawGuide(ctx,ch,x,b,xh,dark){(S.arrowStyle==="full"?drawArrows:drawSimple)(ctx,ch,x,b,xh,dark)}

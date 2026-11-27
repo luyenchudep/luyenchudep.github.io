@@ -1,6 +1,6 @@
 # ✍️ Tập viết S Pen
 
-Luyện chữ đẹp tiếng Việt, kiểu thanh đậm, kiểu nét đều và kiểu chữ tiểu học, ngay trên điện thoại hay máy tính bảng.
+Luyện chữ đẹp tiếng Việt, kiểu thanh đậm, kiểu nét đều và kiểu Sao Mai Tập Viết (chữ tiểu học), ngay trên điện thoại hay máy tính bảng.
 
 Bạn viết bằng S Pen hoặc viết cảm ứng lên màn hình. Ứng dụng chỉ cho bạn từng nét: đặt viết ở đâu, kéo theo hướng nào, nét nào viết trước, nét nào viết sau. Muốn tập trên giấy thì in tập viết ra khổ A4, A5, hoặc chép vào máy reMarkable, Samsung Notes.
 
@@ -30,11 +30,11 @@ Nên mở bằng Chrome hoặc Samsung Internet, rồi chọn **Thêm vào màn 
 
 ## Ứng dụng có gì
 
-### Ba bộ bài tập, tổng cộng 114 bài
+### Ba bộ bài tập, tổng cộng 130 bài
 
 - **Chữ thanh đậm**, nghiêng 28 độ: 45 bài, chia làm 10 phần. Bắt đầu từ các nét cơ bản, rồi tới chữ thường, cách nối chữ, chữ hoa và chữ có dấu, kể cả những chữ mang hai dấu chồng lên nhau như ẫ, Ở, Ữ. Tiếp đó là viết từ, viết câu, chép Truyện Kiều, và cuối cùng là viết nhanh, ghi chép trên trang chia ba ô.
 - **Chữ nét đều**, nghiêng 10 độ: 37 bài, chia làm 10 phần. Gồm chữ in dễ đọc, chữ số, ký hiệu, câu Việt – Anh và ghi chép hằng ngày.
-- **Chữ tiểu học**, chữ đứng nét đều: 32 bài, chia làm 9 phần, theo mẫu chữ viết thường dạy ở trường tiểu học (29 chữ thường, 10 chữ số và dấu thanh). Dùng lưới 4 ô li với cỡ Thường (2 ô li) và cỡ Nhỏ (1 ô li), dòng tô nét đứt, nối chữ trong tiếng, và tập viết PDF in đúng 1 ô li = 2 mm. Chữ hoa dự kiến có ở bản sau.
+- **Sao Mai Tập Viết** (chữ tiểu học), chữ đứng nét đều: 48 bài, chia làm 11 phần, theo mẫu chữ viết dạy ở trường tiểu học (29 chữ thường, 29 chữ hoa, 10 chữ số và dấu thanh). Dùng lưới 4 ô li với cỡ Thường (2 ô li) và cỡ Nhỏ (1 ô li), dòng tô nét đứt, nối chữ trong tiếng, và tập viết PDF in đúng 1 ô li = 2 mm.
 
 Cả ba kiểu chữ đều có hướng dẫn thứ tự nét và lưu tiến độ riêng (riêng Thanh đậm và Nét đều gồm 404 chữ và nét).
 

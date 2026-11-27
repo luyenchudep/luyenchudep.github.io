@@ -33,7 +33,7 @@ function openMenu(keepScroll=false){
   if(!partOpen)partOpen=new Set([curPartName()]);
   const real=LESSONS.slice(0,NREAL),n=real.filter(l=>l.id!=="free").length,k=[...done].filter(id=>real.some(l=>l.id===id&&id!=="free")).length;
   const due=dueItems().length,toolAlert=due>0||paperDue();
-  let h=`<div class="mHead"><h3>Danh mục</h3><div class="seg">${DS_KIEU_CHU.map(([v,t])=>`<button class="${SCRIPT===v?"on":""}" onclick="setScript('${v}')">${t}</button>`).join("")}</div></div>`;
+  let h=`<div class="mHead"><h3>Danh mục</h3><div class="seg">${DS_KIEU_CHU.map(([v,t,m])=>`<button class="${SCRIPT===v?"on":""}" title="${m||t}" onclick="setScript('${v}')">${t}</button>`).join("")}</div></div>`;
   h+=`<div class="mTabs">${[["bai","book","Bài học"],["cong","target","Công cụ"],["cai","sliders","Cài đặt"]].map(([v,icn,t])=>`<button class="${menuTab===v?"on":""}" onclick="setMenuTab('${v}')">${ic(icn)}${t}${v==="cong"&&toolAlert?`<span class="dot"></span>`:""}</button>`).join("")}</div>`;
   if(menuTab==="bai"){
     h+=`<div class="prog" style="margin-bottom:4px">${SC.name} · đã tập ${k}/${n} bài</div><div class="bar"><div style="width:${Math.round(k/n*100)}%"></div></div>`;
