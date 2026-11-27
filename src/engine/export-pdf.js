@@ -101,7 +101,7 @@ async function exportPdf(cfg, tuyChon = {}) {
       const m = SCRIPT === "th" ? sizeForTHPdf(l, pr.pxW / pr.wMm) : sizeFor(l), F = m.F;
       let up = Math.max(l.up || F.asc + .25, F.asc + .05), dn = Math.max(l.dn || F.desc + .1, F.desc + .03);
       let unit = (up + dn) * m.fs + m.xh * (SCRIPT !== "td" ? .72 : .48);
-      if (SCRIPT === "th") { const bd = thBuocDong(m.co); unit = bd.unit * m.fs; up = bd.up; }
+      if (SCRIPT === "th") { const bd = thBuocDong(m.co, m.hoa); unit = bd.unit * m.fs; up = bd.up; }
       const perPage = Math.max(1, Math.floor((H - padT - padB) / unit));
       const avail = Math.max(200, W - padL - padR - 12);
       const rLayout = { m, padL, padR, padT, unit, perPage, up, safeSide: Math.min(padL, padR) };

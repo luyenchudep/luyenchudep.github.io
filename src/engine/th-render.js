@@ -16,7 +16,8 @@ const TH_KHOANG_TIENG = 0.8; // khoảng giữa hai tiếng: rộng bằng một
 const TH_DY_NANG = -0.5;   // dời ô dấu nặng xuống nửa đơn vị: chấm nằm khoảng 0,25 dưới đường chân
 const TH_DAU = { "́": "dausac", "̀": "dauhuyen", "̉": "dauhoi", "̃": "daunga", "̣": "daunang" };
 /* Vị trí ngang của âm chính để đặt dấu thanh (đơn vị chữ, tính từ mép trái chữ) */
-const TH_TAM_DAU = { a: .4, "ă": .4, "â": .4, e: .38, "ê": .36, i: .28, o: .4, "ô": .4, "ơ": .4, u: .57, "ư": .57, y: .57 };
+const TH_TAM_DAU = { a: .4, "ă": .4, "â": .4, e: .38, "ê": .36, i: .28, o: .4, "ô": .4, "ơ": .4, u: .57, "ư": .57, y: .57,
+  A: 1.38, "Ă": 1.38, "Â": 1.38, E: 1, "Ê": 1, I: .55, O: 1, "Ô": 1, "Ơ": 1, U: 1.17, "Ư": 1.17, Y: 1.17 };
 
 /* Dời một đường (danh sách lệnh M/L/C) đi (dx, dy) */
 function thDoi(d, dx, dy) {
@@ -206,14 +207,20 @@ const TH_O_LI_MM = 2;   // 1 ô li in ra = 2 mm
 function thCo(z) { return (SC.CO && SC.CO[z]) || 2; }
 /* Cỡ của bài đang mở (dùng cho bảng Xem, Xem viết chậm, Tự tô); hai kiểu chữ kia trả undefined */
 function thCoBaiDangMo() { return SCRIPT === "th" && typeof cur !== "undefined" && LESSONS[cur.li] ? thCo(LESSONS[cur.li].z) : undefined; }
-function thDongOLi(co) { return co === 1 ? { tren: 2.5, cao: 4 } : { tren: 5, cao: 8 }; }
+/* Bài có chữ hoa: chữ hoa cao 5 ô li, dấu mũ và dấu thanh trên chữ hoa lên tới khoảng 7 ô li, G, Y xuống 3 ô li,
+   nên mỗi dòng chừa 8 ô li trên đường chân (cỡ Nhỏ: 4) và 4 ô li dưới; bước dòng vẫn là bội của 4 ô li để đường chân luôn ở đường kẻ đậm */
+function thDongOLi(co, hoa) { return hoa ? (co === 1 ? { tren: 4, cao: 8 } : { tren: 8, cao: 12 }) : co === 1 ? { tren: 2.5, cao: 4 } : { tren: 5, cao: 8 }; }
+/* Bài (hay nội dung tự gõ) có chữ hoa không */
+const thCoHoa = l => SCRIPT === "th" && !!l && (l.id === "free" ? [["pair", store.get("custom", "")]] : l.rows || []).some(r => typeof r[1] === "string" && /\p{Lu}/u.test(r[1]));
+/* Tâm dải dòng tính từ đường chân lên (điểm ảnh): dùng để gán nét viết, chọn dòng; dòng thường của Tiểu học là 0,5 thân chữ */
+const thTamDong = (up, unit, fs) => (2 * up * fs - unit) / 2;
 /* Khoảng cách hai dòng tập và vị trí đường chân trong dòng, tính theo thân chữ (đơn vị chữ) */
-function thBuocDong(co) { const d = thDongOLi(co); return { unit: d.cao / co, up: d.tren / co }; }
+function thBuocDong(co, hoa) { const d = thDongOLi(co, hoa); return { unit: d.cao / co, up: d.tren / co }; }
 /* vien: { dau, cuoi } cho biết dòng này là dòng đầu hay dòng cuối của trang (khung đơn lẻ: cả hai). */
 function guidesTH(ctx, b, m, gx0, gx1, vien) {
-  const co = m.co || 2, ly = m.xh / co, d = thDongOLi(co), dau = !vien || vien.dau, cuoi = !vien || vien.cuoi;
+  const co = m.co || 2, ly = m.xh / co, d = thDongOLi(co, m.hoa), dau = !vien || vien.dau, cuoi = !vien || vien.cuoi;
   /* Cỡ Nhỏ: mép dòng rơi giữa ô li, nên ở mép trang thêm nửa ô li cho lưới đóng khung tròn ô */
-  const them = co === 1 ? 0.5 : 0;
+  const them = co === 1 && !m.hoa ? 0.5 : 0;
   const top = b - (d.tren + (dau ? them : 0)) * ly, bot = b + (d.cao - d.tren + (cuoi ? them : 0)) * ly;
   const kMin = Math.ceil((b - bot) / ly - 1e-9), kMax = Math.floor((b - top) / ly + 1e-9) - (dau ? 0 : (Math.abs((b - top) / ly % 1) < 1e-9 ? 1 : 0));
   if (S.xBand && T.xBand) { ctx.fillStyle = T.xBand; ctx.fillRect(gx0, b - m.xh, gx1 - gx0, m.xh); }
@@ -232,7 +239,7 @@ function guidesTH(ctx, b, m, gx0, gx1, vien) {
 /* Số đo chữ cho tập viết PDF: thân chữ tính từ mm thật (1 ô li = 2 mm), không theo cỡ màn hình */
 function sizeForTHPdf(l, pxMoiMm) {
   const co = thCo(l.z), xh = TH_O_LI_MM * co * pxMoiMm, F = FONTS.TH;
-  return { xh, fs: xh, asc: xh * F.asc, desc: xh * F.desc, tan: 0, fam: "TH", F, co };
+  return { xh, fs: xh, asc: xh * F.asc, desc: xh * F.desc, tan: 0, fam: "TH", F, co, hoa: thCoHoa(l) };
 }
 
 /* DUCTUS cho Tiểu học: mỗi nét một lượt, lấy điểm cách đều dọc đường tâm nét (samplePath ở draw.js) */
@@ -247,7 +254,7 @@ function dungDuctusTH() {
   const goc = Object.keys(SC.CHU);
   for (const c of goc) {
     them(c, hinhChuTH(c).nets);
-    if (/^[aăâeêioôơuưy]$/.test(c)) for (const dau of Object.keys(TH_DAU)) { const ch = (c + dau).normalize("NFC"); const h = hinhChuTH(ch); if (h) them(ch, h.nets); }
+    if (/^[aăâeêioôơuưyAĂÂEÊIOÔƠUƯY]$/.test(c)) for (const dau of Object.keys(TH_DAU)) { const ch = (c + dau).normalize("NFC"); const h = hinhChuTH(ch); if (h) them(ch, h.nets); }
   }
   for (const k of Object.keys(SC.STROKES)) DUCTUS["~" + k] = [{ r: [thLayDiem(duongNetCoBanTH(k))], s: -1 }];
 }

@@ -25,12 +25,12 @@ function idbGetInk(k){
   });
 }
 let inkCtx=null,inkOthers=[];
-function anchorsOf(lay,rows){const out=[];(rows||[]).forEach((r,i)=>{if(r.rid)out.push({rid:r.rid,b:lay.padT+i*lay.unit+lay.up*lay.m.fs})});return out}
+function anchorsOf(lay,rows){const out=[];(rows||[]).forEach((r,i)=>{if(r.rid){const b=lay.padT+i*lay.unit+lay.up*lay.m.fs;out.push(SCRIPT==="th"?{rid:r.rid,b,t:b-thTamDong(lay.up,lay.unit,lay.m.fs)}:{rid:r.rid,b})}});return out}
 function normStroke(s,c){
   if(!c.anchors.length||!s.p||!s.p.length)return null;
   let y0=1e9,y1=-1e9;for(const q of s.p){if(q[1]<y0)y0=q[1];if(q[1]>y1)y1=q[1]}
   const mid=(y0+y1)/2;let best=c.anchors[0],bd=1e9;
-  for(const a of c.anchors){const d=Math.abs(mid-(a.b-c.xh*.5));if(d<bd){bd=d;best=a}}
+  for(const a of c.anchors){const d=Math.abs(mid-(a.t??a.b-c.xh*.5));if(d<bd){bd=d;best=a}}
   const o=Object.assign({},s);delete o.a;
   o.a=best.rid;o.p=s.p.map(q=>[Math.round((q[0]-c.padL)/c.xh*1000)/1000,Math.round((q[1]-best.b)/c.xh*1000)/1000,q[2],q[3]||0]);
   return o;

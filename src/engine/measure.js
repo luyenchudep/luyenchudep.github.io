@@ -36,7 +36,7 @@ function scoreGeometry(){
     const b=padT+ri*unit+up*m.fs;
     const rs=validStrokes.filter(s=>{
       const ys=s.p.map(q=>q[1]),midY=(Math.min(...ys)+Math.max(...ys))/2;
-      return Math.abs(midY-(b-m.xh*0.5))<unit*0.48;
+      return Math.abs(midY-(SCRIPT==="th"?b-thTamDong(up,unit,m.fs):b-m.xh*0.5))<unit*0.48;
     });
     if(!rs.length)return;
     for(const s of rs){
