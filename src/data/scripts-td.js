@@ -22,7 +22,7 @@ SCRIPTS.td = {
         {"id":"c2","t":"Nhóm móc trên: n m v x z","z":"L","note":"Đỉnh móc tròn, nét xuống thẳng theo đường xiên.","rows":[["rep","n"],["rep","m"],["rep","v"],["rep","x"],["rep","z"],["rep","nm"]],"up":0.896,"dn":0.384},
         {"id":"c3","t":"Nhóm chữ tròn: o a c e","z":"L","note":"Vòng bầu dục nghiêng; bên trái đậm, bên phải mảnh.","rows":[["rep","o"],["rep","a"],["rep","c"],["rep","e"],["rep","ao"],["rep","ce"]],"up":0.896,"dn":0.384},
         {"id":"c4","t":"Chữ tròn có thân: d g q p","z":"L","note":"Thân d lên tới đường trên; thân g, q, p xuống đường dưới.","rows":[["rep","d"],["rep","g"],["rep","q"],["rep","p"],["rep","dq"],["rep","gp"]],"up":0.896,"dn":0.384},
-        {"id":"c5","t":"Thân cao l h k, khuyết trên b f","z":"L","note":"l h k: thân thẳng, kéo một mạch từ đỉnh. b f: khuyết hẹp, cắt nhau gần đường giữa.","rows":[["rep","l"],["rep","h"],["rep","k"],["rep","b"],["rep","f"],["rep","lb"]],"up":0.896,"dn":0.384},
+        {"id":"c5","t":"Khuyết trên: l h k b f","z":"L","note":"Lên mảnh, quay gọn ở đỉnh, kéo thân đậm xuống một mạch. Hai nét cắt nhau gần đường giữa.","rows":[["rep","l"],["rep","h"],["rep","k"],["rep","b"],["rep","f"],["rep","lb"]],"up":0.896,"dn":0.384},
         {"id":"c6","t":"Khuyết dưới và chữ riêng: j y r s","z":"L","note":"Khuyết dưới cắt nhau ở đường chân.","rows":[["rep","j"],["rep","y"],["rep","r"],["rep","s"],["rep","jy"],["rep","rs"]],"up":0.896,"dn":0.384}
       ]
     },
@@ -189,7 +189,7 @@ SCRIPTS.td = {
       }
     ],
     "k": [
-      {"r":[[[1.55,2.27],[0.9,1.35],[0.3,0.5],[-0.18,0]]],"s":-1},
+      {"r":[[[0.67,1.15],[1.22,1.6],[1.72,2.1],[1.9,2.27]],[[1.9,2.27],[1.8,2.28],[1.42,1.95],[0.92,1.32],[0.52,0.82],[0.3,0.5],[-0.18,0]]],"s":[-1,-1]},
       {"r":[[[0.46,0.67],[0.72,0.68],[0.97,0.96],[1.2,1.07],[1.36,0.99],[1.3,0.9]]],"s":1},
       {
         "r": [[[0.74,0.64],[0.78,0.48],[0.6,0.25],[0.6,0.05]],[[0.6,0.05],[0.8,0],[1.05,0.15],[1.42,0.58]]],
@@ -279,7 +279,7 @@ SCRIPTS.td = {
       {"r":[[[0.18,0.7],[0.22,0.5],[0.35,0.3],[0.6,0.25],[0.85,0.35],[1.12,0.6]]],"s":-1}
     ],
     "h": [
-      {"r":[[[1.52,2.28],[0.8,1.25],[0.2,0.4],[-0.25,0.02]]],"s":-1},
+      {"r":[[[0.67,1.15],[1.22,1.6],[1.72,2.1],[1.9,2.27]],[[1.9,2.27],[1.8,2.28],[1.42,1.95],[0.92,1.32],[0.52,0.82],[0.2,0.4],[-0.25,0.02]]],"s":[-1,-1]},
       {
         "r": [[[0.05,0.28],[0.35,0.65],[0.72,0.97],[0.97,0.92],[0.92,0.65],[0.7,0.3],[0.6,0.06]],[[0.6,0.06],[0.75,0],[1,0.12],[1.45,0.58]]],
         "s": [1,-1]
@@ -298,8 +298,8 @@ SCRIPTS.td = {
     ],
     "l": [
       {
-        "r": [[[1.52,2.28],[0.8,1.25],[0.2,0.4],[-0.05,0.08]],[[-0.05,0.08],[0.08,0],[0.35,0.08],[0.82,0.58]]],
-        "s": [-1,-1]
+        "r": [[[0.67,1.15],[1.22,1.6],[1.72,2.1],[1.9,2.27]],[[1.9,2.27],[1.8,2.28],[1.42,1.95],[0.92,1.32],[0.52,0.82],[0.2,0.4],[-0.05,0.08]],[[-0.05,0.08],[0.08,0],[0.35,0.08],[0.82,0.58]]],
+        "s": [-1,-1,-1]
       }
     ],
     "m": [
@@ -1825,12 +1825,12 @@ SCRIPTS.td = {
       ["Thân tách xa vòng bầu dục.","Đuôi g, q ngắn, không chạm đường dưới."]
     ],
     "c5": [
-      "l h k: thân thẳng cao tới đường trên · b f: có khuyết trên.",
+      "l h k b f: cùng có khuyết trên, cao tới đường trên.",
       [
-        "Kéo thân đậm từ đỉnh xuống một mạch, không dừng giữa chừng.",
-        "Khuyết của b, f: lên mảnh, quay gọn ở đỉnh, kéo đậm xuống."
+        "Nét lên mảnh, quay gọn ở đỉnh, rồi kéo thân đậm xuống một mạch, không dừng giữa chừng.",
+        "Nét lên và nét xuống cắt nhau gần đường giữa; khuyết hẹp, đều nhau ở cả năm chữ."
       ],
-      ["Thân cong võng.","Thân không song song với đường xiên."]
+      ["Khuyết phình to hoặc bẹp dẹp.","Thân cong võng, không song song với đường xiên."]
     ],
     "c6": [
       "j y r s: đuôi dưới và hai chữ có dáng riêng.",
@@ -1961,7 +1961,7 @@ SCRIPTS.td = {
       "t": "Tỉ lệ theo thân chữ",
       "p": [
         "<b>Thân chữ</b> là khoảng giữa đường chân (đậm) và đường nét đứt. Mọi tỉ lệ khác đều tính theo thân chữ.",
-        "Thân cao (l, h, k) và khuyết trên (b, f) vươn lên chạm đường mờ trên cùng; đuôi và khuyết dưới (g, j, y, p) chạm đường chấm dưới cùng.",
+        "Khuyết trên (l, h, k, b, f) vươn lên chạm đường mờ trên cùng; đuôi và khuyết dưới (g, j, y, p) chạm đường chấm dưới cùng.",
         "Dấu thanh đặt cao hơn thân chữ khoảng nửa thân. Các chữ cách nhau khoảng nửa thân chữ."
       ],
       "demo": ["l","g"]
