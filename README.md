@@ -24,7 +24,7 @@ Nên mở bằng Chrome hoặc Samsung Internet, rồi chọn **Thêm vào màn 
 </p>
 <p align="center"><sub>Tô · Chép · Xem viết chậm · Tự tô từng nét</sub></p>
 
-> **Bản 0.12.0, đang thử nghiệm.** Ứng dụng đã chạy qua các bài kiểm tra tự động trên Chrome nhưng chưa được nhiều người dùng thử trên máy thật. Cách chấm điểm và độ nhạy khi tự tô từng nét có thể còn phải chỉnh. Bạn dùng thấy chỗ nào chưa ổn, rất mong bạn góp ý.
+> **Bản 0.13.0, đang thử nghiệm.** Ứng dụng đã chạy qua các bài kiểm tra tự động trên Chrome nhưng chưa được nhiều người dùng thử trên máy thật. Cách chấm điểm và độ nhạy khi tự tô từng nét có thể còn phải chỉnh. Bạn dùng thấy chỗ nào chưa ổn, rất mong bạn góp ý.
 
 ---
 
@@ -34,7 +34,7 @@ Nên mở bằng Chrome hoặc Samsung Internet, rồi chọn **Thêm vào màn 
 
 - **Chữ thanh đậm**, nghiêng 28 độ: 45 bài, chia làm 10 phần. Bắt đầu từ các nét cơ bản, rồi tới chữ thường, cách nối chữ, chữ hoa và chữ có dấu, kể cả những chữ mang hai dấu chồng lên nhau như ẫ, Ở, Ữ. Tiếp đó là viết từ, viết câu, chép Truyện Kiều, và cuối cùng là viết nhanh, ghi chép trên trang chia ba ô.
 - **Chữ nét đều**, nghiêng 10 độ: 37 bài, chia làm 10 phần. Gồm chữ in dễ đọc, chữ số, ký hiệu, câu Việt – Anh và ghi chép hằng ngày.
-- **Sao Mai Tập Viết** (chữ tiểu học), chữ đứng nét đều: 48 bài, chia làm 11 phần, theo mẫu chữ viết dạy ở trường tiểu học (29 chữ thường, 29 chữ hoa, 10 chữ số và dấu thanh). Dùng lưới 4 ô li với cỡ Thường (2 ô li) và cỡ Nhỏ (1 ô li), dòng tô nét đứt, nối chữ trong tiếng, và tập viết PDF in đúng 1 ô li = 2 mm.
+- **Sao Mai Tập Viết** (chữ tiểu học), chữ đứng nét đều: 48 bài, chia làm 11 phần, theo mẫu chữ viết dạy ở trường tiểu học (29 chữ thường, 29 chữ hoa, 10 chữ số và dấu thanh). Dùng lưới 4 ô li với cỡ Thường (2 ô li) và cỡ Nhỏ (1 ô li), dòng tô nét đứt, nối chữ mượt trong tiếng, và tập viết PDF in đúng 1 ô li = 2 mm.
 
 Cả ba kiểu chữ đều có hướng dẫn thứ tự nét và lưu tiến độ riêng (riêng Thanh đậm và Nét đều gồm 404 chữ và nét).
 
@@ -68,6 +68,15 @@ Mỗi bài đi qua bốn bước: **Xem**, **Tô**, **Chép** và **Bài ôn**. 
 - Bấm **Chép đường link cấu hình này** để gửi nguyên bộ lựa chọn (khổ giấy, bài tập, kiểu dòng kẻ, kể cả nội dung Tự gõ) cho người khác. Người nhận mở đường link là tạo được đúng tập viết đó; mọi lựa chọn nằm ngay trong đường link, không gửi lên máy chủ nào.
 - Tập viết xuất ra là PDF dạng vectơ, có nhúng phông chữ. In ra hay phóng to cỡ nào nét cũng sắc, file lại nhẹ, và tìm được chữ trong tập.
 - Ngoài ra còn có buổi tập 15 phút mỗi ngày, luyện viết tên và chữ ký, bài tự soạn, nhật ký luyện chữ, và lời nhắc tự kiểm tra chữ viết trên giấy hai tuần một lần.
+
+---
+
+## Font Sao Mai Tập Viết
+
+Đi kèm ứng dụng là bộ **font Sao Mai Tập Viết** miễn phí (giấy phép SIL Open Font License 1.1) gồm hai bản **nét liền** (`SaoMaiTapViet-Regular.ttf`) và **nét đứt để tô** (`SaoMaiTapVietNetDut-Regular.ttf`). Phụ huynh và giáo viên có thể cài lên máy để tự soạn bài tập, giáo án trong Microsoft Word, LibreOffice, PowerPoint hay Canva — Việt hóa đầy đủ (29 chữ thường, 29 chữ hoa, 10 chữ số, nguyên âm có dấu thanh, `f, j, w, z` và dấu câu thường dùng; chữ rời, chưa tự nối trong tiếng).
+
+- Tải file font ở mục [Releases](https://github.com/luyenchudep/luyenchudep.github.io/releases) hoặc trong thư mục [`font/`](font/).
+- Xem hướng dẫn cài đặt, cỡ chữ chuẩn 2 mm trong Word (`35,4 pt` cỡ Thường, `17,7 pt` cỡ Nhỏ) và trang gõ thử tại [`font/README.md`](font/README.md).
 
 ---
 
