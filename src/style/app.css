@@ -666,8 +666,8 @@ body.lefthand #navMo{left:auto;right:0;border-left:1.5px solid var(--line);borde
 body.navAn #navKhu{display:none}
 body.navAn #navMo{display:block}
 /* Bảng mở ra không chui dưới thanh bên */
-body:not(.navAn) .sheet{left:76px}
-body.lefthand:not(.navAn) .sheet{left:0;right:76px}
+body:not(.navAn):not(.tapTrung) .sheet{left:76px}
+body.lefthand:not(.navAn):not(.tapTrung) .sheet{left:0;right:76px}
 /* Điện thoại dọc: thanh 4 khu dưới cùng, luôn hiện */
 @media (max-width:700px) and (orientation:portrait){
   body{flex-direction:column}
@@ -722,17 +722,18 @@ body.tapTrung header,body.tapTrung #navKhu,body.tapTrung #navMo,body.tapTrung #s
 /* Bảng Xem chỉ hiện khi đang mở (chọn Xem); ghim chỉ quyết định nằm cạnh hay nổi đè lên trang */
 @media (min-width:860px){ body.split.xemGhim:not(.xemMo) #sidePane{display:none} }
 /* Bảng Xem đang mở thì ẩn thanh công cụ nổi cho khỏi che bảng (đặt viết xuống trang là bảng tự đóng) */
-body.xemMo.congCuNoi footer{display:none}
+body.xemMo:not(.xemGhim).congCuNoi footer{display:none}
 /* Đang mở bảng Xem thì chỉ nút Xem sáng */
 body.xemMo #modes button.on:not(#mXem){background:transparent;color:var(--muted);box-shadow:none}
 body.xemMo #modes button.on:not(#mXem) .n{border-color:currentColor;color:inherit;background:transparent}
-body.xemMo #navMo{display:none}
+body.xemMo:not(.xemGhim) #navMo{display:none}
 
 /* ================== KHU DẠNG TRANG (Giáo trình, Hồ sơ, Tập viết PDF) ================== */
 .sheet.trang{background:var(--bg);align-items:stretch;justify-content:stretch;top:0}
-.sheet.trang .box{max-width:none;width:100%;height:100%;max-height:none;border-radius:0;animation:none;padding:22px max(18px,calc((100% - 980px)/2)) calc(28px + env(safe-area-inset-bottom))}
+.sheet.trang .box{max-width:none;width:100%;height:100%;max-height:none;border-radius:0;animation:none;border-top:0;padding:max(22px,calc(12px + env(safe-area-inset-top))) max(18px,calc((100% - 980px)/2)) calc(28px + env(safe-area-inset-bottom))}
 .sheet.trang .box::before{display:none}
-.sheet.trang .tiles{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}
+.sheet.trang .tiles{grid-template-columns:repeat(auto-fill,minmax(132px,1fr))}
+@media (min-width:600px){ .sheet.trang .tiles{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))} }
 .li .liPdf{margin-left:auto;flex:0 0 auto;width:40px;height:40px;border:0;border-radius:10px;background:transparent;color:var(--muted);display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
 .li .liPdf:hover,.li .liPdf:focus-visible{background:var(--soft);color:var(--accent)}
 .li .sz + .liPdf{margin-left:8px}
@@ -748,3 +749,32 @@ body.eink #pdfXemCv{box-shadow:none;border:1px solid #000}
   .sheet.trang #pdfXemCv{max-height:70vh}
 }
 #menu.sheet.trang .box,#gen.sheet.trang .box{height:auto;align-self:stretch}
+
+/* ================== SỬA SAU KHI SOÁT (bản 0.14) ================== */
+/* Đang mở bảng: thanh công cụ nổi và nút Thoát không đè lên bảng; đang mở khu dạng trang: ẩn công cụ viết trong thanh bên
+   (bấm Trước, Sau, Hoàn tác lúc này sẽ đổi trang viết đang bị che bên dưới) */
+body.coBang.congCuNoi footer,body.coBang #thoatTT{display:none!important}
+body.coBang:not(.coTrang) #navMo{display:none}
+body.coTrang.congCuRail #navKhu footer{display:none}
+@media (min-width:701px){
+  body.navAn .sheet.trang .box{padding-left:max(38px,calc((100% - 980px)/2));padding-right:max(38px,calc((100% - 980px)/2))}   /* chừa chỗ nút mở thanh bên */
+}
+/* Hộp viết phóng to đang mở: thanh công cụ nổi dời lên trên hộp, không che chỗ viết */
+body.congCuNoi:has(#zboxWrap.on) footer{bottom:calc(clamp(175px,42dvh,310px) + 12px)}
+/* Toàn trang viết: nút Thoát không đè lên các nút góc trên của trang; tay trái thì nút Thoát qua góc trái */
+body.tapTrung #stageTop{padding-right:104px}
+body.lefthand #thoatTT{right:auto;left:max(8px,env(safe-area-inset-left))}
+body.tapTrung.lefthand #stageTop{padding-right:0;padding-left:104px}
+/* Màn thấp (điện thoại xoay ngang): 4 khu và 5 công cụ viết vừa một cột */
+@media (orientation:landscape) and (max-height:520px){
+  #navKhu{gap:1px;padding-top:4px;padding-bottom:4px}
+  body.congCuRail #navKhu .khu,body.congCuRail #navKhu footer .tb{min-height:34px;padding:1px}
+  body.congCuRail #navKhu footer{gap:1px;padding-top:4px}
+  body.congCuRail #navKhu .khuAn{height:26px}
+}
+/* Thanh công cụ nổi trên màn hẹp: ô đo điểm nằm trên thanh */
+@media (max-width:900px){ body.congCuNoi #meas{bottom:76px} }
+/* Điện thoại dọc hẹp: tên khu giữ một dòng */
+@media (max-width:380px) and (orientation:portrait){ #navKhu .khu{font-size:10.5px;white-space:nowrap} }
+/* Máy đọc sách: khu đang chọn đảo màu cho dễ thấy */
+body.eink #navKhu .khu.on{background:#000;color:#fff}

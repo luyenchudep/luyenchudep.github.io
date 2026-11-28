@@ -109,6 +109,7 @@ zboxCv.addEventListener("pointerdown",e=>{
   if(sideBtn&&S.sideBtn==="undo"){undo();toast("Hoàn tác");return}
   if(sideBtn&&S.sideBtn==="fav"){cycleFavPen();return}
   const erase=tool==="eraser"||(sideBtn&&S.sideBtn==="eraser");
+  if(erase&&S.eraseMode==="vung"){zbox.live={erase:true,vung:[zboxPos(e)],changed:false,pid:e.pointerId,redo0:redoStack.slice()};snapshot();return}   /* Khoanh vùng: xử lý lúc nhấc viết */
   if(erase){zbox.live={erase:true,changed:false,pid:e.pointerId,redo0:redoStack.slice()};snapshot();eraseAt(zboxPos(e),zboxZoom());return}
   snapshot();
   const q=zboxPos(e);q[2]=Math.min(q[2],(S.pFull||.38)*.45);
@@ -121,6 +122,7 @@ zboxCv.addEventListener("pointermove",e=>{
   if(!zbox.live||e.pointerId!==zbox.live.pid)return;
   e.preventDefault();
   let evs=e.getCoalescedEvents?e.getCoalescedEvents():[];if(!evs.length)evs=[e];
+  if(zbox.live.erase&&zbox.live.vung){const v=zbox.live.vung,buoc=4/zboxZoom();for(const ev of evs){const q=zboxPos(ev),c=v[v.length-1];if(Math.abs(q[0]-c[0])+Math.abs(q[1]-c[1])>=buoc)v.push(q)}veVongZBox(v);return}
   if(zbox.live.erase){for(const ev of evs)eraseAt(zboxPos(ev),zboxZoom());return}
   const minStep=0.45/zboxZoom(),stb=Math.min(0.75,Math.max(0,S.stab||0));
   const ztp=strokeType(zbox.live),zinc=ztp!=="marker"&&ztp!=="pencil";
@@ -143,7 +145,7 @@ zboxCv.addEventListener("pointermove",e=>{
 function endZBoxStroke(e){
   if(!zbox.live)return;
   if(e&&e.pointerId!=null&&e.pointerId!==zbox.live.pid)return;
-  if(zbox.live.erase)gomXong();   /* xử lý hết điểm gôm còn chờ trước khi kết thúc */
+  if(zbox.live.erase){if(zbox.live.vung){if(xoaTrongVong(zbox.live.vung))zbox.live.changed=true}else gomXong()}   /* xử lý hết điểm gôm còn chờ (hoặc vòng khoanh) trước khi kết thúc */
   clearZBFx();paperSoundStop();
   const st=zbox.live;zbox.live=null;const redo0=st.redo0;delete st.pid;delete st.redo0;
   if(!st.erase){
@@ -158,7 +160,16 @@ function endZBoxStroke(e){
       if(zbox.advArmed){clearTimeout(zbox.advTimer);zbox.advTimer=setTimeout(()=>{zbox.advArmed=false;zboxMove(1,true)},1050)}
     }
   }else if(!st.changed&&history.length){history.pop();if(redo0)redoStack=redo0}
-  renderInk();saveInk();
+  renderInk();if(!st.erase||st.changed)saveInk();   /* gôm vào chỗ trống: không ghi lại */
+  if(st.erase&&st.changed&&tool==="eraser"&&S.gomVeViet)setTool("pen");   /* Gôm xong tự quay về viết */
+}
+/* Vẽ vòng khoanh (nét đứt đỏ) trên lớp tạm của hộp phóng to */
+function veVongZBox(v){
+  clearZBFx();if(!v||v.length<2)return;
+  const d=Math.min(devicePixelRatio||1,3),z=zboxZoom(),{sx,sy}=zboxViewRect();
+  zbfCtx.setTransform(d*z,0,0,d*z,-sx*d*z,-sy*d*z);
+  zbfCtx.beginPath();v.forEach((p,i)=>i?zbfCtx.lineTo(p[0],p[1]):zbfCtx.moveTo(p[0],p[1]));zbfCtx.closePath();
+  zbfCtx.fillStyle="rgba(201,28,23,.08)";zbfCtx.fill();zbfCtx.strokeStyle="rgba(201,28,23,.85)";zbfCtx.lineWidth=1.6/z;zbfCtx.setLineDash([6/z,4/z]);zbfCtx.stroke();zbfCtx.setLineDash([]);
 }
 zboxCv.addEventListener("pointerup",endZBoxStroke);zboxCv.addEventListener("pointercancel",endZBoxStroke);
 

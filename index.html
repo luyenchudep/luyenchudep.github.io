@@ -3,6 +3,7 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-yVSWqPw9OEGWGevenjz/U7jKWgBVk93bqxwtK5vpVFY='; style-src 'unsafe-inline'; font-src data:; img-src data: blob:; manifest-src data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; worker-src 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -697,8 +698,8 @@ body.lefthand #navMo{left:auto;right:0;border-left:1.5px solid var(--line);borde
 body.navAn #navKhu{display:none}
 body.navAn #navMo{display:block}
 /* Bảng mở ra không chui dưới thanh bên */
-body:not(.navAn) .sheet{left:76px}
-body.lefthand:not(.navAn) .sheet{left:0;right:76px}
+body:not(.navAn):not(.tapTrung) .sheet{left:76px}
+body.lefthand:not(.navAn):not(.tapTrung) .sheet{left:0;right:76px}
 /* Điện thoại dọc: thanh 4 khu dưới cùng, luôn hiện */
 @media (max-width:700px) and (orientation:portrait){
   body{flex-direction:column}
@@ -753,17 +754,18 @@ body.tapTrung header,body.tapTrung #navKhu,body.tapTrung #navMo,body.tapTrung #s
 /* Bảng Xem chỉ hiện khi đang mở (chọn Xem); ghim chỉ quyết định nằm cạnh hay nổi đè lên trang */
 @media (min-width:860px){ body.split.xemGhim:not(.xemMo) #sidePane{display:none} }
 /* Bảng Xem đang mở thì ẩn thanh công cụ nổi cho khỏi che bảng (đặt viết xuống trang là bảng tự đóng) */
-body.xemMo.congCuNoi footer{display:none}
+body.xemMo:not(.xemGhim).congCuNoi footer{display:none}
 /* Đang mở bảng Xem thì chỉ nút Xem sáng */
 body.xemMo #modes button.on:not(#mXem){background:transparent;color:var(--muted);box-shadow:none}
 body.xemMo #modes button.on:not(#mXem) .n{border-color:currentColor;color:inherit;background:transparent}
-body.xemMo #navMo{display:none}
+body.xemMo:not(.xemGhim) #navMo{display:none}
 
 /* ================== KHU DẠNG TRANG (Giáo trình, Hồ sơ, Tập viết PDF) ================== */
 .sheet.trang{background:var(--bg);align-items:stretch;justify-content:stretch;top:0}
-.sheet.trang .box{max-width:none;width:100%;height:100%;max-height:none;border-radius:0;animation:none;padding:22px max(18px,calc((100% - 980px)/2)) calc(28px + env(safe-area-inset-bottom))}
+.sheet.trang .box{max-width:none;width:100%;height:100%;max-height:none;border-radius:0;animation:none;border-top:0;padding:max(22px,calc(12px + env(safe-area-inset-top))) max(18px,calc((100% - 980px)/2)) calc(28px + env(safe-area-inset-bottom))}
 .sheet.trang .box::before{display:none}
-.sheet.trang .tiles{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}
+.sheet.trang .tiles{grid-template-columns:repeat(auto-fill,minmax(132px,1fr))}
+@media (min-width:600px){ .sheet.trang .tiles{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))} }
 .li .liPdf{margin-left:auto;flex:0 0 auto;width:40px;height:40px;border:0;border-radius:10px;background:transparent;color:var(--muted);display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
 .li .liPdf:hover,.li .liPdf:focus-visible{background:var(--soft);color:var(--accent)}
 .li .sz + .liPdf{margin-left:8px}
@@ -779,6 +781,35 @@ body.eink #pdfXemCv{box-shadow:none;border:1px solid #000}
   .sheet.trang #pdfXemCv{max-height:70vh}
 }
 #menu.sheet.trang .box,#gen.sheet.trang .box{height:auto;align-self:stretch}
+
+/* ================== SỬA SAU KHI SOÁT (bản 0.14) ================== */
+/* Đang mở bảng: thanh công cụ nổi và nút Thoát không đè lên bảng; đang mở khu dạng trang: ẩn công cụ viết trong thanh bên
+   (bấm Trước, Sau, Hoàn tác lúc này sẽ đổi trang viết đang bị che bên dưới) */
+body.coBang.congCuNoi footer,body.coBang #thoatTT{display:none!important}
+body.coBang:not(.coTrang) #navMo{display:none}
+body.coTrang.congCuRail #navKhu footer{display:none}
+@media (min-width:701px){
+  body.navAn .sheet.trang .box{padding-left:max(38px,calc((100% - 980px)/2));padding-right:max(38px,calc((100% - 980px)/2))}   /* chừa chỗ nút mở thanh bên */
+}
+/* Hộp viết phóng to đang mở: thanh công cụ nổi dời lên trên hộp, không che chỗ viết */
+body.congCuNoi:has(#zboxWrap.on) footer{bottom:calc(clamp(175px,42dvh,310px) + 12px)}
+/* Toàn trang viết: nút Thoát không đè lên các nút góc trên của trang; tay trái thì nút Thoát qua góc trái */
+body.tapTrung #stageTop{padding-right:104px}
+body.lefthand #thoatTT{right:auto;left:max(8px,env(safe-area-inset-left))}
+body.tapTrung.lefthand #stageTop{padding-right:0;padding-left:104px}
+/* Màn thấp (điện thoại xoay ngang): 4 khu và 5 công cụ viết vừa một cột */
+@media (orientation:landscape) and (max-height:520px){
+  #navKhu{gap:1px;padding-top:4px;padding-bottom:4px}
+  body.congCuRail #navKhu .khu,body.congCuRail #navKhu footer .tb{min-height:34px;padding:1px}
+  body.congCuRail #navKhu footer{gap:1px;padding-top:4px}
+  body.congCuRail #navKhu .khuAn{height:26px}
+}
+/* Thanh công cụ nổi trên màn hẹp: ô đo điểm nằm trên thanh */
+@media (max-width:900px){ body.congCuNoi #meas{bottom:76px} }
+/* Điện thoại dọc hẹp: tên khu giữ một dòng */
+@media (max-width:380px) and (orientation:portrait){ #navKhu .khu{font-size:10.5px;white-space:nowrap} }
+/* Máy đọc sách: khu đang chọn đảo màu cho dễ thấy */
+body.eink #navKhu .khu.on{background:#000;color:#fff}
 </style>
 </head>
 <body>
@@ -788,7 +819,7 @@ body.eink #pdfXemCv{box-shadow:none;border:1px solid #000}
 <div id="app">
   <header>
     <div id="topbar">
-      <button class="ibtn" id="bMenu" onclick="openMenu()" aria-label="Danh mục bài và cài đặt"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
+      <button class="ibtn" id="bMenu" data-action="moMenu" aria-label="Danh mục bài và cài đặt"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
       <button id="tbox" data-action="moXem" aria-label="Xem bài học">
         <div id="tline"><span id="ttext"></span></div>
         <div id="part"><span id="partTxt"></span><span id="pageinfo"></span></div>
@@ -796,18 +827,18 @@ body.eink #pdfXemCv{box-shadow:none;border:1px solid #000}
       <div id="modesRow">
         <div id="modes">
           <button id="mXem" data-action="moXem"><span class="n">1</span>Xem</button>
-          <button id="mTo" onclick="setMode('to')"><span class="n">2</span>Tô</button>
-          <button id="mNho" onclick="setMode('nho')"><span class="n">3</span>Chép</button>
+          <button id="mTo" data-action="cheDo" data-chedo="to"><span class="n">2</span>Tô</button>
+          <button id="mNho" data-action="cheDo" data-chedo="nho"><span class="n">3</span>Chép</button>
         </div>
-        <button id="done" onclick="toggleDone()" aria-label="Đánh dấu đã tập"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.4 2.8 2.8L16.2 9.8"/></svg><span class="dl">Đã tập</span></button>
+        <button id="done" data-action="daTap" aria-label="Đánh dấu đã tập"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.4 2.8 2.8L16.2 9.8"/></svg><span class="dl">Đã tập</span></button>
       </div>
       <button class="ibtn" id="bTapTrung" data-action="tapTrung" aria-label="Toàn trang viết: ẩn hết, chỉ còn trang viết"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
-      <button class="ibtn" id="bZBox" onclick="toggleZBox()" aria-label="Hộp viết phóng to tự trượt"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.3 15.3 20 20M10.5 8v5M8 10.5h5"/></svg></button>
-      <button class="ibtn" id="bAa" onclick="openAa()" aria-label="Cỡ dòng, màu giấy, toàn màn hình"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19 8.4 5h1.2L15 19M5.2 14.2h7.6"/><circle cx="18.4" cy="15.6" r="2.6"/><path d="M21 12.6V19"/></svg></button>
+      <button class="ibtn" id="bZBox" data-action="hopViet" aria-label="Hộp viết phóng to tự trượt"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.3 15.3 20 20M10.5 8v5M8 10.5h5"/></svg></button>
+      <button class="ibtn" id="bAa" data-action="moAa" aria-label="Cỡ dòng, màu giấy, toàn màn hình"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19 8.4 5h1.2L15 19M5.2 14.2h7.6"/><circle cx="18.4" cy="15.6" r="2.6"/><path d="M21 12.6V19"/></svg></button>
     </div>
     <div id="subbar">
-      <div id="note" onclick="this.classList.toggle('open');setTimeout(resize,30)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.2M12 7.8v.1"/></svg><span id="noteTxt"></span></div>
-      <div id="session"><span id="sessTxt"></span><button onclick="sessNext()">Tiếp ›</button><button class="x" onclick="sessEnd()" aria-label="Kết thúc buổi tập">✕</button></div>
+      <div id="note" data-action="moGhiChu"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.2M12 7.8v.1"/></svg><span id="noteTxt"></span></div>
+      <div id="session"><span id="sessTxt"></span><button data-action="buoiTiep">Tiếp ›</button><button class="x" data-action="buoiKet" aria-label="Kết thúc buổi tập">✕</button></div>
       <div id="warn">Đang mở file trực tiếp nên trình duyệt không lưu được bài viết và tiến độ. Bạn mở bằng link luyenchudep.github.io để ứng dụng tự lưu.</div>
     </div>
   </header>
@@ -820,8 +851,8 @@ body.eink #pdfXemCv{box-shadow:none;border:1px solid #000}
         <button type="button" class="ibtn" data-action="dongXem" aria-label="Đóng bảng Xem"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
       </div>
       <div id="sideTabs" hidden>
-        <button id="stXem" class="on" onclick="setSideTab('xem')"><span class="n">1</span>Xem</button>
-        <button id="stList" onclick="setSideTab('list')"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg>Mục lục</button>
+        <button id="stXem" class="on" data-action="tabBen" data-tab="xem"><span class="n">1</span>Xem</button>
+        <button id="stList" data-action="tabBen" data-tab="list"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg>Mục lục</button>
       </div>
       <div id="sideBody" class="card"></div>
     </aside>
@@ -832,29 +863,29 @@ body.eink #pdfXemCv{box-shadow:none;border:1px solid #000}
           <div id="stageLeft">
             <div id="favDock"></div>
             <div id="zoomPill">
-              <button onclick="zoomStep(-0.35)" aria-label="Thu nhỏ trang giấy">−</button>
-              <button class="zreset" id="zoomVal" onclick="resetZoom()" aria-label="Thu về 100%">100%</button>
-              <button onclick="zoomStep(0.35)" aria-label="Phóng to trang giấy">+</button>
+              <button data-action="buocPhong" data-d="-0.35" aria-label="Thu nhỏ trang giấy">−</button>
+              <button class="zreset" id="zoomVal" data-action="thuVe100" aria-label="Thu về 100%">100%</button>
+              <button data-action="buocPhong" data-d="0.35" aria-label="Phóng to trang giấy">+</button>
             </div>
           </div>
-          <button id="redoBtn" onclick="redo()" aria-label="Làm lại nét vừa hoàn tác"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 14 5-5-5-5M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg>Làm lại</button>
+          <button id="redoBtn" data-action="lamLai" aria-label="Làm lại nét vừa hoàn tác"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 14 5-5-5-5M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg>Làm lại</button>
           <div id="grade">
-            <button class="ok" onclick="grade(true)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg> Đạt</button>
-            <button class="no" onclick="grade(false)">Luyện thêm</button>
+            <button class="ok" data-action="chamBai" data-dat="1"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg> Đạt</button>
+            <button class="no" data-action="chamBai" data-dat="0">Luyện thêm</button>
           </div>
-          <button id="cmp" onclick="toggleCompare()"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg><span id="cmpTxt">So sánh</span></button>
+          <button id="cmp" data-action="soSanh"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg><span id="cmpTxt">So sánh</span></button>
         </div>
-        <div id="meas" onclick="openScoreReport()" title="Chạm để xem phân tích chi tiết nét viết"></div>
+        <div id="meas" data-action="moPhanTich" title="Chạm để xem phân tích chi tiết nét viết"></div>
       </div>
       <div id="zboxWrap">
         <div id="zboxBar">
           <span class="zbSp" id="zbTitle"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.3 15.3 20 20M10.5 8v5M8 10.5h5"/></svg>Hộp viết tự trượt (2,4×)</span>
-          <button onclick="zboxMove(-1)" aria-label="Lùi trái"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 7.5 12l7 7"/></svg></button>
-          <button onclick="zboxMove(1)" aria-label="Tiến phải"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 5 7 7-7 7"/></svg></button>
-          <button onclick="zboxNextLine()" aria-label="Xuống dòng dưới"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 5v6a3 3 0 0 1-3 3H6M9.5 10.5 6 14l3.5 3.5"/></svg></button>
-          <button onclick="zboxScale(-0.3)" aria-label="Thu nhỏ"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg></button>
-          <button onclick="zboxScale(0.3)" aria-label="Phóng to"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
-          <button class="x" onclick="toggleZBox()" aria-label="Đóng hộp viết"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+          <button data-action="hopTruot" data-huong="-1" aria-label="Lùi trái"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 7.5 12l7 7"/></svg></button>
+          <button data-action="hopTruot" data-huong="1" aria-label="Tiến phải"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 5 7 7-7 7"/></svg></button>
+          <button data-action="hopXuongDong" aria-label="Xuống dòng dưới"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 5v6a3 3 0 0 1-3 3H6M9.5 10.5 6 14l3.5 3.5"/></svg></button>
+          <button data-action="hopCo" data-d="-0.3" aria-label="Thu nhỏ"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+          <button data-action="hopCo" data-d="0.3" aria-label="Phóng to"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+          <button class="x" data-action="hopViet" aria-label="Đóng hộp viết"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
         </div>
         <div id="zboxStage"><canvas id="zboxCv"></canvas><canvas id="zboxFx"></canvas></div>
       </div>
@@ -862,31 +893,31 @@ body.eink #pdfXemCv{box-shadow:none;border:1px solid #000}
   </div>
 
   <footer>
-    <button class="tb" id="bPrev" onclick="go(-1)"><b><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 7.5 12l7 7"/></svg></b><i>Trước</i></button>
+    <button class="tb" id="bPrev" data-action="chuyenTrang" data-huong="-1"><b><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 7.5 12l7 7"/></svg></b><i>Trước</i></button>
     <button class="tb on" id="bPen" aria-label="Viết. Nhấn giữ để chọn nhanh viết yêu thích"><b><span id="penIco"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 17 9l-2.5 9h-5L7 9zM12 3v7.2M9.5 21h5"/><circle cx="12" cy="11.6" r="1.3"/></svg></span><span id="penDot"></span></b><i id="penLbl">Viết</i></button>
-    <button class="tb" id="bEraser" onclick="eraserTap()"><b><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 20h12M4.6 14.6l8.8-8.8a2 2 0 0 1 2.8 0l3 3a2 2 0 0 1 0 2.8L12 18.8a2 2 0 0 1-1.4.6H8.4a2 2 0 0 1-1.4-.6l-2.4-2.4a2 2 0 0 1 0-2.8zM9 10.2l5.8 5.8"/></svg></b><i>Gôm</i></button>
-    <button class="tb" id="bUndo" onclick="undo()"><b><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></b><i>Hoàn tác</i></button>
-    <button class="tb" id="bNext" onclick="go(1)"><b><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 5 7 7-7 7"/></svg></b><i>Sau</i></button>
+    <button class="tb" id="bEraser" data-action="moGom"><b><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 20h12M4.6 14.6l8.8-8.8a2 2 0 0 1 2.8 0l3 3a2 2 0 0 1 0 2.8L12 18.8a2 2 0 0 1-1.4.6H8.4a2 2 0 0 1-1.4-.6l-2.4-2.4a2 2 0 0 1 0-2.8zM9 10.2l5.8 5.8"/></svg></b><i>Gôm</i></button>
+    <button class="tb" id="bUndo" data-action="hoanTac"><b><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></b><i>Hoàn tác</i></button>
+    <button class="tb" id="bNext" data-action="chuyenTrang" data-huong="1"><b><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 5 7 7-7 7"/></svg></b><i>Sau</i></button>
   </footer>
 </div>
 
-<div class="sheet" id="menu" onclick="if(event.target===this)closeSheets()"><div class="box" id="menuBox"></div></div>
-<div class="sheet" id="pen" onclick="if(event.target===this)closeSheets()"><div class="box" id="penBox"></div></div>
-<div class="sheet" id="eraserSheet" onclick="if(event.target===this)closeSheets()"><div class="box" id="eraserBox"></div></div>
-<div class="sheet" id="card" onclick="if(event.target===this)closeSheets()"><div class="box card" id="cardBox"></div></div>
-<div class="sheet" id="gen" onclick="if(event.target===this)closeSheets()"><div class="box card" id="genBox"></div></div>
-<div class="sheet" id="custom" onclick="if(event.target===this)closeSheets()"><div class="box">
+<div class="sheet" id="menu" data-action="dongBangNen"><div class="box" id="menuBox"></div></div>
+<div class="sheet" id="pen" data-action="dongBangNen"><div class="box" id="penBox"></div></div>
+<div class="sheet" id="eraserSheet" data-action="dongBangNen"><div class="box" id="eraserBox"></div></div>
+<div class="sheet" id="card" data-action="dongBangNen"><div class="box card" id="cardBox"></div></div>
+<div class="sheet" id="gen" data-action="dongBangNen"><div class="box card" id="genBox"></div></div>
+<div class="sheet" id="custom" data-action="dongBangNen"><div class="box">
   <h3>Bài tự do</h3>
   <div class="prog">Mỗi dòng bạn gõ vào sẽ thành một dòng chữ mẫu đen, hai dòng chữ mờ để tô và một dòng trống để tự viết.</div>
   <textarea id="customText" placeholder="Dán đoạn văn, câu thơ, ghi chú… cần tập viết"></textarea>
-  <button class="btn ghost" id="customPrevBtn" style="display:none" onclick="restoreCustomPrev()"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>Lấy lại nội dung trước khi luyện tên</button>
-  <button class="btn primary" onclick="saveCustom()">Lưu và tập</button>
-  <button class="btn ghost" onclick="closeSheets()">Hủy</button>
+  <button class="btn ghost" id="customPrevBtn" style="display:none" data-action="layLaiTuDo"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>Lấy lại nội dung trước khi luyện tên</button>
+  <button class="btn primary" data-action="luuTuDo">Lưu và tập</button>
+  <button class="btn ghost" data-action="dongBang">Hủy</button>
 </div></div>
-<input type="file" id="paperFile" accept="image/*" capture="environment" style="display:none" onchange="savePaper(this)">
-<input type="file" id="restoreFile" accept=".json,application/json" style="display:none" onchange="restoreBackup(this)">
+<input type="file" id="paperFile" accept="image/*" capture="environment" style="display:none" data-doi="luuHinhGiay">
+<input type="file" id="restoreFile" accept=".json,application/json" style="display:none" data-doi="khoiPhucSaoLuu">
 <div id="toast"></div>
-<div id="popLayer" onpointerdown="if(event.target===this)closePop()"><div id="popBox"></div></div>
+<div id="popLayer" data-nhan="dongPopNen"><div id="popBox"></div></div>
 
 <script>
 const IC = {
@@ -7201,8 +7232,8 @@ const HANH_DONG=Object.create(null);
 function escHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c])}
 const laMauHex=c=>typeof c==="string"&&/^#[0-9a-fA-F]{6}$/.test(c),laMaMau=c=>typeof c==="string"&&/^[a-z]{1,12}$/.test(c);
 const soTrong=(v,a,b,md)=>{v=Number(v);return Number.isFinite(v)?Math.min(b,Math.max(a,v)):md};
-S.scale=soTrong(S.scale,.5,3,1.25);S.eraserR=soTrong(S.eraserR,4,60,16);S.nibAngle=soTrong(S.nibAngle,0,90,38);S.stab=soTrong(S.stab,0,1,.32);S.pFull=soTrong(S.pFull,.05,1,.38);
-S.width=soTrong(S.width,.3,30,(SC.pen&&SC.pen.width)||2.6);S.activeFav=soTrong(S.activeFav,0,3,0)|0;S.targetFav=soTrong(S.targetFav,0,3,0)|0;
+S.scale=soTrong(S.scale,.5,3,1.25);S.eraserR=soTrong(S.eraserR,4,60,16);S.nibAngle=soTrong(S.nibAngle,-90,90,38);S.stab=soTrong(S.stab,0,1,.32);S.pFull=soTrong(S.pFull,.05,1,.38);
+S.width=soTrong(S.width,.3,30,(SC.pen&&SC.pen.width)||2.6);S.activeFav=soTrong(S.activeFav,-1,3,0)|0;S.targetFav=soTrong(S.targetFav,0,3,0)|0;
 if(!laMauHex(S.color)&&!laMaMau(S.color))S.color="k";
 if(!["part","stroke","vung"].includes(S.eraseMode))S.eraseMode="part";S.gomVeViet=S.gomVeViet===true;S.xemGhim=S.xemGhim===true;
 S.favs=S.favs.map((f,i)=>{const d=DEFAULT_FAVS[i]||DEFAULT_FAVS[0];if(!f||typeof f!=="object")return Object.assign({},d);
@@ -8301,8 +8332,10 @@ function tapOnMeas(e){const el=document.getElementById("meas");if(!el||!el.class
   const r=el.getBoundingClientRect();return e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom}
 function openPenHelp(){document.getElementById("genBox").innerHTML=`<h3>Chưa nhận ra S Pen</h3>
   <div class="prog">Ứng dụng đang bật <b>Chỉ nhận S Pen</b> để tay tựa lên màn hình không để lại nét. Máy này chưa báo nét nào là của viết; có thể trình duyệt đang coi viết của máy như ngón tay (thường gặp ở máy đọc sách, máy tính bảng không phải Samsung).</div>
-  <button class="btn primary" onclick="S.penOnly=false;saveS();closeSheets();toast('Đã tắt Chỉ nhận S Pen — viết và ngón tay đều dùng được')">Tắt “Chỉ nhận S Pen” để viết được</button>
-  <button class="btn ghost" onclick="closeSheets()">Giữ nguyên</button>`;openSheet("gen")}
+  <button class="btn primary" data-action="tatChiNhanSPen">Tắt “Chỉ nhận S Pen” để viết được</button>
+  <button class="btn ghost" data-action="dongBang">Giữ nguyên</button>`;openSheet("gen")}
+/* Hành động tắt chế độ Chỉ nhận S Pen từ hộp hướng dẫn */
+HANH_DONG.tatChiNhanSPen=()=>{S.penOnly=false;saveS();closeSheets();toast("Đã tắt Chỉ nhận S Pen — viết và ngón tay đều dùng được")};
 function startPinch(){
   const pts=[...touches.values()];if(pts.length<2)return;
   const r=ink.getBoundingClientRect();
@@ -8319,7 +8352,7 @@ ink.addEventListener("pointerdown",e=>{
     touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
     if(touches.size>=2&&(!live||live.fromTouch)){
       e.preventDefault();
-      if(live&&live.fromTouch){live=null;paperSoundStop();if(history.length)strokes=history.pop();renderInk()}
+      if(live&&live.fromTouch){if(live.erase){if(gomHen){cancelAnimationFrame(gomHen);gomHen=0}gomCho.length=0;gomTruoc=null;clearFx()}if(live.redo0)redoStack=live.redo0;live=null;paperSoundStop();if(history.length)strokes=history.pop();renderInk()}
       startPinch();return;
     }
   }
@@ -8375,7 +8408,7 @@ ink.addEventListener("pointermove",e=>{
     return}
   e.preventDefault();
   let evs=e.getCoalescedEvents?e.getCoalescedEvents():[];if(!evs.length)evs=[e];
-  if(live.erase&&live.vung){for(const ev of evs)live.vung.push(pos(ev));veVongKhoanh(live.vung);return}
+  if(live.erase&&live.vung){const v=live.vung,buoc=4/view.z;for(const ev of evs){const q=pos(ev),c=v[v.length-1];if(Math.abs(q[0]-c[0])+Math.abs(q[1]-c[1])>=buoc)v.push(q)}veVongKhoanh(v);return}
   if(live.erase){
     if(live.meas){if(Math.hypot(e.clientX-live.meas.x,e.clientY-live.meas.y)<10)return;delete live.meas}
     for(const ev of evs)eraseAt(pos(ev));return}
@@ -8442,7 +8475,7 @@ function endStroke(e){
   const gomVua=live.erase&&live.changed&&tool==="eraser";
   if(!live.erase){delete live.fromTouch;live.p=simplifyStroke(live.p,0.32);strokes.push(live)}
   else if(!live.changed&&history.length){history.pop();if(redo0)redoStack=redo0}
-  paperSoundStop();live=null;renderInk();saveInk();
+  const doiNet=!live.erase||live.changed;paperSoundStop();live=null;renderInk();if(doiNet)saveInk();
   if(gomVua&&S.gomVeViet)setTool("pen");   /* Tự quay về viết sau khi gôm (Bật/Tắt trong bảng Gôm) */
 }
 ink.addEventListener("pointerup",endStroke);ink.addEventListener("pointercancel",endStroke);
@@ -8485,11 +8518,14 @@ function xuLyGom(){
   if(S.eraseMode==="stroke"){for(const s of strokes){if(cham(s))changed=true;else next.push(s)}}
   else for(const s of strokes){
     if(!cham(s)){next.push(s);continue}
+    /* Xóa từng đoạn: chèn thêm điểm dọc nét rồi cắt, nên tẩy được cả khúc giữa nét thẳng.
+       Đầu gôm chỉ sượt mép (không điểm nào bị xóa) thì giữ nguyên nét gốc. */
+    const pts=densify(s.p,Math.max(1,ds[0][2]*.35)),manh=[];let seg=[],cat=false;
+    for(const p of pts){if(gan(p)){cat=true;if(seg.length>1)manh.push(Object.assign({},s,{p:seg}));seg=[]}else seg.push(p)}
+    if(!cat){next.push(s);continue}
     changed=true;
-    /* Xóa từng đoạn: chèn thêm điểm dọc nét rồi cắt, nên tẩy được cả khúc giữa nét thẳng */
-    const pts=densify(s.p,Math.max(1,ds[0][2]*.35));let seg=[];
-    for(const p of pts){if(gan(p)){if(seg.length>1)next.push(Object.assign({},s,{p:seg}));seg=[]}else seg.push(p)}
-    if(seg.length>1)next.push(Object.assign({},s,{p:seg}));
+    if(seg.length>1)manh.push(Object.assign({},s,{p:seg}));
+    next.push(...manh);
   }
   if(changed){strokes=next;if(live)live.changed=true;if(typeof zbox!=="undefined"&&zbox.live)zbox.live.changed=true;renderInk()}
 }
@@ -8501,7 +8537,8 @@ function gomXong(){if(gomHen){cancelAnimationFrame(gomHen);gomHen=0}xuLyGom();go
 function trongVong(p,v){let o=false;for(let i=0,j=v.length-1;i<v.length;j=i++){const a=v[i],b=v[j];if((a[1]>p[1])!==(b[1]>p[1])&&p[0]<(b[0]-a[0])*(p[1]-a[1])/(b[1]-a[1])+a[0])o=!o}return o}
 function xoaTrongVong(v){
   if(!v||v.length<3)return false;
-  const next=strokes.filter(s=>{let n=0;for(const p of s.p)if(trongVong(p,v))n++;return n*2<s.p.length});
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const[x,y]of v){x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x);y1=Math.max(y1,y)}
+  const next=strokes.filter(s=>{const k=khungNet(s);if(k[2]<x0||k[0]>x1||k[3]<y0||k[1]>y1)return true;let n=0;for(const p of s.p)if(trongVong(p,v))n++;return n*2<s.p.length});
   if(next.length===strokes.length)return false;
   strokes=next;renderInk();return true;
 }
@@ -8682,7 +8719,7 @@ function openScoreReport(){
     <b>Bám đường chân</b>${m.geo&&m.geo.baseDrift!=null?`Lệch ${m.geo.baseDrift}% thân chữ`:"Chưa đủ dữ liệu"}
   </div>
   <h4>Gợi ý điều chỉnh tay viết</h4><ul>${tips.map(t=>`<li>${t}</li>`).join("")}</ul>
-  <button class="btn primary" onclick="closeSheets()">Tiếp tục tập</button>`;
+  <button class="btn primary" data-action="dongBang">Tiếp tục tập</button>`;
   openSheet("gen");
 }
 
@@ -8797,6 +8834,7 @@ zboxCv.addEventListener("pointerdown",e=>{
   if(sideBtn&&S.sideBtn==="undo"){undo();toast("Hoàn tác");return}
   if(sideBtn&&S.sideBtn==="fav"){cycleFavPen();return}
   const erase=tool==="eraser"||(sideBtn&&S.sideBtn==="eraser");
+  if(erase&&S.eraseMode==="vung"){zbox.live={erase:true,vung:[zboxPos(e)],changed:false,pid:e.pointerId,redo0:redoStack.slice()};snapshot();return}   /* Khoanh vùng: xử lý lúc nhấc viết */
   if(erase){zbox.live={erase:true,changed:false,pid:e.pointerId,redo0:redoStack.slice()};snapshot();eraseAt(zboxPos(e),zboxZoom());return}
   snapshot();
   const q=zboxPos(e);q[2]=Math.min(q[2],(S.pFull||.38)*.45);
@@ -8809,6 +8847,7 @@ zboxCv.addEventListener("pointermove",e=>{
   if(!zbox.live||e.pointerId!==zbox.live.pid)return;
   e.preventDefault();
   let evs=e.getCoalescedEvents?e.getCoalescedEvents():[];if(!evs.length)evs=[e];
+  if(zbox.live.erase&&zbox.live.vung){const v=zbox.live.vung,buoc=4/zboxZoom();for(const ev of evs){const q=zboxPos(ev),c=v[v.length-1];if(Math.abs(q[0]-c[0])+Math.abs(q[1]-c[1])>=buoc)v.push(q)}veVongZBox(v);return}
   if(zbox.live.erase){for(const ev of evs)eraseAt(zboxPos(ev),zboxZoom());return}
   const minStep=0.45/zboxZoom(),stb=Math.min(0.75,Math.max(0,S.stab||0));
   const ztp=strokeType(zbox.live),zinc=ztp!=="marker"&&ztp!=="pencil";
@@ -8831,7 +8870,7 @@ zboxCv.addEventListener("pointermove",e=>{
 function endZBoxStroke(e){
   if(!zbox.live)return;
   if(e&&e.pointerId!=null&&e.pointerId!==zbox.live.pid)return;
-  if(zbox.live.erase)gomXong();   /* xử lý hết điểm gôm còn chờ trước khi kết thúc */
+  if(zbox.live.erase){if(zbox.live.vung){if(xoaTrongVong(zbox.live.vung))zbox.live.changed=true}else gomXong()}   /* xử lý hết điểm gôm còn chờ (hoặc vòng khoanh) trước khi kết thúc */
   clearZBFx();paperSoundStop();
   const st=zbox.live;zbox.live=null;const redo0=st.redo0;delete st.pid;delete st.redo0;
   if(!st.erase){
@@ -8846,7 +8885,16 @@ function endZBoxStroke(e){
       if(zbox.advArmed){clearTimeout(zbox.advTimer);zbox.advTimer=setTimeout(()=>{zbox.advArmed=false;zboxMove(1,true)},1050)}
     }
   }else if(!st.changed&&history.length){history.pop();if(redo0)redoStack=redo0}
-  renderInk();saveInk();
+  renderInk();if(!st.erase||st.changed)saveInk();   /* gôm vào chỗ trống: không ghi lại */
+  if(st.erase&&st.changed&&tool==="eraser"&&S.gomVeViet)setTool("pen");   /* Gôm xong tự quay về viết */
+}
+/* Vẽ vòng khoanh (nét đứt đỏ) trên lớp tạm của hộp phóng to */
+function veVongZBox(v){
+  clearZBFx();if(!v||v.length<2)return;
+  const d=Math.min(devicePixelRatio||1,3),z=zboxZoom(),{sx,sy}=zboxViewRect();
+  zbfCtx.setTransform(d*z,0,0,d*z,-sx*d*z,-sy*d*z);
+  zbfCtx.beginPath();v.forEach((p,i)=>i?zbfCtx.lineTo(p[0],p[1]):zbfCtx.moveTo(p[0],p[1]));zbfCtx.closePath();
+  zbfCtx.fillStyle="rgba(201,28,23,.08)";zbfCtx.fill();zbfCtx.strokeStyle="rgba(201,28,23,.85)";zbfCtx.lineWidth=1.6/z;zbfCtx.setLineDash([6/z,4/z]);zbfCtx.stroke();zbfCtx.setLineDash([]);
 }
 zboxCv.addEventListener("pointerup",endZBoxStroke);zboxCv.addEventListener("pointercancel",endZBoxStroke);
 
@@ -8865,6 +8913,7 @@ function setSideTab(t){
 function applySplit(){
   const on=isTablet()&&S.split;
   document.body.classList.toggle("split",on);
+  if(!on&&document.body.classList.contains("xemMo")&&typeof moNganXem==="function")moNganXem(false);
   if(on)renderSidePane();
 }
 function renderSidePane(){
@@ -8872,7 +8921,7 @@ function renderSidePane(){
   const pane=document.getElementById("sidePane");if(!pane||pane.offsetWidth<120)return;   /* bảng đang ẩn: không vẽ */
   const box=document.getElementById("sideBody");if(!box)return;
   if(sideTab==="list"){
-    let h=`<div class="row" style="border:0;padding:4px 0 8px"><span>Kiểu chữ</span><div class="seg">${DS_KIEU_CHU.map(([v,t,m])=>[v,t.replace(" 10°",""),m]).map(([v,t,m])=>`<button class="${SCRIPT===v?"on":""}" title="${m||t}" onclick="setScript('${v}')">${t}</button>`).join("")}</div></div>`;
+    let h=`<div class="row" style="border:0;padding:4px 0 8px"><span>Kiểu chữ</span><div class="seg">${DS_KIEU_CHU.map(([v,t,m])=>[v,t.replace(" 10°",""),m]).map(([v,t,m])=>`<button class="${SCRIPT===v?"on":""}" title="${m||t}" data-action="chonKieuChu" data-kieu="${escHtml(v)}">${t}</button>`).join("")}</div></div>`;
     if(!sidePartOpen)sidePartOpen=new Set([curPartName()]);
     for(const p of COURSE)h+=partBlock(p,sidePartOpen,"sidePartOpen",true);
     box.innerHTML=h;return;
@@ -8885,10 +8934,12 @@ function renderSidePane(){
   if(items.length&&l.f!=="AL")h+=`<h4 style="margin-top:10px">Thứ tự nét</h4>${LEGEND}<canvas id="sideCardCv"></canvas>`;
   if(st&&st[1].length)h+=`<h4>Cách viết</h4><ul>${st[1].map(t=>`<li style="font-size:14.5px">${t}</li>`).join("")}</ul>`;
   if(st&&st[2].length)h+=`<h4>Lỗi hay gặp</h4><ul>${st[2].map(t=>`<li style="font-size:14.5px">${t}</li>`).join("")}</ul>`;
-  if(animList.length)h+=`<div class="sideAct"><button class="btn primary" onclick="openCard(null,'watch')">${ic("play")}Xem viết chậm</button><button class="btn ghost" onclick="openCard(null,'quiz')">${ic("pen")}Tự tô nét</button></div>`;
+  if(animList.length)h+=`<div class="sideAct"><button class="btn primary" data-action="moTheHocNet" data-chedo="watch">${ic("play")}Xem viết chậm</button><button class="btn ghost" data-action="moTheHocNet" data-chedo="quiz">${ic("pen")}Tự tô nét</button></div>`;
   box.innerHTML=h;
   const cv=document.getElementById("sideCardCv");if(cv)drawCard(cv,items,l.f);
 }
+/* Hành động mở thẻ học nét từ bảng Xem */
+HANH_DONG.moTheHocNet=el=>openCard(null,el.dataset.chedo);
 
 /* ================== LUYỆN TÊN RIÊNG & CHỮ KÝ (NAME & SIGNATURE LAB) ================== */
 function openNameLab(){
@@ -8896,10 +8947,12 @@ function openNameLab(){
   document.getElementById("genBox").innerHTML=`<h3>${ic("sign")} Luyện tên riêng và chữ ký</h3>
   <div class="prog">Nhập họ tên hoặc chữ ký bạn muốn luyện. Ứng dụng sẽ tự tạo bài tập từ cỡ lớn, ghép tên, tới câu giới thiệu hoàn chỉnh.</div>
   <input id="nameInp" type="text" value="${prev.replace(/"/g,"&quot;")}" placeholder="Ví dụ: Anna · An An · Minh Minh · Đăng Định" style="width:100%;font:inherit;font-size:18px;padding:12px;border:1.5px solid var(--line);border-radius:12px;background:var(--paper);color:var(--ink)">
-  <button class="btn primary" onclick="applyNameLab()">Tạo bài luyện tên và tập ngay</button>
-  <button class="btn ghost" onclick="closeSheets()">Đóng</button>`;
+  <button class="btn primary" data-action="taoBaiTenRieng">Tạo bài luyện tên và tập ngay</button>
+  <button class="btn ghost" data-action="dongBang">Đóng</button>`;
   openSheet("gen");
 }
+/* Hành động tạo bài luyện tên riêng */
+HANH_DONG.taoBaiTenRieng=()=>applyNameLab();
 let nameArm=false;
 function applyNameLab(){
   const nm=(document.getElementById("nameInp").value||"").trim();
@@ -9100,7 +9153,7 @@ async function journalSnap(snap){
 }
 async function openJournal(){
   if(!idb)await openIDB();const box=document.getElementById("genBox");
-  if(!idb){box.innerHTML=`<h3>Nhật ký luyện chữ</h3><p>Trình duyệt này không cho lưu nhật ký.</p><button class="btn" onclick="closeSheets()">Đóng</button>`;openSheet("gen");return}
+  if(!idb){box.innerHTML=`<h3>Nhật ký luyện chữ</h3><p>Trình duyệt này không cho lưu nhật ký.</p><button class="btn" data-action="dongBang">Đóng</button>`;openSheet("gen");return}
   const all=[];await new Promise(res=>{const r=idb.transaction("j").objectStore("j").openCursor();
     r.onsuccess=()=>{const c=r.result;if(c){all.push(c.value);c.continue()}else res()};r.onerror=res});
   const days=[...new Set(all.filter(laBanGhiNhatKy).map(r=>r.d))].sort().reverse();
@@ -9108,7 +9161,7 @@ async function openJournal(){
   if(!days.length)h+=`<p>Chưa có trang nào. Cứ viết vài nét là nhật ký tự lưu.</p>`;
   for(const d of days){const [y,mo,da]=d.split("-");h+=`<div class="ph">${da}/${mo}/${y}</div><div class="jl">`;
     for(const r of all.filter(r=>r.d===d&&laBanGhiNhatKy(r)))h+=`<figure><img src="${r.img}" alt="" loading="lazy" decoding="async"><figcaption>${escHtml(r.t)}${r.p?" · trang "+(r.p|0):""}${r.m==="nho"?" · Chép":""}</figcaption></figure>`;h+=`</div>`}
-  h+=`<button class="btn" onclick="closeSheets()">Đóng</button>`;box.innerHTML=h;openSheet("gen")}
+  h+=`<button class="btn" data-action="dongBang">Đóng</button>`;box.innerHTML=h;openSheet("gen")}
 
 /* Bảo mật: bản ghi nhật ký có thể đến từ file sao lưu; chỉ nhận ngày đúng dạng và hình nhúng (data:image) */
 const laNgay=d=>typeof d==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(d);
@@ -9125,9 +9178,11 @@ async function openPaper(){const box=document.getElementById("genBox"),list=awai
   let h=`<h3>Kiểm tra trên giấy</h3><div class="prog">Cứ 2 tuần một lần, bạn viết câu dưới đây <b>bằng viết thật lên giấy</b> theo kiểu chữ ${SC.name.toLowerCase()}, rồi chụp hình lưu lại.</div>
   <div class="goal">${PAPER_TXT}</div>
   <div class="prog">${last?`Lần gần nhất: ${last.split("-").reverse().join("/")}`:"Chưa có lần kiểm tra nào."}${paperDue()?` · <span class="due">đã tới hạn</span>`:""}</div>
-  <button class="btn primary" onclick="document.getElementById('paperFile').click()">Chụp hình trang giấy</button><div class="papers" style="margin-top:14px">`;
+  <button class="btn primary" data-action="chupHinhGiay">Chụp hình trang giấy</button><div class="papers" style="margin-top:14px">`;
   for(const r of list)h+=`<figure><img src="${r.img}" alt="" loading="lazy" decoding="async"><figcaption>${r.d.split("-").reverse().join("/")}</figcaption></figure>`;
-  h+=`</div><button class="btn ghost" onclick="closeSheets()">Đóng</button>`;box.innerHTML=h;openSheet("gen")}
+  h+=`</div><button class="btn ghost" data-action="dongBang">Đóng</button>`;box.innerHTML=h;openSheet("gen")}
+/* Hành động chụp hình trang giấy kiểm tra */
+HANH_DONG.chupHinhGiay=()=>document.getElementById("paperFile").click();
 function savePaper(inp){const f=inp.files[0];inp.value="";if(!f)return;const img=new Image(),u=URL.createObjectURL(f);
   img.onload=async()=>{const w=Math.min(1100,img.width),h=Math.round(img.height*w/img.width),c=document.createElement("canvas");c.width=w;c.height=h;
     c.getContext("2d").drawImage(img,0,0,w,h);URL.revokeObjectURL(u);if(!idb)await openIDB();
@@ -9207,18 +9262,25 @@ function openSheet(id,keepScroll=false){
   el.classList.add("open");
   box.scrollTop=(keepScroll&&wasOpen)?prevTop:0;
 }
-function seg(label,key,opts){return `<div class="row"><span>${label}</span><div class="seg">${opts.map(([v,t])=>`<button class="${S[key]===v?"on":""}" onclick="setS('${key}',${JSON.stringify(v).replace(/"/g,"&quot;")})">${t}</button>`).join("")}</div></div>`}
+function seg(label,key,opts){return `<div class="row"><span>${label}</span><div class="seg">${opts.map(([v,t])=>`<button class="${S[key]===v?"on":""}" data-action="datCaiDat" data-khoa="${escHtml(key)}" data-gt="${escHtml(typeof v==="boolean"?(v?"1":"0"):v)}"${typeof v==="boolean"?' data-loai="bool"':typeof v==="number"?' data-loai="so"':""}>${t}</button>`).join("")}</div></div>`}
+/* Hành động cho các nút chọn cài đặt */
+HANH_DONG.datCaiDat=el=>{const l=el.dataset.loai,g=el.dataset.gt;setS(el.dataset.khoa,l==="bool"?g==="1":l==="so"?+g:g)};
 function ckIcon(id){return done.has(id)?`<span class="ck d">${ic("done")}</span>`:`<span class="ck o"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></span>`}
 let menuOpenGrp;
-function grp(id,icon,title,body){return `<details class="grp" ${menuOpenGrp.has(id)?"open":""} ontoggle="this.open?menuOpenGrp.add('${id}'):menuOpenGrp.delete('${id}')"><summary>${ic(icon)}${title}</summary>${body}</details>`}
+function grp(id,icon,title,body){return `<details class="grp" ${menuOpenGrp.has(id)?"open":""} data-mo="moNhomCaiDat" data-id="${escHtml(id)}"><summary>${ic(icon)}${title}</summary>${body}</details>`}
+/* Hành động đóng mở nhóm cài đặt */
+HANH_DONG.moNhomCaiDat=el=>{el.open?menuOpenGrp.add(el.dataset.id):menuOpenGrp.delete(el.dataset.id)};
 let menuTab="bai",partOpen=null,sidePartOpen=null;menuOpenGrp=new Set(["hien"]);
 function curPartName(){if(cur.li<NREAL)return LESSONS[cur.li].part;const p=COURSE.find(p=>p.lessons.some(x=>!done.has(x.id)));return(p||COURSE[0]).part}
 function partBlock(p,openSet,setName,liStyle){
   const n=p.lessons.length,k=p.lessons.filter(l=>done.has(l.id)).length,isCur=cur.li<NREAL&&LESSONS[cur.li].part===p.part;
-  let h=`<details class="part ${isCur?"cur":""}" data-p="${p.part}" ${openSet.has(p.part)?"open":""} ontoggle="${setName}[this.open?'add':'delete'](this.dataset.p)"><summary><span class="pn">${p.part}</span><span class="pc ${k===n?"full":""}">${k}/${n}</span></summary>`;
+  let h=`<details class="part ${isCur?"cur":""}" data-p="${escHtml(p.part)}" data-tap="${escHtml(setName)}" ${openSet.has(p.part)?"open":""} data-mo="moPhanBai"><summary><span class="pn">${p.part}</span><span class="pc ${k===n?"full":""}">${k}/${n}</span></summary>`;
   for(const l of p.lessons){const idx=LESSONS.indexOf(l);
-    h+=`<div class="li ${idx===cur.li?"cur":""}" onclick="openLesson(${idx})">${ckIcon(l.id)}<span>${idx+1}. ${l.t}</span>${liStyle?"":`<span class="sz">${({L:"cỡ lớn",M:"cỡ vừa",S:"cỡ nhỏ",thuong:"cỡ thường",nho:"cỡ nhỏ"}[l.z]||"")}</span><button type="button" class="liPdf" data-action="pdfBai" aria-label="Xuất PDF bài này" title="Xuất PDF bài này">${ic("download")}</button>`}</div>`}
+    h+=`<div class="li ${idx===cur.li?"cur":""}" data-action="moBai" data-i="${idx}">${ckIcon(l.id)}<span>${idx+1}. ${l.t}</span>${liStyle?"":`<span class="sz">${({L:"cỡ lớn",M:"cỡ vừa",S:"cỡ nhỏ",thuong:"cỡ thường",nho:"cỡ nhỏ"}[l.z]||"")}</span><button type="button" class="liPdf" data-action="pdfBai" data-id="${escHtml(l.id)}" aria-label="Xuất PDF bài này" title="Xuất PDF bài này">${ic("download")}</button>`}</div>`}
   return h+`</details>`}
+/* Hành động đóng mở phần bài, mở bài và xuất PDF bài trong mục lục */
+HANH_DONG.moPhanBai=el=>{const s=el.dataset.tap==="sidePartOpen"?sidePartOpen:partOpen;if(s)s[el.open?"add":"delete"](el.dataset.p)};
+HANH_DONG.moBai=el=>openLesson(+el.dataset.i);
 function setMenuTab(t){menuTab=t;openMenu(true);const b=document.getElementById("menuBox");if(b)b.scrollTop=0}
 function openMenu(keepScroll=false){
   closePop();
@@ -9226,40 +9288,40 @@ function openMenu(keepScroll=false){
   if(!partOpen)partOpen=new Set([curPartName()]);
   const real=LESSONS.slice(0,NREAL),n=real.filter(l=>l.id!=="free").length,k=[...done].filter(id=>real.some(l=>l.id===id&&id!=="free")).length;
   const due=dueItems().length,toolAlert=due>0||paperDue();
-  let h=`<div class="mHead"><h3>${menuTab==="cai"?"Hồ sơ":"Giáo trình"}</h3><div class="seg">${DS_KIEU_CHU.map(([v,t,m])=>`<button class="${SCRIPT===v?"on":""}" title="${m||t}" onclick="setScript('${v}')">${t}</button>`).join("")}</div></div>`;
+  let h=`<div class="mHead"><h3>${menuTab==="cai"?"Hồ sơ":"Giáo trình"}</h3><div class="seg">${DS_KIEU_CHU.map(([v,t,m])=>`<button class="${SCRIPT===v?"on":""}" title="${m||t}" data-action="chonKieuChu" data-kieu="${escHtml(v)}">${t}</button>`).join("")}</div></div>`;
   /* Chuyển giữa Giáo trình và Hồ sơ bằng thanh 4 khu (bản 0.14) */
   if(menuTab!=="cai"){
-    const tile=(icon,title,sub,act,badge)=>`<button class="tile" onclick="${act}">${ic(icon)}<b>${title}</b><small>${sub}</small>${badge?`<span class="badge">${badge}</span>`:""}</button>`;
+    const tile=(icon,title,sub,act,badge)=>`<button class="tile" data-action="${escHtml(act)}">${ic(icon)}<b>${title}</b><small>${sub}</small>${badge?`<span class="badge">${badge}</span>`:""}</button>`;
     h+=`<div class="tiles">`+
-      tile("review","Bài ôn","viết theo trí nhớ",`openLesson(${REVIEW_I},'nho')`,due?due+" chữ":"")+
-      tile("target","Luyện thêm",WEAK.length?WEAK.length+" mục cần luyện":"chữ chấm chưa đạt",`openLesson(${LUYEN_I},'to')`,"")+
-      tile("edit","Bài tự do","tự soạn nội dung","openCustom()","")+
-      tile("sign","Tên và chữ ký","luyện tên riêng","openNameLab()","")+
-      tile("book","Nhập môn","lý thuyết rèn chữ","openNhapMon()","")+
+      tile("review","Bài ôn","viết theo trí nhớ","moBaiOn",due?due+" chữ":"")+
+      tile("target","Luyện thêm",WEAK.length?WEAK.length+" mục cần luyện":"chữ chấm chưa đạt","moLuyenThem","")+
+      tile("edit","Bài tự do","tự soạn nội dung","moTuDo","")+
+      tile("sign","Tên và chữ ký","luyện tên riêng","moTenRieng","")+
+      tile("book","Nhập môn","lý thuyết rèn chữ","moNhapMon","")+
     `</div>`;
     h+=`<div class="prog" style="margin-bottom:4px">${SC.name} · đã tập ${k}/${n} bài</div><div class="bar"><div style="width:${Math.round(k/n*100)}%"></div></div>`;
-    h+=`<button class="hero" onclick="sessStart()"><span class="hIc">${ic("play")}</span><span><b>${sess?"Bắt đầu lại buổi tập":"Buổi tập hôm nay"}</b><small>15 phút · khởi động, bài mới, bài ôn</small></span></button>`;
+    h+=`<button class="hero" data-action="batDauBuoi"><span class="hIc">${ic("play")}</span><span><b>${sess?"Bắt đầu lại buổi tập":"Buổi tập hôm nay"}</b><small>15 phút · khởi động, bài mới, bài ôn</small></span></button>`;
     for(const p of COURSE)h+=partBlock(p,partOpen,"partOpen",false);
   }else if(false){
-    const tile=(icon,title,sub,act,badge)=>`<button class="tile" onclick="${act}">${ic(icon)}<b>${title}</b><small>${sub}</small>${badge?`<span class="badge">${badge}</span>`:""}</button>`;
+    const tile=(icon,title,sub,act,badge)=>`<button class="tile" data-action="${escHtml(act)}">${ic(icon)}<b>${title}</b><small>${sub}</small>${badge?`<span class="badge">${badge}</span>`:""}</button>`;
     h+=`<div class="tiles">`+
-      tile("review","Bài ôn","viết theo trí nhớ",`openLesson(${REVIEW_I},'nho')`,due?due+" chữ":"")+
-      tile("target","Luyện thêm",WEAK.length?WEAK.length+" mục cần luyện":"chữ chấm chưa đạt",`openLesson(${LUYEN_I},'to')`,"")+
-      tile("camera","Kiểm tra trên giấy","2 tuần một lần","openPaper()",paperDue()?"tới hạn":"")+
-      tile("book","Nhập môn","lý thuyết rèn chữ","openNhapMon()","")+
-      tile("sign","Tên và chữ ký","luyện tên riêng","openNameLab()","")+
-      tile("edit","Bài tự do","tự soạn nội dung","openCustom()","")+
-      tile("journal","Nhật ký luyện chữ","mỗi ngày một trang","openJournal()","")+
-      tile("download","Tạo tập viết PDF","A4, A5, máy đọc sách, tự gõ","openPdfModal()","")+
+      tile("review","Bài ôn","viết theo trí nhớ","moBaiOn",due?due+" chữ":"")+
+      tile("target","Luyện thêm",WEAK.length?WEAK.length+" mục cần luyện":"chữ chấm chưa đạt","moLuyenThem","")+
+      tile("camera","Kiểm tra trên giấy","2 tuần một lần","moKiemTraGiay",paperDue()?"tới hạn":"")+
+      tile("book","Nhập môn","lý thuyết rèn chữ","moNhapMon","")+
+      tile("sign","Tên và chữ ký","luyện tên riêng","moTenRieng","")+
+      tile("edit","Bài tự do","tự soạn nội dung","moTuDo","")+
+      tile("journal","Nhật ký luyện chữ","mỗi ngày một trang","moNhatKy","")+
+      tile("download","Tạo tập viết PDF","A4, A5, máy đọc sách, tự gõ","moTaoPdf","")+
     `</div>`;
   }else{
-    const tile2=(icon,title,sub,act,badge)=>`<button class="tile" onclick="${act}">${ic(icon)}<b>${title}</b><small>${sub}</small>${badge?`<span class="badge">${badge}</span>`:""}</button>`;
+    const tile2=(icon,title,sub,act,badge)=>`<button class="tile" data-action="${escHtml(act)}">${ic(icon)}<b>${title}</b><small>${sub}</small>${badge?`<span class="badge">${badge}</span>`:""}</button>`;
     h+=`<div class="prog" style="margin-bottom:4px">${escHtml(SC.name)} · đã tập ${k}/${n} bài</div><div class="bar"><div style="width:${Math.round(k/n*100)}%"></div></div>`;
-    h+=`<div class="tiles">`+tile2("journal","Nhật ký luyện chữ","mỗi ngày một trang","openJournal()","")+tile2("camera","Kiểm tra trên giấy","2 tuần một lần","openPaper()",paperDue()?"tới hạn":"")+`</div>`;
+    h+=`<div class="tiles">`+tile2("journal","Nhật ký luyện chữ","mỗi ngày một trang","moNhatKy","")+tile2("camera","Kiểm tra trên giấy","2 tuần một lần","moKiemTraGiay",paperDue()?"tới hạn":"")+`</div>`;
     h+=grp("hien","sliders","Hiển thị",
-      `<div class="row"><span>Màu giấy</span><div class="seg">${[["sepia","Ấm"],["light","Sáng"],["dark","Tối"],["eink","Trắng đen"]].map(([v,t])=>`<button class="${S.theme===v?"on":""}" onclick="setTheme('${v}');openMenu(true)">${t}</button>`).join("")}</div></div>`+
+      `<div class="row"><span>Màu giấy</span><div class="seg">${[["sepia","Ấm"],["light","Sáng"],["dark","Tối"],["eink","Trắng đen"]].map(([v,t])=>`<button class="${S.theme===v?"on":""}" data-action="chonMauGiay" data-mau="${escHtml(v)}">${t}</button>`).join("")}</div></div>`+
       seg("Màu nhấn","accent",[["blue","Xanh mực"],["black","Đen"]])+
-      `<div class="row"><span>Cỡ dòng kẻ</span><div class="stepRow" style="min-width:190px"><button onclick="stepScale(-1);openMenu(true)" aria-label="Thu nhỏ cỡ dòng">${ic("minus")}</button><b>${Math.round(S.scale*100)}%</b><button onclick="stepScale(1);openMenu(true)" aria-label="Phóng to cỡ dòng">${ic("plus")}</button></div></div>`+
+      `<div class="row"><span>Cỡ dòng kẻ</span><div class="stepRow" style="min-width:190px"><button data-action="doiCoDong" data-d="-1" aria-label="Thu nhỏ cỡ dòng">${ic("minus")}</button><b>${Math.round(S.scale*100)}%</b><button data-action="doiCoDong" data-d="1" aria-label="Phóng to cỡ dòng">${ic("plus")}</button></div></div>`+
       (SCRIPT==="th"?"":seg("Kiểu dòng kẻ","gridStyle",[["french","Lưới xiên Pháp"],["oly4","4 ô li Việt Nam"]]))+
       seg("Tô dải màu thân chữ","xBand",[[true,"Bật"],[false,"Tắt"]])+
       seg("Độ đậm chữ tô","trace",[["normal","Vừa"],["dark","Đậm"]])+
@@ -9267,11 +9329,11 @@ function openMenu(keepScroll=false){
       seg("Mũi tên trên dòng tập","rowArrows",[[true,"Bật"],[false,"Tắt"]])+
       seg("Đo độ nghiêng","measure",[[true,"Bật"],[false,"Tắt"]]));
     h+=grp("but","pen","S Pen và thao tác",
-      `<div class="row"><span>Thanh viết yêu thích trên trang</span><div class="seg"><button class="${S.favBar?"on":""}" onclick="setPen('favBar',true,false);openMenu(true)">Hiện</button><button class="${!S.favBar?"on":""}" onclick="setPen('favBar',false,false);openMenu(true)">Ẩn</button></div></div>`+
+      `<div class="row"><span>Thanh viết yêu thích trên trang</span><div class="seg"><button class="${S.favBar?"on":""}" data-action="batThanhVietYeuThich" data-bat="1">Hiện</button><button class="${!S.favBar?"on":""}" data-action="batThanhVietYeuThich" data-bat="0">Ẩn</button></div></div>`+
       `<div class="prog" style="margin:4px 0 6px">Không cần hiện: nhấn giữ nút Viết ở thanh dưới là chọn nhanh được 4 viết yêu thích.</div>`+
-      `<div class="row"><span>Nút trên thân S Pen</span><div class="seg">${[["eraser","Gôm"],["undo","Hoàn tác"],["fav","Đổi viết"]].map(([v,t])=>`<button class="${(S.sideBtn||"eraser")===v?"on":""}" onclick="setPen('sideBtn','${v}',false);openMenu(true)">${t}</button>`).join("")}</div></div>`+
+      `<div class="row"><span>Nút trên thân S Pen</span><div class="seg">${[["eraser","Gôm"],["undo","Hoàn tác"],["fav","Đổi viết"]].map(([v,t])=>`<button class="${(S.sideBtn||"eraser")===v?"on":""}" data-action="chonNutThanPen" data-gt="${escHtml(v)}">${t}</button>`).join("")}</div></div>`+
       seg("Chỉ nhận S Pen","penOnly",[[true,"Bật"],[false,"Tắt"]])+
-      `<div class="row"><span>Phóng to trang giấy</span><div class="seg"><button class="${view.z<=1.01?"on":""}" onclick="closeSheets();setZoomLevel(1)">100%</button><button class="${view.z>1.01&&view.z<1.75?"on":""}" onclick="closeSheets();setZoomLevel(1.5)">150%</button><button class="${view.z>=1.75?"on":""}" onclick="closeSheets();setZoomLevel(2)">200%</button></div></div>`+
+      `<div class="row"><span>Phóng to trang giấy</span><div class="seg"><button class="${view.z<=1.01?"on":""}" data-action="mucPhongTrang" data-z="1">100%</button><button class="${view.z>1.01&&view.z<1.75?"on":""}" data-action="mucPhongTrang" data-z="1.5">150%</button><button class="${view.z>=1.75?"on":""}" data-action="mucPhongTrang" data-z="2">200%</button></div></div>`+
       seg("Vuốt ngón tay lật trang","fingerSwipe",[[true,"Bật"],[false,"Tắt"]])+
       `<div class="prog" style="margin:4px 0 6px">Nên tắt vuốt ngón tay để khi tựa tay viết không bị nhảy trang.</div>`+
       seg("Dự đoán nét (giảm độ trễ)","predict",[[true,"Bật"],[false,"Tắt"]])+
@@ -9279,19 +9341,40 @@ function openMenu(keepScroll=false){
       seg("Hộp viết tự trượt khi tới mép","autoAdv",[[true,"Bật"],[false,"Tắt"]])+
       seg("Âm thanh giấy khi viết","sound",[[true,"Bật"],[false,"Tắt"]])+
       seg("Chế độ tay trái","leftHand",[[true,"Bật"],[false,"Tắt"]])+
-      `<div class="row"><span>Nét bám sát đầu viết</span><div class="seg"><button class="${S.lowLat?"on":""}" onclick="setLowLat(true)">Bật</button><button class="${!S.lowLat?"on":""}" onclick="setLowLat(false)">Tắt</button></div></div>
+      `<div class="row"><span>Nét bám sát đầu viết</span><div class="seg"><button class="${S.lowLat?"on":""}" data-action="batDoTreThap" data-bat="1">Bật</button><button class="${!S.lowLat?"on":""}" data-action="batDoTreThap" data-bat="0">Tắt</button></div></div>
       <div class="prog" style="margin:4px 0 8px">Nếu vùng viết bị đen hoặc chớp nháy, bạn tắt mục này.</div>
-      <button class="btn ghost" onclick="openPenTest()">${ic("pulse")}Kiểm tra S Pen</button><div style="height:12px"></div>`);
+      <button class="btn ghost" data-action="kiemTraSPen">${ic("pulse")}Kiểm tra S Pen</button><div style="height:12px"></div>`);
     h+=grp("du","data","Dữ liệu",
-      `<button class="btn ghost" onclick="backup()">${ic("download")}Sao lưu bài viết ra file</button>
-      <button class="btn ghost" onclick="document.getElementById('restoreFile').click()">${ic("upload")}Khôi phục từ file sao lưu</button>
-      ${window.self===window.top?`<button class="btn ghost" onclick="savePng()">${ic("image")}Lưu trang này thành hình (PNG)</button>`:""}<div style="height:12px"></div>`);
+      `<button class="btn ghost" data-action="saoLuuFile">${ic("download")}Sao lưu bài viết ra file</button>
+      <button class="btn ghost" data-action="chonFileKhoiPhuc">${ic("upload")}Khôi phục từ file sao lưu</button>
+      ${window.self===window.top?`<button class="btn ghost" data-action="luuHinhPng">${ic("image")}Lưu trang này thành hình (PNG)</button>`:""}<div style="height:12px"></div>`);
     h+=`<p class="ver" style="text-align:center;color:var(--muted);font-size:13px;margin:16px 0 4px">${VERSION}</p>`;
   }
-  h+=`<button class="btn" onclick="closeSheets()">Về trang viết</button>`;
+  h+=`<button class="btn" data-action="dongBang">Về trang viết</button>`;
   document.getElementById("menuBox").innerHTML=h;openSheet("menu",keepScroll);
   if(!keepScroll&&menuTab==="bai")setTimeout(()=>{const c=document.querySelector("#menuBox .li.cur");if(c){const b=document.getElementById("menuBox"),r=c.getBoundingClientRect(),br=b.getBoundingClientRect();if(r.bottom>br.bottom-20)c.scrollIntoView({block:"center"})}},30);
 }
+/* Hành động cho các nút trong bảng Giáo trình và Hồ sơ */
+HANH_DONG.chonKieuChu=el=>setScript(el.dataset.kieu);
+HANH_DONG.moBaiOn=()=>openLesson(REVIEW_I,"nho");
+HANH_DONG.moLuyenThem=()=>openLesson(LUYEN_I,"to");
+HANH_DONG.moTuDo=()=>openCustom();
+HANH_DONG.moTenRieng=()=>openNameLab();
+HANH_DONG.moNhapMon=()=>openNhapMon();
+HANH_DONG.moKiemTraGiay=()=>openPaper();
+HANH_DONG.moNhatKy=()=>openJournal();
+HANH_DONG.moTaoPdf=()=>openPdfModal();
+HANH_DONG.batDauBuoi=()=>sessStart();
+HANH_DONG.chonMauGiay=el=>{setTheme(el.dataset.mau);openMenu(true)};
+HANH_DONG.doiCoDong=el=>{stepScale(+el.dataset.d);openMenu(true)};
+HANH_DONG.batThanhVietYeuThich=el=>{setPen("favBar",el.dataset.bat==="1",false);openMenu(true)};
+HANH_DONG.chonNutThanPen=el=>{setPen("sideBtn",el.dataset.gt,false);openMenu(true)};
+HANH_DONG.mucPhongTrang=el=>{closeSheets();setZoomLevel(+el.dataset.z)};
+HANH_DONG.batDoTreThap=el=>setLowLat(el.dataset.bat==="1");
+HANH_DONG.kiemTraSPen=()=>openPenTest();
+HANH_DONG.saoLuuFile=()=>backup();
+HANH_DONG.chonFileKhoiPhuc=()=>document.getElementById("restoreFile").click();
+HANH_DONG.luuHinhPng=()=>savePng();
 function setS(k,v){S[k]=v;saveS();if(k==="leftHand"||k==="accent")applyTheme();if(["scale","trace","rowArrows","measure","arrowStyle","xBand","gridStyle"].includes(k))show();openMenu(true)}
 function openCustom(){closeSheets();document.getElementById("customText").value=store.get("custom","");
   const pb=document.getElementById("customPrevBtn");if(pb)pb.style.display=store.get("customPrev","").trim()?"block":"none";
@@ -9419,22 +9502,32 @@ function renderAnimCtrl(){
     const curI=animState.list.indexOf(animState.ch),hasNext=curI>=0&&curI<animState.list.length-1;
     let h="";
     if(doneAll&&hasNext){
-      h+=`<button class="play" onclick="quizNextChar()">Chữ tiếp theo ›</button>`;
+      h+=`<button class="play" data-action="toChuTiep">Chữ tiếp theo ›</button>`;
     }else{
-      h+=`<button class="play" onclick="quizShowHint()">${ic("play")}Gợi ý nét</button>`;
+      h+=`<button class="play" data-action="goiYNet">${ic("play")}Gợi ý nét</button>`;
     }
-    h+=`<button onclick="quizReset()">${ic("replay")}Tô lại</button>`;
-    h+=`<button id="animZoomBtn" onclick="toggleAnimZoom()">${animState.big?ic("collapse")+"Thu gọn":ic("zbox")+"Phóng to"}</button>`;
+    h+=`<button data-action="toLaiChu">${ic("replay")}Tô lại</button>`;
+    h+=`<button id="animZoomBtn" data-action="phongToVietCham">${animState.big?ic("collapse")+"Thu gọn":ic("zbox")+"Phóng to"}</button>`;
     box.innerHTML=h;return;
   }
   const memOn=!!animState.mem;
-  box.innerHTML=`<button class="${memOn?"":"play"}" id="animPlayBtn" onclick="toggleAnimPlay()">${animState.playing?ic("pause")+"Tạm dừng":ic("play")+"Tiếp tục"}</button>
-    <button id="animSpdBtn" onclick="toggleAnimSpeed()">Tốc độ: ${animState.slow?"Chậm":"Vừa"}</button>
-    <button onclick="initAnim(animState.ch,true)">${ic("replay")}Viết lại</button>
-    <button id="animZoomBtn" onclick="toggleAnimZoom()">${animState.big?ic("collapse")+"Thu gọn":ic("zbox")+"Phóng to"}</button>
-    <button id="animMemBtn" class="${memOn?"play":""}" onclick="toggleAnimMem()">${ic(animState.mem==="hide"?"eye":"eyeoff")}Nhìn rồi tự viết</button>`
-    +(animState.mem==="hide"?`<button onclick="clearAnimMem()">${ic("eraser")}Xóa nét</button>`:"");
+  box.innerHTML=`<button class="${memOn?"":"play"}" id="animPlayBtn" data-action="chayDungVietCham">${animState.playing?ic("pause")+"Tạm dừng":ic("play")+"Tiếp tục"}</button>
+    <button id="animSpdBtn" data-action="tocDoVietCham">Tốc độ: ${animState.slow?"Chậm":"Vừa"}</button>
+    <button data-action="vietLaiMau">${ic("replay")}Viết lại</button>
+    <button id="animZoomBtn" data-action="phongToVietCham">${animState.big?ic("collapse")+"Thu gọn":ic("zbox")+"Phóng to"}</button>
+    <button id="animMemBtn" class="${memOn?"play":""}" data-action="nhinRoiTuViet">${ic(animState.mem==="hide"?"eye":"eyeoff")}Nhìn rồi tự viết</button>`
+    +(animState.mem==="hide"?`<button data-action="xoaNetTuViet">${ic("eraser")}Xóa nét</button>`:"");
 }
+/* Hành động cho thanh điều khiển viết chậm và tự tô */
+HANH_DONG.toChuTiep=()=>quizNextChar();
+HANH_DONG.goiYNet=()=>quizShowHint();
+HANH_DONG.toLaiChu=()=>quizReset();
+HANH_DONG.phongToVietCham=()=>toggleAnimZoom();
+HANH_DONG.chayDungVietCham=()=>toggleAnimPlay();
+HANH_DONG.tocDoVietCham=()=>toggleAnimSpeed();
+HANH_DONG.vietLaiMau=()=>initAnim(animState.ch,true);
+HANH_DONG.nhinRoiTuViet=()=>toggleAnimMem();
+HANH_DONG.xoaNetTuViet=()=>clearAnimMem();
 function resetAnimMem(){animState.mem=false;ANIM_HOLD=ANIM_HOLD_DEF;animState.memStrokes=[];animState.memLive=null;animState.memGeom=null}
 function toggleAnimMem(){
   if(!animState.ch||animState.mode!=="watch")return;
@@ -10004,22 +10097,22 @@ function openCard(focusCh,startMode){stopAnim();LEGEND=S.arrowStyle==="full"?LEG
   if(animList.length){
     h+=`<h4>Học nét chữ</h4><div class="animBox">
     <div class="animTabs">
-      <button id="atWatch" class="${animState.mode==="watch"?"on":""}" onclick="setAnimMode('watch')">${ic("play")}Xem viết chậm</button>
-      <button id="atQuiz" class="${animState.mode==="quiz"?"on":""}" onclick="setAnimMode('quiz')">${ic("pen")}Tự tô từng nét</button>
+      <button id="atWatch" class="${animState.mode==="watch"?"on":""}" data-action="cheDoHocNet" data-chedo="watch">${ic("play")}Xem viết chậm</button>
+      <button id="atQuiz" class="${animState.mode==="quiz"?"on":""}" data-action="cheDoHocNet" data-chedo="quiz">${ic("pen")}Tự tô từng nét</button>
     </div>`;
     if(animList.length>1){
-      h+=`<div class="animChips">${animList.map(ch=>`<button class="animChip" data-ch="${ch}" onclick="initAnim('${ch.replace(/'/g,"\\'")}',true)">${ch[0]==="~"?(STROKE_NAME[ch.slice(1)]||ch.slice(1)):ch}</button>`).join("")}</div>`;
+      h+=`<div class="animChips">${animList.map(ch=>`<button class="animChip" data-ch="${escHtml(ch)}" data-action="chonChuHocNet">${ch[0]==="~"?(STROKE_NAME[ch.slice(1)]||ch.slice(1)):ch}</button>`).join("")}</div>`;
     }
     h+=`<canvas id="animCv"></canvas><div id="animInfo"></div><div class="animCtrl" id="animCtrl"></div>
-    <div style="display:flex;gap:8px;margin-top:10px"><button class="btn primary" style="flex:2;margin:0" onclick="leaveCard('to')"><span class="n">2</span>Tô phần này</button><button class="btn ghost" style="flex:1;margin:0" onclick="leaveCard('nho')"><span class="n">3</span>Chép</button></div></div>`;
+    <div style="display:flex;gap:8px;margin-top:10px"><button class="btn primary" style="flex:2;margin:0" data-action="roiTheHoc" data-chedo="to"><span class="n">2</span>Tô phần này</button><button class="btn ghost" style="flex:1;margin:0" data-action="roiTheHoc" data-chedo="nho"><span class="n">3</span>Chép</button></div></div>`;
   }
   if(items.length&&l.f!=="AL")h+=`<h4>Sơ đồ thứ tự nét</h4>${LEGEND}<canvas id="cardCv"></canvas>`;
   else if(items.length)h+=`<h4>Chữ mẫu</h4><canvas id="cardCv"></canvas><div class="prog">Phần viết nhanh dùng chữ nét đều nên không có mũi tên nhấn/thả.</div>`;
   if(st&&st[1].length)h+=`<h4>Cách viết</h4><ul>${st[1].map(t=>`<li>${t}</li>`).join("")}</ul>`;
   if(st&&st[2].length)h+=`<h4>Lỗi hay gặp</h4><ul>${st[2].map(t=>`<li>${t}</li>`).join("")}</ul>`;
-  h+=`<button class="btn primary" onclick="leaveCard('to')"><span class="n">2</span>Tô</button>
-  <button class="btn ghost" onclick="leaveCard('nho')"><span class="n">3</span>Chép</button>
-  <button class="btn ghost" onclick="openNhapMon()">${ic("book")}Nhập môn · lý thuyết chung</button>`;
+  h+=`<button class="btn primary" data-action="roiTheHoc" data-chedo="to"><span class="n">2</span>Tô</button>
+  <button class="btn ghost" data-action="roiTheHoc" data-chedo="nho"><span class="n">3</span>Chép</button>
+  <button class="btn ghost" data-action="nhapMonTuThe">${ic("book")}Nhập môn · lý thuyết chung</button>`;
   document.getElementById("cardBox").innerHTML=h;openSheet("card");
   const cv=document.getElementById("cardCv");if(cv)drawCard(cv,items,l.f);
   if(animList.length){
@@ -10030,10 +10123,15 @@ function openCard(focusCh,startMode){stopAnim();LEGEND=S.arrowStyle==="full"?LEG
       if(firstCh!==animList[0]){const b=document.querySelector("#cardBox .animBox");b&&b.scrollIntoView({block:"nearest"})}}},60);
   }
 }
+/* Hành động cho thẻ bài học và phần học nét */
+HANH_DONG.cheDoHocNet=el=>setAnimMode(el.dataset.chedo);
+HANH_DONG.chonChuHocNet=el=>initAnim(el.dataset.ch,true);
+HANH_DONG.roiTheHoc=el=>leaveCard(el.dataset.chedo);
+HANH_DONG.nhapMonTuThe=()=>openNhapMon();
 function openNhapMon(){LEGEND=S.arrowStyle==="full"?LEGEND_FULL:LEGEND_SIMPLE;
   let h=`<h3>${SC.nmTitle}</h3><div class="prog">${SCRIPT==="td"?"Tóm tắt từ giáo trình viết chữ của trường Pháp xưa và các nghiên cứu hiện đại về học viết.":SCRIPT==="th"?"Theo mẫu chữ viết trong trường tiểu học (Quyết định 31/2002/QĐ-BGD&ĐT). Phần cuối dành cho ba mẹ.":"Tóm tắt nguyên tắc viết chữ in rõ ràng và các nghiên cứu hiện đại về học viết."}</div>`;
   NHAPMON.forEach((c,i)=>{h+=`<h4>${i+1}. ${c.t}</h4>`+c.p.map(p=>`<p>${p}</p>`).join("");if(c.demo)h+=LEGEND+`<canvas id="nmCv${i}"></canvas>`});
-  h+=`<button class="btn primary" onclick="closeSheets()">Bắt đầu tập viết</button>`;
+  h+=`<button class="btn primary" data-action="dongBang">Bắt đầu tập viết</button>`;
   document.getElementById("genBox").innerHTML=h;openSheet("gen");
   NHAPMON.forEach((c,i)=>{if(c.demo)drawCard(document.getElementById("nmCv"+i),SCRIPT==="qs"?["~o","a","g"]:c.demo)});
 }
@@ -10054,9 +10152,11 @@ function renderFavDock(){
   dock.innerHTML=S.favs.map((f,idx)=>{
     const p=PEN_MAP[f.penType]||PEN_TYPES[0];
     const on=tool==="pen"&&S.activeFav===idx;
-    return `<button class="fdot ${on?"on":""}" onclick="useFav(${idx})" aria-label="Viết yêu thích ${f.name}">${ic(p.ic)}<em style="background:${inkColor(f.color)}"></em></button>`;
+    return `<button class="fdot ${on?"on":""}" data-action="dungVietYeuThich" data-i="${idx}" aria-label="Viết yêu thích ${f.name}">${ic(p.ic)}<em style="background:${inkColor(f.color)}"></em></button>`;
   }).join("");
 }
+/* Hành động cho thanh viết yêu thích trên trang */
+HANH_DONG.dungVietYeuThich=el=>useFav(+el.dataset.i);
 function useFav(idx,keepOpen){
   const f=S.favs[idx];if(!f)return;
   S.penType=f.penType;S.color=f.color;S.width=f.width;S.contrast=f.contrast||"med";
@@ -10115,43 +10215,64 @@ function penTap(forceOpen=false){
   <div class="ph" style="margin-top:4px">Viết yêu thích · chạm để đổi</div>
   <div class="favRow">${S.favs.map((f,idx)=>{
     const fp=PEN_MAP[f.penType]||PEN_TYPES[0];
-    return `<button class="fslot ${S.activeFav===idx?"on":""}" onclick="useFav(${idx},true)"><span>${ic(fp.ic)} ${f.name}</span><span style="font-size:11.5px;color:var(--muted)">cỡ ${f.width}</span><span class="fbar" style="background:${inkColor(f.color)}"></span></button>`;
+    return `<button class="fslot ${S.activeFav===idx?"on":""}" data-action="chonVietYeuThich" data-i="${idx}"><span>${ic(fp.ic)} ${f.name}</span><span style="font-size:11.5px;color:var(--muted)">cỡ ${f.width}</span><span class="fbar" style="background:${inkColor(f.color)}"></span></button>`;
   }).join("")}</div>
   <div class="saveFavBar">
     <span>Lưu viết đang chỉnh vào ô:</span>
-    ${[0,1,2,3].map(i=>`<button class="${(S.targetFav||0)===i?"on":""}" onclick="saveToFav(${i})">${i+1}</button>`).join("")}
-    ${SCRIPT==="td"?`<button style="margin-left:auto" onclick="nibPreset()">${ic("fountain")} Ngòi lá tre</button>`:""}
+    ${[0,1,2,3].map(i=>`<button class="${(S.targetFav||0)===i?"on":""}" data-action="luuVietYeuThich" data-i="${i}">${i+1}</button>`).join("")}
+    ${SCRIPT==="td"?`<button style="margin-left:auto" data-action="ngoiLaTre">${ic("fountain")} Ngòi lá tre</button>`:""}
   </div>
 
   <div class="ph">1. Loại viết và ngòi</div>
-  <div class="penGrid">${PEN_TYPES.map(p=>`<button class="pcard ${S.penType===p.id?"on":""}" onclick="selectPenType('${p.id}')"><span class="pic">${ic(p.ic)}</span><span class="pnm">${p.name}</span><span class="psb">${p.sub}</span></button>`).join("")}</div>
+  <div class="penGrid">${PEN_TYPES.map(p=>`<button class="pcard ${S.penType===p.id?"on":""}" data-action="chonLoaiViet" data-loai="${escHtml(p.id)}"><span class="pic">${ic(p.ic)}</span><span class="pnm">${p.name}</span><span class="psb">${p.sub}</span></button>`).join("")}</div>
 
   <div class="ph">2. Màu mực (12 màu + tự chọn)</div>
-  <div class="swGrid">${INK_META.map(([c,nm])=>`<span class="sw ${S.color===c?"on":""}" title="${nm}" style="background:${T.ink[c]}" onclick="setPen('color','${c}')"></span>`).join("")}</div>
-  <div class="row" style="padding:8px 0"><span>Chọn màu khác</span><label class="swPick" style="${isCustomCol?`background:${S.color};border-style:solid`:""}" title="Chọn màu bất kỳ"><span style="font-size:16px;display:flex">${isCustomCol?ic("check"):ic("plus")}</span><input type="color" value="${isCustomCol?S.color:inkColor(S.color)}" onchange="setPen('color',this.value)"></label></div>
+  <div class="swGrid">${INK_META.map(([c,nm])=>`<span class="sw ${S.color===c?"on":""}" title="${nm}" style="background:${T.ink[c]}" data-action="chonMauViet" data-mau="${escHtml(c)}"></span>`).join("")}</div>
+  <div class="row" style="padding:8px 0"><span>Chọn màu khác</span><label class="swPick" style="${isCustomCol?`background:${S.color};border-style:solid`:""}" title="Chọn màu bất kỳ"><span style="font-size:16px;display:flex">${isCustomCol?ic("check"):ic("plus")}</span><input type="color" value="${isCustomCol?S.color:inkColor(S.color)}" data-doi="chonMauVietTuChon"></label></div>
 
   <div class="ph">3. Cỡ nét (${S.width})</div>
-  <div class="wPills">${WIDTH_PRESETS.map(w=>`<button class="wpill ${Math.abs(S.width-w)<0.05?"on":""}" data-w="${w}" onclick="setPenWidth(${w})"><span style="height:${Math.max(2,Math.min(11,w*1.15))}px"></span>${w}</button>`).join("")}</div>
-  <div class="row"><span>Chỉnh chi tiết cỡ nét</span><div class="stepper"><button onclick="stepWidth(-0.2)">−</button><input id="wRange" type="range" min="0.6" max="16" step="0.2" value="${S.width}" oninput="setPenWidth(+this.value)"><button onclick="stepWidth(0.2)">+</button><b id="wv">${S.width}</b></div></div>
+  <div class="wPills">${WIDTH_PRESETS.map(w=>`<button class="wpill ${Math.abs(S.width-w)<0.05?"on":""}" data-w="${w}" data-action="chonCoNet"><span style="height:${Math.max(2,Math.min(11,w*1.15))}px"></span>${w}</button>`).join("")}</div>
+  <div class="row"><span>Chỉnh chi tiết cỡ nét</span><div class="stepper"><button data-action="tangGiamCoNet" data-buoc="-0.2">−</button><input id="wRange" type="range" min="0.6" max="16" step="0.2" value="${S.width}" data-nhap="coViet"><button data-action="tangGiamCoNet" data-buoc="0.2">+</button><b id="wv">${S.width}</b></div></div>
 
   <div class="ph">4. Cảm biến và tính năng S Pen</div>
-  ${showPressure?`<div class="row"><span>Lực nhấn 4096 mức</span><div class="seg"><button class="${S.pressure?"on":""}" onclick="setPen('pressure',true)">Thanh đậm</button><button class="${!S.pressure?"on":""}" onclick="setPen('pressure',false)">Nét đều</button></div></div>`:""}
-  ${showSens?`<div class="row"><span>Độ nhạy lực nhấn</span><div class="seg">${[["nhe","Nhẹ tay"],["vua","Vừa"],["manh","Mạnh tay"]].concat(S.sens==="tu"?[["tu","Theo tay tôi"]]:[]).map(([v,t])=>`<button class="${(S.sens||"vua")===v?"on":""}" onclick="setSens('${v}')">${t}</button>`).join("")}</div></div>
-  <button class="btn ghost" onclick="openPenTest(true)">Đo lực tay của tôi</button>`:""}
-  ${showContrast?`<div class="row"><span>Độ chênh thanh – đậm</span><div class="seg">${[["soft","Nhẹ"],["med","Vừa"],["strong","Mạnh"],["nib","Lá tre"]].map(([v,t])=>`<button class="${S.contrast===v?"on":""}" onclick="setPen('contrast','${v}')">${t}</button>`).join("")}</div></div>`:""}
-  ${showAngle?`<div class="row"><span>Góc vát ngòi thư pháp</span><div class="seg">${[30,38,45,-38].map(a=>`<button class="${(S.nibAngle||38)===a?"on":""}" onclick="setPen('nibAngle',${a})">${a}°</button>`).join("")}</div></div>`:""}
-  ${showTilt?`<div class="row"><span>Cảm biến nghiêng viết</span><div class="seg"><button class="${S.tiltOn?"on":""}" onclick="setPen('tiltOn',true)">Bật</button><button class="${!S.tiltOn?"on":""}" onclick="setPen('tiltOn',false)">Tắt</button></div></div>`:""}
-  <div class="row"><span>Làm mịn nét (chống run tay)</span><div class="seg">${[[0,"Tắt"],[0.32,"Vừa"],[0.58,"Mạnh"]].map(([v,t])=>`<button class="${Math.abs((S.stab||0)-v)<0.05?"on":""}" onclick="setPen('stab',${v})">${t}</button>`).join("")}</div></div>
-  <div class="row"><span>Nút trên thân S Pen</span><div class="seg">${[["eraser","Gôm"],["undo","Hoàn tác"],["fav","Đổi viết"]].map(([v,t])=>`<button class="${(S.sideBtn||"eraser")===v?"on":""}" onclick="setPen('sideBtn','${v}')">${t}</button>`).join("")}</div></div>
-  <div class="row"><span>Thanh viết yêu thích trên trang</span><div class="seg"><button class="${S.favBar?"on":""}" onclick="setPen('favBar',true)">Hiện</button><button class="${!S.favBar?"on":""}" onclick="setPen('favBar',false)">Ẩn</button></div></div>
+  ${showPressure?`<div class="row"><span>Lực nhấn 4096 mức</span><div class="seg"><button class="${S.pressure?"on":""}" data-action="batLucNhan" data-bat="1">Thanh đậm</button><button class="${!S.pressure?"on":""}" data-action="batLucNhan" data-bat="0">Nét đều</button></div></div>`:""}
+  ${showSens?`<div class="row"><span>Độ nhạy lực nhấn</span><div class="seg">${[["nhe","Nhẹ tay"],["vua","Vừa"],["manh","Mạnh tay"]].concat(S.sens==="tu"?[["tu","Theo tay tôi"]]:[]).map(([v,t])=>`<button class="${(S.sens||"vua")===v?"on":""}" data-action="chonDoNhayLuc" data-muc="${escHtml(v)}">${t}</button>`).join("")}</div></div>
+  <button class="btn ghost" data-action="doLucTay">Đo lực tay của tôi</button>`:""}
+  ${showContrast?`<div class="row"><span>Độ chênh thanh – đậm</span><div class="seg">${[["soft","Nhẹ"],["med","Vừa"],["strong","Mạnh"],["nib","Lá tre"]].map(([v,t])=>`<button class="${S.contrast===v?"on":""}" data-action="chonThanhDam" data-muc="${escHtml(v)}">${t}</button>`).join("")}</div></div>`:""}
+  ${showAngle?`<div class="row"><span>Góc vát ngòi thư pháp</span><div class="seg">${[30,38,45,-38].map(a=>`<button class="${(S.nibAngle||38)===a?"on":""}" data-action="chonGocVat" data-goc="${a}">${a}°</button>`).join("")}</div></div>`:""}
+  ${showTilt?`<div class="row"><span>Cảm biến nghiêng viết</span><div class="seg"><button class="${S.tiltOn?"on":""}" data-action="batNghiengViet" data-bat="1">Bật</button><button class="${!S.tiltOn?"on":""}" data-action="batNghiengViet" data-bat="0">Tắt</button></div></div>`:""}
+  <div class="row"><span>Làm mịn nét (chống run tay)</span><div class="seg">${[[0,"Tắt"],[0.32,"Vừa"],[0.58,"Mạnh"]].map(([v,t])=>`<button class="${Math.abs((S.stab||0)-v)<0.05?"on":""}" data-action="chonLamMin" data-muc="${v}">${t}</button>`).join("")}</div></div>
+  <div class="row"><span>Nút trên thân S Pen</span><div class="seg">${[["eraser","Gôm"],["undo","Hoàn tác"],["fav","Đổi viết"]].map(([v,t])=>`<button class="${(S.sideBtn||"eraser")===v?"on":""}" data-action="vietNutThan" data-kieu="${escHtml(v)}">${t}</button>`).join("")}</div></div>
+  <div class="row"><span>Thanh viết yêu thích trên trang</span><div class="seg"><button class="${S.favBar?"on":""}" data-action="vietThanhYeuThich" data-bat="1">Hiện</button><button class="${!S.favBar?"on":""}" data-action="vietThanhYeuThich" data-bat="0">Ẩn</button></div></div>
 
   <div class="prog" style="margin-top:10px">Viết thử bằng S Pen (thử nhấn nhẹ/mạnh hoặc nghiêng viết):</div>
   <canvas id="demo"></canvas>
-  <button class="btn ghost" onclick="demoS=[];demo()">Xóa ô viết thử</button>
-  <button class="btn danger" onclick="confirmClearBtn(this)">Xóa toàn bộ nét trên trang này</button>
-  <button class="btn primary" onclick="closeSheets()">Xong</button>`;
+  <button class="btn ghost" data-action="xoaOVietThu">Xóa ô viết thử</button>
+  <button class="btn danger" data-action="xacNhanXoaTrang">Xóa toàn bộ nét trên trang này</button>
+  <button class="btn primary" data-action="dongBang">Xong</button>`;
   openSheet("pen",forceOpen);demoInit();
 }
+/* Hành động cho bảng chỉnh viết */
+HANH_DONG.chonVietYeuThich=el=>useFav(+el.dataset.i,true);
+HANH_DONG.luuVietYeuThich=el=>saveToFav(+el.dataset.i);
+HANH_DONG.ngoiLaTre=()=>nibPreset();
+HANH_DONG.chonLoaiViet=el=>selectPenType(el.dataset.loai);
+HANH_DONG.chonMauViet=el=>setPen("color",el.dataset.mau);
+HANH_DONG.chonMauVietTuChon=el=>setPen("color",el.value);
+HANH_DONG.chonCoNet=el=>setPenWidth(+el.dataset.w);
+HANH_DONG.tangGiamCoNet=el=>stepWidth(+el.dataset.buoc);
+HANH_DONG.coViet=el=>setPenWidth(+el.value);
+HANH_DONG.batLucNhan=el=>setPen("pressure",el.dataset.bat==="1");
+HANH_DONG.chonDoNhayLuc=el=>setSens(el.dataset.muc);
+HANH_DONG.doLucTay=()=>openPenTest(true);
+HANH_DONG.chonThanhDam=el=>setPen("contrast",el.dataset.muc);
+HANH_DONG.chonGocVat=el=>setPen("nibAngle",+el.dataset.goc);
+HANH_DONG.batNghiengViet=el=>setPen("tiltOn",el.dataset.bat==="1");
+HANH_DONG.chonLamMin=el=>setPen("stab",+el.dataset.muc);
+HANH_DONG.vietNutThan=el=>setPen("sideBtn",el.dataset.kieu);
+HANH_DONG.vietThanhYeuThich=el=>setPen("favBar",el.dataset.bat==="1");
+HANH_DONG.xoaOVietThu=()=>{demoS=[];demo()};
+HANH_DONG.xacNhanXoaTrang=el=>confirmClearBtn(el);
 function stepEraser(d){S.eraserR=Math.min(36,Math.max(8,Math.round((S.eraserR||16)+d)));saveS();const inp=document.getElementById("eRange"),ev=document.getElementById("ev");if(inp)inp.value=S.eraserR;if(ev)ev.textContent=S.eraserR+"px"}
 function setEraserMode(m){S.eraseMode=["part","stroke","vung"].includes(m)?m:"part";saveS();eraserTap(true)}
 HANH_DONG.kieuGom=el=>setEraserMode(el.dataset.kieu);
@@ -10162,12 +10283,15 @@ function eraserTap(forceOpen=false){
   document.getElementById("eraserBox").innerHTML=`<h3>Gôm và xóa trang</h3>
   <div class="row"><span>Kiểu xóa</span><div class="seg">${[["part","Xóa từng đoạn"],["stroke","Xóa cả nét"],["vung","Khoanh vùng"]].map(([v,t])=>`<button type="button" class="${S.eraseMode===v?"on":""}" data-action="kieuGom" data-kieu="${v}">${t}</button>`).join("")}</div></div>
   <div class="prog" style="margin-top:6px">${{part:"<b>Xóa từng đoạn</b>: đưa gôm tới đâu xóa tới đó, như cục gôm thật.",stroke:"<b>Xóa cả nét</b>: chạm vào nét nào là xóa trọn nét đó.",vung:"<b>Khoanh vùng</b>: vẽ một vòng quanh chỗ cần xóa, nhấc viết là các nét bên trong được xóa."}[S.eraseMode]||""}</div>
-  <div class="row"><span>Cỡ đầu gôm</span><div class="stepper"><button onclick="stepEraser(-4)">−</button><input id="eRange" type="range" min="8" max="36" step="2" value="${S.eraserR||16}" oninput="S.eraserR=+this.value;saveS();document.getElementById('ev').textContent=this.value+'px'"><button onclick="stepEraser(4)">+</button><b id="ev">${S.eraserR||16}px</b></div></div>
+  <div class="row"><span>Cỡ đầu gôm</span><div class="stepper"><button data-action="tangGiamCoGom" data-buoc="-4">−</button><input id="eRange" type="range" min="8" max="36" step="2" value="${S.eraserR||16}" data-nhap="coGom"><button data-action="tangGiamCoGom" data-buoc="4">+</button><b id="ev">${S.eraserR||16}px</b></div></div>
   <div class="row"><span>Gôm xong tự quay về viết</span><div class="seg"><button type="button" class="${S.gomVeViet?"on":""}" data-action="gomVeViet" data-bat="1">Bật</button><button type="button" class="${S.gomVeViet?"":"on"}" data-action="gomVeViet" data-bat="0">Tắt</button></div></div>
-  <button class="btn danger" onclick="confirmClearBtn(this)">Xóa cả trang</button>
-  <button class="btn primary" onclick="closeSheets()">Xong</button>`;
+  <button class="btn danger" data-action="xacNhanXoaTrang">Xóa cả trang</button>
+  <button class="btn primary" data-action="dongBang">Xong</button>`;
   openSheet("eraserSheet",forceOpen);
 }
+/* Hành động cho bảng gôm */
+HANH_DONG.tangGiamCoGom=el=>stepEraser(+el.dataset.buoc);
+HANH_DONG.coGom=el=>{S.eraserR=+el.value;saveS();document.getElementById("ev").textContent=el.value+"px"};
 let demoS=[];
 function demoInit(){const c=document.getElementById("demo");if(!c)return;const r=c.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,3);
   c.width=r.width*d;c.height=r.height*d;let s=null;
@@ -10198,7 +10322,7 @@ function openPenTest(calib){
   <canvas id="ptest"></canvas>
   <div style="font-size:13.5px;color:var(--muted)">Lực nhấn hiện tại: <b id="pLbl">0%</b></div><div class="meter"><div id="pBar" style="width:0%"></div></div>
   <div style="font-size:13.5px;color:var(--muted)">Độ nghiêng viết: <b id="tLbl">0°</b></div><div class="meter"><div id="tBar" style="width:0%"></div></div>
-  <div class="kv" id="pres"></div>${calib?`<button class="btn primary" id="calOk" onclick="applyCalib()">Dùng lực tay này</button><button class="btn ghost" onclick="closeSheets()">Hủy</button>`:`<button class="btn primary" onclick="closeSheets()">Đóng</button>`}`;
+  <div class="kv" id="pres"></div>${calib?`<button class="btn primary" id="calOk" data-action="apDungLucTay">Dùng lực tay này</button><button class="btn ghost" data-action="dongBang">Hủy</button>`:`<button class="btn primary" data-action="dongBang">Đóng</button>`}`;
   openSheet("gen");calR=R;
   const c=document.getElementById("ptest"),d=Math.min(devicePixelRatio||1,3),r=c.getBoundingClientRect();c.width=r.width*d;c.height=r.height*d;
   const x=c.getContext("2d");x.setTransform(d,0,0,d,0,0);let last=null,evTimes=[];
@@ -10224,6 +10348,8 @@ function openPenTest(calib){
     out()};
   const up=()=>{last=null;R.pNow=0;out()};
   c.onpointerdown=e=>{e.preventDefault();try{c.setPointerCapture(e.pointerId)}catch(_){}h(e)};c.onpointermove=h;c.onpointerup=c.onpointercancel=up;out()}
+/* Hành động cho bảng đo lực tay */
+HANH_DONG.apDungLucTay=()=>applyCalib();
 let calR=null;
 function pctl(a,q){const b=a.slice().sort((x,y)=>x-y);return b[Math.min(b.length-1,Math.floor(q*b.length))]}
 function applyCalib(){
@@ -10266,11 +10392,11 @@ function khoDangChon(){return pdfOpt.preset==="tunhap"?khoTuNhap(pdfOpt.wMm,pdfO
 /* ================== MÀN TẠO TẬP VIẾT PDF ==================
    Chọn mọi mục của cấu hình vở (docs/KIEN_TRUC.md mục 5.3), rồi tạo PDF hoặc chép đường link.
    Mỗi lần đổi một lựa chọn, màn được vẽ lại từ pdfOpt; ô gõ chữ và ô nhập số ghi thẳng vào pdfOpt khi gõ. */
-function nutChon(ds,dangChon,lenh){return ds.map(([v,t])=>`<button class="${dangChon===v?"on":""}" onclick="${lenh(v)};openPdfModal(true)">${t}</button>`).join("")}
+function nutChon(ds,dangChon,hanhDong){return ds.map(([v,t])=>`<button class="${dangChon===v?"on":""}" data-action="${escHtml(hanhDong)}" data-gt="${typeof v==="boolean"?(v?"1":"0"):escHtml(v)}">${t}</button>`).join("")}
 function chonKhoTuNhap(){pdfOpt.preset="tunhap";if(!pdfOpt.wMm)pdfOpt.wMm=100;if(!pdfOpt.hMm)pdfOpt.hMm=150}
-function datKhoTuNhap(truong,gt){pdfOpt[truong]=Number(gt);const o=document.getElementById("pdfKhoMoTa");if(o){try{const k=khoTuNhap(pdfOpt.wMm,pdfOpt.hMm);o.innerHTML=`<b>${k.name}:</b> ${k.desc}`}catch(e){o.textContent=e.message}}}
-function chonBaiPdfUi(id,co){const s=new Set(pdfOpt.lessons);co?s.add(id):s.delete(id);pdfOpt.lessons=LESSONS.slice(0,NREAL).map(l=>l.id).filter(x=>s.has(x));const o=document.getElementById("pdfSoBai");if(o)o.textContent=`Đã chọn ${pdfOpt.lessons.length} bài`}
-function datChuTuGo(gt){pdfOpt.text=gt.slice(0,TU_GO_TOI_DA);const o=document.getElementById("pdfSoChu");if(o)o.textContent=`${pdfOpt.text.length}/${TU_GO_TOI_DA} ký tự`}
+function datKhoTuNhap(truong,gt){pdfOpt[truong]=Number(gt);const o=document.getElementById("pdfKhoMoTa");if(o){try{const k=khoTuNhap(pdfOpt.wMm,pdfOpt.hMm);o.innerHTML=`<b>${escHtml(k.name)}:</b> ${escHtml(k.desc)}`}catch(e){o.textContent=e.message}}veXemTruocPdf()}
+function chonBaiPdfUi(id,co){const s=new Set(pdfOpt.lessons);co?s.add(id):s.delete(id);pdfOpt.lessons=LESSONS.slice(0,NREAL).map(l=>l.id).filter(x=>s.has(x));const o=document.getElementById("pdfSoBai");if(o)o.textContent=`Đã chọn ${pdfOpt.lessons.length} bài`;veXemTruocPdf()}
+function datChuTuGo(gt){pdfOpt.text=gt.slice(0,TU_GO_TOI_DA);const o=document.getElementById("pdfSoChu");if(o)o.textContent=`${pdfOpt.text.length}/${TU_GO_TOI_DA} ký tự`;veXemTruocPdf()}
 
 function openPdfModal(keepScroll=false){
   if(pdfOpt.busy){toast("Đang tạo PDF — chờ xong rồi đổi tùy chọn");return}
@@ -10286,34 +10412,46 @@ function openPdfModal(keepScroll=false){
     :nd==="weak"?`Các chữ trong Luyện thêm (${WEAK.length||"chưa có, sẽ lấy Bài ôn"}).`
     :nd==="free"?"Nội dung Bài tự do hoặc Tên riêng đã lưu."
     :"Gõ hoặc dán nội dung cần tập, mỗi dòng một dòng tập.";
-  const dsBai=nd!=="pick"?"":`<div class="pdfDsBai">${COURSE.map(p=>`<details${p.lessons.some(l=>pdfOpt.lessons.includes(l.id))?" open":""}><summary>${escHtml(p.part)}</summary>${p.lessons.map(l=>`<label class="pdfBai"><input type="checkbox" ${pdfOpt.lessons.includes(l.id)?"checked":""} onchange="chonBaiPdfUi('${l.id}',this.checked)"> ${escHtml(l.t)}</label>`).join("")}</details>`).join("")}</div>`;
-  const oTuGo=nd!=="type"?"":`<textarea id="pdfText" class="pdfText" maxlength="${TU_GO_TOI_DA}" placeholder="VD: Học ăn, học nói, học gói, học mở." oninput="datChuTuGo(this.value)">${escHtml(pdfOpt.text)}</textarea><div class="prog" id="pdfSoChu" style="text-align:right">${pdfOpt.text.length}/${TU_GO_TOI_DA} ký tự</div>`;
-  const oKho=pdfOpt.preset!=="tunhap"?"":`<div class="row"><span>Khổ tự nhập (mm)</span><div class="pdfKhoNhap"><input type="number" min="40" max="500" step="0.1" value="${pdfOpt.wMm}" oninput="datKhoTuNhap('wMm',this.value)" aria-label="Rộng (mm)"> × <input type="number" min="40" max="500" step="0.1" value="${pdfOpt.hMm}" oninput="datKhoTuNhap('hMm',this.value)" aria-label="Cao (mm)"></div></div>`;
+  const dsBai=nd!=="pick"?"":`<div class="pdfDsBai">${COURSE.map(p=>`<details${p.lessons.some(l=>pdfOpt.lessons.includes(l.id))?" open":""}><summary>${escHtml(p.part)}</summary>${p.lessons.map(l=>`<label class="pdfBai"><input type="checkbox" ${pdfOpt.lessons.includes(l.id)?"checked":""} data-doi="pdfChonBai" data-id="${escHtml(l.id)}"> ${escHtml(l.t)}</label>`).join("")}</details>`).join("")}</div>`;
+  const oTuGo=nd!=="type"?"":`<textarea id="pdfText" class="pdfText" maxlength="${TU_GO_TOI_DA}" placeholder="VD: Học ăn, học nói, học gói, học mở." data-nhap="pdfTuGo">${escHtml(pdfOpt.text)}</textarea><div class="prog" id="pdfSoChu" style="text-align:right">${pdfOpt.text.length}/${TU_GO_TOI_DA} ký tự</div>`;
+  const oKho=pdfOpt.preset!=="tunhap"?"":`<div class="row"><span>Khổ tự nhập (mm)</span><div class="pdfKhoNhap"><input type="number" min="40" max="500" step="0.1" value="${pdfOpt.wMm}" data-nhap="pdfKhoTuNhap" data-truong="wMm" aria-label="Rộng (mm)"> × <input type="number" min="40" max="500" step="0.1" value="${pdfOpt.hMm}" data-nhap="pdfKhoTuNhap" data-truong="hMm" aria-label="Cao (mm)"></div></div>`;
   document.getElementById("genBox").innerHTML=`<h3>${ic("download")} Tạo tập viết PDF</h3>
   <div class="prog">Tạo tập viết PDF ngay trên máy, không cần mạng. Chọn nội dung và khổ giấy, rồi tạo file hoặc chép đường link để gửi cho người khác.</div>
   <aside class="pdfXem" aria-label="Xem trước trang đầu"><div class="pdfXemKhung"><canvas id="pdfXemCv"></canvas></div><div class="prog" id="pdfXemTxt">Đang dựng trang xem trước…</div></aside>
-  <div class="row"><span>Nội dung</span><div class="seg">${nutChon([["cur","Bài này"],["pick","Chọn bài"],["part","Cả phần"],["all","Cả giáo trình"],["weak","Luyện thêm"],["free","Bài tự do"],["type","Tự gõ"]],nd,v=>`pdfOpt.scope='${v}'`)}</div></div>
+  <div class="row"><span>Nội dung</span><div class="seg">${nutChon([["cur","Bài này"],["pick","Chọn bài"],["part","Cả phần"],["all","Cả giáo trình"],["weak","Luyện thêm"],["free","Bài tự do"],["type","Tự gõ"]],nd,"pdfNoiDung")}</div></div>
   <div class="prog" style="margin:4px 0 8px">${moTaNd}</div>${dsBai}${oTuGo}
-  <div class="row"><span>Khổ giấy hoặc máy</span><select aria-label="Khổ giấy hoặc máy" style="flex:1;min-width:0;max-width:100%;padding:10px 12px;border-radius:12px;border:1px solid currentColor;background:transparent;color:inherit;font:inherit" onchange="if(this.value==='tunhap')chonKhoTuNhap();else pdfOpt.preset=this.value;openPdfModal(true)">${nhomKho().map(([ten,ds])=>`<optgroup label="${ten}">${ds.map(v=>`<option value="${v}"${pdfOpt.preset===v?" selected":""}>${escHtml(KHO_TRANG[v].ten)}</option>`).join("")}</optgroup>`).join("")}<optgroup label="Khác"><option value="tunhap"${pdfOpt.preset==="tunhap"?" selected":""}>Tự nhập kích thước (mm)</option></optgroup></select></div>
+  <div class="row"><span>Khổ giấy hoặc máy</span><select aria-label="Khổ giấy hoặc máy" style="flex:1;min-width:0;max-width:100%;padding:10px 12px;border-radius:12px;border:1px solid currentColor;background:transparent;color:inherit;font:inherit" data-doi="pdfKhoGiay">${nhomKho().map(([ten,ds])=>`<optgroup label="${ten}">${ds.map(v=>`<option value="${v}"${pdfOpt.preset===v?" selected":""}>${escHtml(KHO_TRANG[v].ten)}</option>`).join("")}</optgroup>`).join("")}<optgroup label="Khác"><option value="tunhap"${pdfOpt.preset==="tunhap"?" selected":""}>Tự nhập kích thước (mm)</option></optgroup></select></div>
   ${oKho}<div class="prog" id="pdfKhoMoTa" style="margin:4px 0 8px">${pr?`<b>${escHtml(pr.name)}:</b> ${escHtml(pr.desc)}`:escHtml(loiKho)}</div>
-  <div class="row"><span>Cách tập trên dòng</span><div class="seg">${nutChon([["to","② Tô"],["nho","③ Chép"]],pdfOpt.mode,v=>`pdfOpt.mode='${v}'`)}</div></div>
-  ${SCRIPT==="th"?"":`<div class="row"><span>Kiểu dòng kẻ</span><div class="seg">${nutChon([["french","Lưới xiên Pháp"],["oly4","4 ô li Việt Nam"]],pdfOpt.grid,v=>`pdfOpt.grid='${v}'`)}</div></div>`}
-  <div class="row"><span>Chừa lề thanh công cụ</span><div class="seg">${nutChon([["left","Lề trái (tay phải)"],["right","Lề phải (tay trái)"]],pdfOpt.barSide,v=>`pdfOpt.barSide='${v}'`)}</div></div>
-  <div class="row"><span>Mũi tên thứ tự nét ở chữ mẫu</span><div class="seg">${nutChon([[true,"Bật"],[false,"Tắt"]],pdfOpt.arrows,v=>`pdfOpt.arrows=${v}`)}</div></div>
+  <div class="row"><span>Cách tập trên dòng</span><div class="seg">${nutChon([["to","② Tô"],["nho","③ Chép"]],pdfOpt.mode,"pdfCachTap")}</div></div>
+  ${SCRIPT==="th"?"":`<div class="row"><span>Kiểu dòng kẻ</span><div class="seg">${nutChon([["french","Lưới xiên Pháp"],["oly4","4 ô li Việt Nam"]],pdfOpt.grid,"pdfDongKe")}</div></div>`}
+  <div class="row"><span>Chừa lề thanh công cụ</span><div class="seg">${nutChon([["left","Lề trái (tay phải)"],["right","Lề phải (tay trái)"]],pdfOpt.barSide,"pdfLeCongCu")}</div></div>
+  <div class="row"><span>Mũi tên thứ tự nét ở chữ mẫu</span><div class="seg">${nutChon([[true,"Bật"],[false,"Tắt"]],pdfOpt.arrows,"pdfMuiTen")}</div></div>
   <div id="pdfProg" class="prog" style="display:none;color:var(--accent);font-weight:700;margin-top:8px"></div>
-  <button class="btn primary" id="pdfGoBtn" onclick="generateWorkbookPdf()">${ic("download")}Tạo và tải file PDF</button>
-  <button class="btn ghost" onclick="chepLinkCfg()">Chép đường link cấu hình này</button>
-  <button class="btn ghost" onclick="closeSheets()">Đóng</button>`;
+  <button class="btn primary" id="pdfGoBtn" data-action="taoPdf">${ic("download")}Tạo và tải file PDF</button>
+  <button class="btn ghost" data-action="chepLinkPdf">Chép đường link cấu hình này</button>
+  <button class="btn ghost" data-action="dongBang">Đóng</button>`;
   openSheet("gen",keepScroll);
   veXemTruocPdf();
 }
+/* Hành động cho màn tạo tập viết PDF */
+HANH_DONG.pdfNoiDung=el=>{pdfOpt.scope=el.dataset.gt;openPdfModal(true)};
+HANH_DONG.pdfCachTap=el=>{pdfOpt.mode=el.dataset.gt;openPdfModal(true)};
+HANH_DONG.pdfDongKe=el=>{pdfOpt.grid=el.dataset.gt;openPdfModal(true)};
+HANH_DONG.pdfLeCongCu=el=>{pdfOpt.barSide=el.dataset.gt;openPdfModal(true)};
+HANH_DONG.pdfMuiTen=el=>{pdfOpt.arrows=el.dataset.gt==="1";openPdfModal(true)};
+HANH_DONG.pdfChonBai=el=>chonBaiPdfUi(el.dataset.id,el.checked);
+HANH_DONG.pdfTuGo=el=>datChuTuGo(el.value);
+HANH_DONG.pdfKhoTuNhap=el=>datKhoTuNhap(el.dataset.truong,el.value);
+HANH_DONG.pdfKhoGiay=el=>{if(el.value==="tunhap")chonKhoTuNhap();else pdfOpt.preset=el.value;openPdfModal(true)};
+HANH_DONG.taoPdf=()=>generateWorkbookPdf();
+HANH_DONG.chepLinkPdf=()=>chepLinkCfg();
 /* Xem trước trang nội dung đầu tiên (không tạo file) */
 let _xemPdfLan=0;
 async function veXemTruocPdf(){
   const lan=++_xemPdfLan,cv=document.getElementById("pdfXemCv"),txt=document.getElementById("pdfXemTxt");if(!cv)return;
-  await new Promise(r=>setTimeout(r,60));if(lan!==_xemPdfLan||pdfBusyFlag)return;
+  await new Promise(r=>setTimeout(r,220));if(lan!==_xemPdfLan)return;   /* chờ ngừng gõ; đang tạo PDF thì exportPdf tự xếp hàng chạy sau */
   try{const r=await exportPdf(pdfCfgTuManHinh(),{xemTruoc:(w,h)=>{cv.width=w;cv.height=h;return cv.getContext("2d")}});
-    if(lan===_xemPdfLan&&txt)txt.textContent=r&&r.xemTruoc?`${r.tenKho} · trang đầu trong ${r.soTrang} trang`:"";}
+    if(lan===_xemPdfLan&&txt)txt.textContent=!r||!r.xemTruoc?"":r.soBai>1?`${r.tenKho} · trang đầu của bài 1 trong ${r.soBai} bài (trang 1 là mục lục)`:`${r.tenKho} · trang đầu trong ${r.soTrang} trang`;}
   catch(e){if(lan===_xemPdfLan&&txt)txt.textContent="Chưa xem trước được: "+e.message}
 }
 const PDFF = {
@@ -10738,7 +10876,9 @@ async function exportPdfMot(cfg, tuyChon = {}) {
     /* Tạo trước danh sách trang cho từng bài học */
     const lessonJobs = [];
     let totalContentPages = 0;
-    for (const l of targetLessons) {
+    /* Xem trước nhiều bài: chỉ dựng bài đầu (không phân trang cả giáo trình mỗi lần đổi lựa chọn) */
+    const xemGon = !!tuyChon.xemTruoc && targetLessons.length > 1;
+    for (const l of (xemGon ? targetLessons.slice(0, 1) : targetLessons)) {
       /* Tiểu học: thân chữ tính theo mm thật (1 ô li = 2 mm), các dòng 4 ô li nối liền nhau */
       const m = SCRIPT === "th" ? sizeForTHPdf(l, pr.pxW / pr.wMm) : sizeFor(l), F = m.F;
       let up = Math.max(l.up || F.asc + .25, F.asc + .05), dn = Math.max(l.dn || F.desc + .1, F.desc + .03);
@@ -10764,7 +10904,7 @@ async function exportPdfMot(cfg, tuyChon = {}) {
       totalContentPages += lPages.length;
     }
 
-    const needToc = lessonJobs.length > 1;
+    const needToc = targetLessons.length > 1;
     const tocOffset = needToc ? 1 : 0;
     let runningIdx = tocOffset;
     for (const job of lessonJobs) { job.startPageIdx = runningIdx; runningIdx += job.pages.length }
@@ -10818,7 +10958,10 @@ async function exportPdfMot(cfg, tuyChon = {}) {
         baoTienDo(`Đang vẽ trang ${donePages}/${totalContentPages} (${job.lesson.t})…`);
         await new Promise(r => setTimeout(r, 8));
         /* Xem trước: vẽ lên canvas thường (cùng lệnh vẽ như PDF) rồi dừng ở trang đầu */
-        ctx = tuyChon.xemTruoc ? tuyChon.xemTruoc(W, H) : new PdfCtx(doc, mctx);
+        if (tuyChon.xemTruoc) {   /* canvas xem trước thu nhỏ, cạnh lớn nhất khoảng 900 px (đủ nét, đỡ tốn bộ nhớ) */
+          const kx = Math.min(1, 900 / Math.max(W, H));
+          ctx = tuyChon.xemTruoc(Math.round(W * kx), Math.round(H * kx)); ctx.setTransform(kx, 0, 0, kx, 0, 0);
+        } else ctx = new PdfCtx(doc, mctx);
         ctx.fillStyle = T.paper; ctx.fillRect(0, 0, W, H);
         /* Tiêu đề trang vở */
         ctx.fillStyle = "#000000"; ctx.textBaseline = "alphabetic"; ctx.textAlign = "left";
@@ -10829,7 +10972,7 @@ async function exportPdfMot(cfg, tuyChon = {}) {
         ctx.font = `500 ${px(22)}px 'QS',sans-serif`; ctx.fillStyle = "#444444";
         ctx.fillText(`${SC.name} · ${job.lesson.id === "review" ? "Bài ôn" : c.mode === "to" ? "Tô" : "Chép"} · ${c.grid === "oly4" ? "4 ô li Việt Nam" : "Lưới xiên Pháp"}`, padL, px(100));
         ctx.textAlign = "right";
-        ctx.fillText(`Trang ${donePages + tocOffset}/${totalContentPages + tocOffset}${needToc && pr.links ? "  ·  ↑ Mục lục" : ""}`, W - padR, px(66));
+        ctx.fillText(`Trang ${donePages + tocOffset}/${xemGon ? "…" : totalContentPages + tocOffset}${needToc && pr.links ? "  ·  ↑ Mục lục" : ""}`, W - padR, px(66));
         ctx.textAlign = "left";
         ctx.strokeStyle = "#CCCCCC"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(padL, px(116)); ctx.lineTo(W - padR, px(116)); ctx.stroke();
 
@@ -10858,7 +11001,7 @@ async function exportPdfMot(cfg, tuyChon = {}) {
           ctx.fillText("Gợi ý: " + job.lesson.note, padL, H - px(36));
         }
         /* Nút bấm góc trên phải để quay về Trang 1 Mục lục trên reMarkable */
-        if (tuyChon.xemTruoc) return { xemTruoc: true, soTrang: totalContentPages + tocOffset, tenKho: pr.name };
+        if (tuyChon.xemTruoc) return { xemTruoc: true, soTrang: xemGon ? 0 : totalContentPages + tocOffset, soBai: targetLessons.length, coMucLuc: needToc, tenKho: pr.name };
         const backLinks = needToc && pr.links ? [{ rect: [((W - padR - 220) / W) * pr.ptW, pr.ptH - (95 / H) * pr.ptH, ((W - padR) / W) * pr.ptW, pr.ptH - (25 / H) * pr.ptH], targetPage: 0 }] : [];
         pdfPages.push({ content: ctx.out.join("\n"), links: backLinks });
       }
@@ -10873,7 +11016,8 @@ async function exportPdfMot(cfg, tuyChon = {}) {
     S.theme = saveTheme; W = saveW; H = saveH; layout = saveLayout; T = saveT; S.gridStyle = saveSGrid; S.rowArrows = saveSArrows; S.xBand = saveSXBand; S.scale = saveScale; S.trace = saveSTrace;
     luyenRounds = saveLR; frozenLuyen = saveFL; frozenReview = saveFR; LUYEN.rows = saveLRows; REVIEW.rows = saveRRows;
     pdfBusyFlag = false; exporting = false;
-    pendingResize = false; resize();
+    /* Xem trước không đổi trang viết: chỉ dựng lại khi cửa sổ vừa đổi cỡ trong lúc chạy */
+    if (!tuyChon.xemTruoc || pendingResize) { pendingResize = false; resize(); }
   }
 }
 /* ================== CẤU HÌNH VỞ TRONG ĐƯỜNG LINK ==================
@@ -10954,7 +11098,7 @@ async function apDungCfgTuLink() {
     scope: c.scope === "bai" && c.lessons.length > 1 ? "pick" : { bai: "cur", phan: "part", tatca: "all", luyenthem: "weak", tudo: "free", tugo: "type" }[c.scope],
     lessons: c.lessons.slice(), text: c.text || "",
   });
-  openPdfModal();
+  openPdfModal();if(typeof datTrang==="function"){datTrang("gen");datKhu("pdf")}   /* mở thành trang Tập viết PDF */
   toast("Đã mở cấu hình vở từ đường link");
 }
 
@@ -10979,8 +11123,9 @@ function openPop(kind,html,anchor,dir){
   const tt=document.getElementById("toast");if(tt){tt.style.opacity=0;clearTimeout(tT)}
   const r=anchor.getBoundingClientRect(),bw=B.offsetWidth,bh=B.offsetHeight,vw=innerWidth,vh=innerHeight;
   let x,y;
-  if(dir==="up"&&r.height>r.width*.9&&r.left<vw/2-40&&vw>vh){x=r.right+8;y=r.top+r.height/2-bh/2}
-  else if(dir==="up"&&vw>vh&&r.left>vw/2){x=r.left-bw-8;y=r.top+r.height/2-bh/2}
+  const trongRail=document.body.classList.contains("congCuRail")&&anchor.closest&&anchor.closest("#navKhu");
+  if(dir==="up"&&trongRail&&!document.body.classList.contains("lefthand")){x=r.right+8;y=r.top+r.height/2-bh/2}
+  else if(dir==="up"&&trongRail){x=r.left-bw-8;y=r.top+r.height/2-bh/2}
   else{x=dir==="down"?r.right-bw:r.left+r.width/2-bw/2;y=dir==="down"?r.bottom+8:r.top-bh-8}
   x=Math.max(8,Math.min(vw-bw-8,x));y=Math.max(8,Math.min(vh-bh-8,y));
   B.style.left=x+"px";B.style.top=y+"px";
@@ -10989,22 +11134,31 @@ function openAa(){
   const th=themeName(),acc=S.accent==="black"?"black":"blue";
   const papers=[["sepia","Ấm","#F7F2E7"],["light","Sáng","#FFFFFF"],["dark","Tối","#1B1E23"],["eink","Trắng đen","#FFFFFF"]];
   let h=`<div class="popT">Cỡ dòng kẻ</div>
-  <div class="stepRow"><button onclick="stepScale(-0.15);openAa()" aria-label="Thu nhỏ cỡ dòng">${ic("minus")}</button><b>${Math.round(S.scale*100)}%</b><button onclick="stepScale(0.15);openAa()" aria-label="Phóng to cỡ dòng">${ic("plus")}</button></div>
+  <div class="stepRow"><button data-action="aaCoDong" data-buoc="-0.15" aria-label="Thu nhỏ cỡ dòng">${ic("minus")}</button><b>${Math.round(S.scale*100)}%</b><button data-action="aaCoDong" data-buoc="0.15" aria-label="Phóng to cỡ dòng">${ic("plus")}</button></div>
   <div class="popT" style="margin-top:12px">Màu giấy</div>
-  <div class="papers4">${papers.map(([v,t,c])=>`<button class="${th===v?"on":""}" onclick="setTheme('${v}');openAa()"><span style="background-color:${c};${v==="eink"?"box-shadow:0 0 0 2px #000":""}"></span>${t}</button>`).join("")}</div>
+  <div class="papers4">${papers.map(([v,t,c])=>`<button class="${th===v?"on":""}" data-action="aaMauGiay" data-mau="${escHtml(v)}"><span style="background-color:${c};${v==="eink"?"box-shadow:0 0 0 2px #000":""}"></span>${t}</button>`).join("")}</div>
   <div class="popT" style="margin-top:10px">Màu nhấn</div>
-  <div class="popSeg">${[["blue","Xanh mực"],["black","Đen"]].map(([v,t])=>`<button class="${acc===v?"on":""}" onclick="S.accent='${v}';saveS();applyTheme();openAa()">${t}</button>`).join("")}</div>`;
+  <div class="popSeg">${[["blue","Xanh mực"],["black","Đen"]].map(([v,t])=>`<button class="${acc===v?"on":""}" data-action="aaMauNhan" data-mau="${escHtml(v)}">${t}</button>`).join("")}</div>`;
   if(isTablet())h+=`<div class="popT" style="margin-top:10px">Chia đôi màn hình (mẫu bên ${S.leftHand?"phải":"trái"})</div>
-  <div class="popSeg">${[[true,"Bật"],[false,"Tắt"]].map(([v,t])=>`<button class="${!!S.split===v?"on":""}" onclick="if(!!S.split!==${v})toggleSplit();setTimeout(openAa,120)">${t}</button>`).join("")}</div>`;
-  h+=`<button class="popBtn" onclick="closePop();toggleFocus()">${ic(focusOn?"collapse":"expand")}${focusOn?"Thoát toàn màn hình":"Toàn màn hình, ẩn thanh chế độ"}</button>`;
+  <div class="popSeg">${[[true,"Bật"],[false,"Tắt"]].map(([v,t])=>`<button class="${!!S.split===v?"on":""}" data-action="aaChiaDoi" data-bat="${v?"1":"0"}">${t}</button>`).join("")}</div>`;
+  h+=`<button class="popBtn" data-action="aaToanMan">${ic(focusOn?"collapse":"expand")}${focusOn?"Thoát toàn màn hình":"Toàn màn hình, ẩn thanh chế độ"}</button>`;
   openPop("aa",h,document.getElementById("bAa"),"down");
 }
+/* Hành động cho bảng nổi cỡ dòng và màu giấy */
+HANH_DONG.aaCoDong=el=>{stepScale(+el.dataset.buoc);openAa()};
+HANH_DONG.aaMauGiay=el=>{setTheme(el.dataset.mau);openAa()};
+HANH_DONG.aaMauNhan=el=>{S.accent=el.dataset.mau;saveS();applyTheme();openAa()};
+HANH_DONG.aaChiaDoi=el=>{const b=el.dataset.bat==="1";if(!!S.split!==b)toggleSplit();setTimeout(openAa,120)};
+HANH_DONG.aaToanMan=()=>{closePop();toggleFocus()};
 function openFavPop(){
   const h=`<div class="popT">Viết yêu thích</div><div class="favPick">${S.favs.map((f,idx)=>{const p=PEN_MAP[f.penType]||PEN_TYPES[0];
-    return `<button class="${tool==="pen"&&S.activeFav===idx?"on":""}" onclick="closePop();useFav(${idx})"><span class="fc">${ic(p.ic)}<em style="background:${inkColor(f.color)}"></em></span>${f.name}</button>`}).join("")}</div>
-  <button class="popBtn" onclick="closePop();penTap(true)">${ic("sliders")}Chỉnh viết, màu mực, cỡ nét</button>`;
+    return `<button class="${tool==="pen"&&S.activeFav===idx?"on":""}" data-action="popVietYeuThich" data-i="${idx}"><span class="fc">${ic(p.ic)}<em style="background:${inkColor(f.color)}"></em></span>${f.name}</button>`}).join("")}</div>
+  <button class="popBtn" data-action="popChinhViet">${ic("sliders")}Chỉnh viết, màu mực, cỡ nét</button>`;
   openPop("fav",h,document.getElementById("bPen"),"up");
 }
+/* Hành động cho bảng nổi chọn nhanh viết yêu thích */
+HANH_DONG.popVietYeuThich=el=>{closePop();useFav(+el.dataset.i)};
+HANH_DONG.popChinhViet=()=>{closePop();penTap(true)};
 (function(){const b=document.getElementById("bPen");let t=0,lp=false;
   b.addEventListener("pointerdown",()=>{lp=false;clearTimeout(t);t=setTimeout(()=>{lp=true;if(navigator.vibrate)try{navigator.vibrate(12)}catch(_){}openFavPop()},450)});
   for(const ev of["pointerup","pointerleave","pointercancel"])b.addEventListener(ev,()=>clearTimeout(t));
@@ -11020,18 +11174,79 @@ function placeToast(t){try{const r=document.getElementById("canvasWrap").getBoun
   const room=minL-r.left-24;
   if(room>=200){t.style.maxWidth=Math.min(520,room)+"px";t.style.top=(r.top+6)+"px"}else{t.style.maxWidth=Math.min(520,r.width-24)+"px";t.style.top=(r.top+58)+"px"}
   if(S.leftHand){t.style.left="auto";t.style.right=(innerWidth-r.right+12)+"px"}else{t.style.right="auto";t.style.left=(r.left+12)+"px"}}catch(_){}}
+/* ================== HÀNH ĐỘNG CHO CÁC NÚT CỐ ĐỊNH TRONG app.html ==================
+   Mỗi nút trong app.html có data-action="tên" (hoặc data-doi, data-nhan…) và hàm tương ứng ở đây.
+   Cách gắn sự kiện chung: xem đầu file ui/khu.js. */
+
+/* Đóng bảng dùng chung cho nhiều màn hình */
+HANH_DONG.dongBang = () => closeSheets();
+HANH_DONG.dongBangNen = (el, e) => { if (e.target === el) closeSheets(); };
+HANH_DONG.dongPopNen = (el, e) => { if (e.target === el) closePop(); };
+
+/* Thanh đầu, ghi chú và buổi tập */
+HANH_DONG.moMenu = () => openMenu();
+HANH_DONG.cheDo = el => setMode(el.dataset.chedo);
+HANH_DONG.daTap = () => toggleDone();
+HANH_DONG.hopViet = () => toggleZBox();
+HANH_DONG.moAa = () => openAa();
+HANH_DONG.moGhiChu = el => { el.classList.toggle("open"); setTimeout(resize, 30); };
+HANH_DONG.buoiTiep = () => sessNext();
+HANH_DONG.buoiKet = () => sessEnd();
+
+/* Bảng bên, phóng to trang, chấm bài và đo nét */
+HANH_DONG.tabBen = el => setSideTab(el.dataset.tab);
+HANH_DONG.buocPhong = el => zoomStep(+el.dataset.d);
+HANH_DONG.thuVe100 = () => resetZoom();
+HANH_DONG.lamLai = () => redo();
+HANH_DONG.chamBai = el => grade(el.dataset.dat === "1");
+HANH_DONG.soSanh = () => toggleCompare();
+HANH_DONG.moPhanTich = () => openScoreReport();
+
+/* Hộp viết phóng to tự trượt */
+HANH_DONG.hopTruot = el => zboxMove(+el.dataset.huong);
+HANH_DONG.hopXuongDong = () => zboxNextLine();
+HANH_DONG.hopCo = el => zboxScale(+el.dataset.d);
+
+/* Thanh công cụ dưới */
+HANH_DONG.chuyenTrang = el => go(+el.dataset.huong);
+HANH_DONG.moGom = () => eraserTap();
+HANH_DONG.hoanTac = () => undo();
+
+/* Bài tự do và ô chọn file ẩn */
+HANH_DONG.layLaiTuDo = () => restoreCustomPrev();
+HANH_DONG.luuTuDo = () => saveCustom();
+HANH_DONG.luuHinhGiay = el => savePaper(el);
+HANH_DONG.khoiPhucSaoLuu = el => restoreBackup(el);
+
 /* ================== KHUNG 4 KHU (bản 0.14) ==================
    Thanh điều hướng 4 khu: Luyện viết, Giáo trình, Tập viết PDF, Hồ sơ.
    - Máy tính bảng, máy tính: thanh dọc bên trái (tay trái: bên phải), ẩn hiện bằng nút ☰; app nhớ trạng thái.
    - Điện thoại dọc: thanh 4 nút dưới cùng.
    Bộ xử lý nút chung: phần tử có data-action="tên" gọi HANH_DONG[tên](phần tử, sự kiện). Giao diện mới dùng cách này
-   thay cho onclick="…" trong chuỗi HTML (dễ bảo trì, và để bật được chính sách bảo mật nội dung CSP). */
+   thay cho thuộc tính onclick trong chuỗi HTML (dễ bảo trì, và để bật được chính sách bảo mật nội dung CSP).
+   Các sự kiện khác cũng theo cách đó, mỗi loại một thuộc tính:
+     data-action (click) · data-doi (change) · data-nhap (input) · data-mo (toggle của <details>) · data-nhan (pointerdown)
+   Ví dụ: <input data-nhap="coViet"> gọi HANH_DONG.coViet(phần tử, sự kiện) mỗi lần gõ. App không còn thuộc tính on…= nào. */
+function goiHanhDong(ten, el, e) {
+  const f = HANH_DONG[ten];
+  if (typeof f === "function") f(el, e);
+  else console.warn("Chưa có hành động:", ten);
+}
 document.addEventListener("click", e => {
-  const el = e.target.closest("[data-action]");
+  const el = e.target.closest && e.target.closest("[data-action]");
   if (!el) return;
-  const f = HANH_DONG[el.dataset.action];
-  if (typeof f === "function") { e.preventDefault(); f(el, e); }
+  if (el.tagName === "A") e.preventDefault();
+  goiHanhDong(el.dataset.action, el, e);
 });
+/* toggle không nổi lên nên bắt cả bốn ở pha capture. change, input, toggle: thuộc tính đặt ngay trên phần tử phát sự kiện
+   (ô nhập, <details>), không tìm lên cha để <details> lồng nhau không gọi nhầm. pointerdown: tìm lên phần tử gần nhất. */
+for (const [loai, khoa, timLen] of [["change", "doi"], ["input", "nhap"], ["toggle", "mo"], ["pointerdown", "nhan", true]]) {
+  document.addEventListener(loai, e => {
+    const t = e.target;
+    const el = !t || !t.closest ? null : timLen ? t.closest(`[data-${khoa}]`) : (t.dataset && t.dataset[khoa] ? t : null);
+    if (el) goiHanhDong(el.dataset[khoa], el, e);
+  }, true);
+}
 
 const KHU = [
   ["luyen", "Luyện viết", '<path d="M12 3 17 9l-2.5 9h-5L7 9z"/><path d="M12 3v7.5"/><circle cx="12" cy="11.5" r="1.3"/><path d="M9.5 21h5"/>'],
@@ -11054,8 +11269,19 @@ function datKhu(k) {
   document.querySelectorAll("#navKhu .khu").forEach(b => { const on = b.dataset.khu === k; b.classList.toggle("on", on); if (on) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
 }
 /* Các khu mở thành trang đầy đủ (không phải bảng trượt) */
-function datTrang(id) { document.querySelectorAll(".sheet.trang").forEach(s => s.classList.remove("trang")); if (id) { const s = document.getElementById(id); if (s) s.classList.add("trang"); } }
-HANH_DONG.pdfBai = () => { setTimeout(() => { closeSheets(); openPdfModal(); datTrang("gen"); datKhu("pdf"); }, 0); };
+function datTrang(id) { document.querySelectorAll(".sheet.trang").forEach(s => s.classList.remove("trang")); if (id) { const s = document.getElementById(id); if (s) s.classList.add("trang"); } lopBang(); }
+/* body.coBang: đang mở một bảng; body.coTrang: đang mở một khu dạng trang (CSS dùng để ẩn thanh công cụ nổi, nút góc) */
+function lopBang() {
+  document.body.classList.toggle("coBang", !!document.querySelector(".sheet.open"));
+  document.body.classList.toggle("coTrang", !!document.querySelector(".sheet.open.trang"));
+}
+/* Nút tải xuống trên từng bài trong Giáo trình: mở Tập viết PDF đúng bài đó, không đổi bài đang tập */
+HANH_DONG.pdfBai = el => {
+  if (pdfBusyFlag) { toast("Đang tạo PDF, chờ xong rồi chuyển khu"); return; }
+  const l = LESSONS.find(x => x.id === el.dataset.id);
+  if (l) { const i = LESSONS.indexOf(l); pdfOpt.scope = i === cur.li ? "cur" : "pick"; pdfOpt.lessons = [l.id]; }
+  closeSheets(); openPdfModal(); datTrang("gen"); datKhu("pdf");
+};
 HANH_DONG.moKhu = el => {
   const k = el.dataset.khu;
   if (typeof pdfBusyFlag !== "undefined" && pdfBusyFlag) { toast("Đang tạo PDF, chờ xong rồi chuyển khu"); return; }
@@ -11104,7 +11330,7 @@ function apGhimXem() {
   const b = document.getElementById("bGhimXem"); if (b) { b.classList.toggle("on", !!S.xemGhim); b.setAttribute("aria-pressed", S.xemGhim ? "true" : "false"); }
   setTimeout(resize, 30);
 }
-document.getElementById("ink").addEventListener("pointerdown", () => { if (!S.xemGhim && document.body.classList.contains("xemMo")) moNganXem(false); }, true);
+for (const id of ["ink", "zboxCv"]) { const c = document.getElementById(id); if (c) c.addEventListener("pointerdown", () => { if (!S.xemGhim && document.body.classList.contains("xemMo")) moNganXem(false); }, true); }
 
 /* Toàn trang viết: ẩn thanh đầu, thanh bên, bảng Xem; công cụ thành thanh nổi; nút Thoát ở góc */
 HANH_DONG.tapTrung = () => {
@@ -11115,8 +11341,27 @@ HANH_DONG.tapTrung = () => {
 HANH_DONG.anThanhKhu = () => { GS.set("navAn", true); apThanhKhu(); };
 HANH_DONG.hienThanhKhu = () => { GS.set("navAn", false); apThanhKhu(); };
 
-/* Đóng hết bảng thì quay về khu Luyện viết (bọc closeSheets, thay cho theo dõi mọi thay đổi trên trang) */
-{ const dongCu = closeSheets; closeSheets = function (...a) { const kq = dongCu.apply(this, a); if (!document.querySelector(".sheet.open")) { datKhu("luyen"); datTrang(null); } return kq; }; }
+/* Đóng hết bảng thì quay về khu Luyện viết (bọc closeSheets, thay cho theo dõi mọi thay đổi trên trang).
+   Đang tạo PDF thì không đóng được: trả về false để openSheet không mở chồng bảng mới lên. */
+let dangMoBang = false;
+{ const dongCu = closeSheets; closeSheets = function (...a) {
+  if (pdfBusyFlag) { dongCu.apply(this, a); return false; }
+  dongCu.apply(this, a);
+  if (!document.querySelector(".sheet.open")) { if (!dangMoBang) datKhu("luyen"); datTrang(null); }
+  lopBang(); return true;
+}; }
+/* Mở một bảng: bỏ dạng trang còn sót (VD Nhật ký mở vào #gen đang là trang Tập viết PDF); giữ khu đang sáng
+   khi mở bảng con từ một khu (VD Nhật ký từ Hồ sơ). Khu dạng trang gọi datTrang ngay sau đó. */
+{ const moCu = openSheet; openSheet = function (id, ...a) {
+  const el = document.getElementById(id); if (!el) return;
+  if (!el.classList.contains("open") && document.querySelector(".sheet.open") && pdfBusyFlag) { toast("Đang tạo PDF — chờ xong rồi mở"); return; }
+  el.classList.remove("trang");
+  dangMoBang = true; try { moCu.call(this, id, ...a); } finally { dangMoBang = false; }
+  lopBang();
+}; }
+/* Vẽ lại nội dung khu (đổi lựa chọn trong Tập viết PDF, Giáo trình, Hồ sơ) thì giữ dạng trang */
+{ const veCu = openPdfModal; openPdfModal = function (...a) { const kq = veCu.apply(this, a); if (khuDang === "pdf") datTrang("gen"); return kq; }; }
+{ const veCu = openMenu; openMenu = function (...a) { const kq = veCu.apply(this, a); if (khuDang === "giaotrinh" || khuDang === "hoso") datTrang("menu"); return kq; }; }
 /* Nút ☰ trên thanh đầu mở khu Giáo trình */
 { const b = document.getElementById("bMenu"); if (b) { b.removeAttribute("onclick"); b.dataset.action = "moKhu"; b.dataset.khu = "giaotrinh"; } }
 

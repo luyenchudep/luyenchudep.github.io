@@ -76,7 +76,7 @@ async function apDungCfgTuLink() {
     scope: c.scope === "bai" && c.lessons.length > 1 ? "pick" : { bai: "cur", phan: "part", tatca: "all", luyenthem: "weak", tudo: "free", tugo: "type" }[c.scope],
     lessons: c.lessons.slice(), text: c.text || "",
   });
-  openPdfModal();
+  openPdfModal();if(typeof datTrang==="function"){datTrang("gen");datKhu("pdf")}   /* mở thành trang Tập viết PDF */
   toast("Đã mở cấu hình vở từ đường link");
 }
 

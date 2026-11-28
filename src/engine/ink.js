@@ -403,8 +403,10 @@ function tapOnMeas(e){const el=document.getElementById("meas");if(!el||!el.class
   const r=el.getBoundingClientRect();return e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom}
 function openPenHelp(){document.getElementById("genBox").innerHTML=`<h3>Chưa nhận ra S Pen</h3>
   <div class="prog">Ứng dụng đang bật <b>Chỉ nhận S Pen</b> để tay tựa lên màn hình không để lại nét. Máy này chưa báo nét nào là của viết; có thể trình duyệt đang coi viết của máy như ngón tay (thường gặp ở máy đọc sách, máy tính bảng không phải Samsung).</div>
-  <button class="btn primary" onclick="S.penOnly=false;saveS();closeSheets();toast('Đã tắt Chỉ nhận S Pen — viết và ngón tay đều dùng được')">Tắt “Chỉ nhận S Pen” để viết được</button>
-  <button class="btn ghost" onclick="closeSheets()">Giữ nguyên</button>`;openSheet("gen")}
+  <button class="btn primary" data-action="tatChiNhanSPen">Tắt “Chỉ nhận S Pen” để viết được</button>
+  <button class="btn ghost" data-action="dongBang">Giữ nguyên</button>`;openSheet("gen")}
+/* Hành động tắt chế độ Chỉ nhận S Pen từ hộp hướng dẫn */
+HANH_DONG.tatChiNhanSPen=()=>{S.penOnly=false;saveS();closeSheets();toast("Đã tắt Chỉ nhận S Pen — viết và ngón tay đều dùng được")};
 function startPinch(){
   const pts=[...touches.values()];if(pts.length<2)return;
   const r=ink.getBoundingClientRect();
@@ -421,7 +423,7 @@ ink.addEventListener("pointerdown",e=>{
     touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
     if(touches.size>=2&&(!live||live.fromTouch)){
       e.preventDefault();
-      if(live&&live.fromTouch){live=null;paperSoundStop();if(history.length)strokes=history.pop();renderInk()}
+      if(live&&live.fromTouch){if(live.erase){if(gomHen){cancelAnimationFrame(gomHen);gomHen=0}gomCho.length=0;gomTruoc=null;clearFx()}if(live.redo0)redoStack=live.redo0;live=null;paperSoundStop();if(history.length)strokes=history.pop();renderInk()}
       startPinch();return;
     }
   }
@@ -477,7 +479,7 @@ ink.addEventListener("pointermove",e=>{
     return}
   e.preventDefault();
   let evs=e.getCoalescedEvents?e.getCoalescedEvents():[];if(!evs.length)evs=[e];
-  if(live.erase&&live.vung){for(const ev of evs)live.vung.push(pos(ev));veVongKhoanh(live.vung);return}
+  if(live.erase&&live.vung){const v=live.vung,buoc=4/view.z;for(const ev of evs){const q=pos(ev),c=v[v.length-1];if(Math.abs(q[0]-c[0])+Math.abs(q[1]-c[1])>=buoc)v.push(q)}veVongKhoanh(v);return}
   if(live.erase){
     if(live.meas){if(Math.hypot(e.clientX-live.meas.x,e.clientY-live.meas.y)<10)return;delete live.meas}
     for(const ev of evs)eraseAt(pos(ev));return}
@@ -544,7 +546,7 @@ function endStroke(e){
   const gomVua=live.erase&&live.changed&&tool==="eraser";
   if(!live.erase){delete live.fromTouch;live.p=simplifyStroke(live.p,0.32);strokes.push(live)}
   else if(!live.changed&&history.length){history.pop();if(redo0)redoStack=redo0}
-  paperSoundStop();live=null;renderInk();saveInk();
+  const doiNet=!live.erase||live.changed;paperSoundStop();live=null;renderInk();if(doiNet)saveInk();
   if(gomVua&&S.gomVeViet)setTool("pen");   /* Tự quay về viết sau khi gôm (Bật/Tắt trong bảng Gôm) */
 }
 ink.addEventListener("pointerup",endStroke);ink.addEventListener("pointercancel",endStroke);
@@ -587,11 +589,14 @@ function xuLyGom(){
   if(S.eraseMode==="stroke"){for(const s of strokes){if(cham(s))changed=true;else next.push(s)}}
   else for(const s of strokes){
     if(!cham(s)){next.push(s);continue}
+    /* Xóa từng đoạn: chèn thêm điểm dọc nét rồi cắt, nên tẩy được cả khúc giữa nét thẳng.
+       Đầu gôm chỉ sượt mép (không điểm nào bị xóa) thì giữ nguyên nét gốc. */
+    const pts=densify(s.p,Math.max(1,ds[0][2]*.35)),manh=[];let seg=[],cat=false;
+    for(const p of pts){if(gan(p)){cat=true;if(seg.length>1)manh.push(Object.assign({},s,{p:seg}));seg=[]}else seg.push(p)}
+    if(!cat){next.push(s);continue}
     changed=true;
-    /* Xóa từng đoạn: chèn thêm điểm dọc nét rồi cắt, nên tẩy được cả khúc giữa nét thẳng */
-    const pts=densify(s.p,Math.max(1,ds[0][2]*.35));let seg=[];
-    for(const p of pts){if(gan(p)){if(seg.length>1)next.push(Object.assign({},s,{p:seg}));seg=[]}else seg.push(p)}
-    if(seg.length>1)next.push(Object.assign({},s,{p:seg}));
+    if(seg.length>1)manh.push(Object.assign({},s,{p:seg}));
+    next.push(...manh);
   }
   if(changed){strokes=next;if(live)live.changed=true;if(typeof zbox!=="undefined"&&zbox.live)zbox.live.changed=true;renderInk()}
 }
@@ -603,7 +608,8 @@ function gomXong(){if(gomHen){cancelAnimationFrame(gomHen);gomHen=0}xuLyGom();go
 function trongVong(p,v){let o=false;for(let i=0,j=v.length-1;i<v.length;j=i++){const a=v[i],b=v[j];if((a[1]>p[1])!==(b[1]>p[1])&&p[0]<(b[0]-a[0])*(p[1]-a[1])/(b[1]-a[1])+a[0])o=!o}return o}
 function xoaTrongVong(v){
   if(!v||v.length<3)return false;
-  const next=strokes.filter(s=>{let n=0;for(const p of s.p)if(trongVong(p,v))n++;return n*2<s.p.length});
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const[x,y]of v){x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x);y1=Math.max(y1,y)}
+  const next=strokes.filter(s=>{const k=khungNet(s);if(k[2]<x0||k[0]>x1||k[3]<y0||k[1]>y1)return true;let n=0;for(const p of s.p)if(trongVong(p,v))n++;return n*2<s.p.length});
   if(next.length===strokes.length)return false;
   strokes=next;renderInk();return true;
 }

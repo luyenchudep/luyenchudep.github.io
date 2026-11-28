@@ -14,9 +14,11 @@ function renderFavDock(){
   dock.innerHTML=S.favs.map((f,idx)=>{
     const p=PEN_MAP[f.penType]||PEN_TYPES[0];
     const on=tool==="pen"&&S.activeFav===idx;
-    return `<button class="fdot ${on?"on":""}" onclick="useFav(${idx})" aria-label="Viết yêu thích ${f.name}">${ic(p.ic)}<em style="background:${inkColor(f.color)}"></em></button>`;
+    return `<button class="fdot ${on?"on":""}" data-action="dungVietYeuThich" data-i="${idx}" aria-label="Viết yêu thích ${f.name}">${ic(p.ic)}<em style="background:${inkColor(f.color)}"></em></button>`;
   }).join("");
 }
+/* Hành động cho thanh viết yêu thích trên trang */
+HANH_DONG.dungVietYeuThich=el=>useFav(+el.dataset.i);
 function useFav(idx,keepOpen){
   const f=S.favs[idx];if(!f)return;
   S.penType=f.penType;S.color=f.color;S.width=f.width;S.contrast=f.contrast||"med";
@@ -75,43 +77,64 @@ function penTap(forceOpen=false){
   <div class="ph" style="margin-top:4px">Viết yêu thích · chạm để đổi</div>
   <div class="favRow">${S.favs.map((f,idx)=>{
     const fp=PEN_MAP[f.penType]||PEN_TYPES[0];
-    return `<button class="fslot ${S.activeFav===idx?"on":""}" onclick="useFav(${idx},true)"><span>${ic(fp.ic)} ${f.name}</span><span style="font-size:11.5px;color:var(--muted)">cỡ ${f.width}</span><span class="fbar" style="background:${inkColor(f.color)}"></span></button>`;
+    return `<button class="fslot ${S.activeFav===idx?"on":""}" data-action="chonVietYeuThich" data-i="${idx}"><span>${ic(fp.ic)} ${f.name}</span><span style="font-size:11.5px;color:var(--muted)">cỡ ${f.width}</span><span class="fbar" style="background:${inkColor(f.color)}"></span></button>`;
   }).join("")}</div>
   <div class="saveFavBar">
     <span>Lưu viết đang chỉnh vào ô:</span>
-    ${[0,1,2,3].map(i=>`<button class="${(S.targetFav||0)===i?"on":""}" onclick="saveToFav(${i})">${i+1}</button>`).join("")}
-    ${SCRIPT==="td"?`<button style="margin-left:auto" onclick="nibPreset()">${ic("fountain")} Ngòi lá tre</button>`:""}
+    ${[0,1,2,3].map(i=>`<button class="${(S.targetFav||0)===i?"on":""}" data-action="luuVietYeuThich" data-i="${i}">${i+1}</button>`).join("")}
+    ${SCRIPT==="td"?`<button style="margin-left:auto" data-action="ngoiLaTre">${ic("fountain")} Ngòi lá tre</button>`:""}
   </div>
 
   <div class="ph">1. Loại viết và ngòi</div>
-  <div class="penGrid">${PEN_TYPES.map(p=>`<button class="pcard ${S.penType===p.id?"on":""}" onclick="selectPenType('${p.id}')"><span class="pic">${ic(p.ic)}</span><span class="pnm">${p.name}</span><span class="psb">${p.sub}</span></button>`).join("")}</div>
+  <div class="penGrid">${PEN_TYPES.map(p=>`<button class="pcard ${S.penType===p.id?"on":""}" data-action="chonLoaiViet" data-loai="${escHtml(p.id)}"><span class="pic">${ic(p.ic)}</span><span class="pnm">${p.name}</span><span class="psb">${p.sub}</span></button>`).join("")}</div>
 
   <div class="ph">2. Màu mực (12 màu + tự chọn)</div>
-  <div class="swGrid">${INK_META.map(([c,nm])=>`<span class="sw ${S.color===c?"on":""}" title="${nm}" style="background:${T.ink[c]}" onclick="setPen('color','${c}')"></span>`).join("")}</div>
-  <div class="row" style="padding:8px 0"><span>Chọn màu khác</span><label class="swPick" style="${isCustomCol?`background:${S.color};border-style:solid`:""}" title="Chọn màu bất kỳ"><span style="font-size:16px;display:flex">${isCustomCol?ic("check"):ic("plus")}</span><input type="color" value="${isCustomCol?S.color:inkColor(S.color)}" onchange="setPen('color',this.value)"></label></div>
+  <div class="swGrid">${INK_META.map(([c,nm])=>`<span class="sw ${S.color===c?"on":""}" title="${nm}" style="background:${T.ink[c]}" data-action="chonMauViet" data-mau="${escHtml(c)}"></span>`).join("")}</div>
+  <div class="row" style="padding:8px 0"><span>Chọn màu khác</span><label class="swPick" style="${isCustomCol?`background:${S.color};border-style:solid`:""}" title="Chọn màu bất kỳ"><span style="font-size:16px;display:flex">${isCustomCol?ic("check"):ic("plus")}</span><input type="color" value="${isCustomCol?S.color:inkColor(S.color)}" data-doi="chonMauVietTuChon"></label></div>
 
   <div class="ph">3. Cỡ nét (${S.width})</div>
-  <div class="wPills">${WIDTH_PRESETS.map(w=>`<button class="wpill ${Math.abs(S.width-w)<0.05?"on":""}" data-w="${w}" onclick="setPenWidth(${w})"><span style="height:${Math.max(2,Math.min(11,w*1.15))}px"></span>${w}</button>`).join("")}</div>
-  <div class="row"><span>Chỉnh chi tiết cỡ nét</span><div class="stepper"><button onclick="stepWidth(-0.2)">−</button><input id="wRange" type="range" min="0.6" max="16" step="0.2" value="${S.width}" oninput="setPenWidth(+this.value)"><button onclick="stepWidth(0.2)">+</button><b id="wv">${S.width}</b></div></div>
+  <div class="wPills">${WIDTH_PRESETS.map(w=>`<button class="wpill ${Math.abs(S.width-w)<0.05?"on":""}" data-w="${w}" data-action="chonCoNet"><span style="height:${Math.max(2,Math.min(11,w*1.15))}px"></span>${w}</button>`).join("")}</div>
+  <div class="row"><span>Chỉnh chi tiết cỡ nét</span><div class="stepper"><button data-action="tangGiamCoNet" data-buoc="-0.2">−</button><input id="wRange" type="range" min="0.6" max="16" step="0.2" value="${S.width}" data-nhap="coViet"><button data-action="tangGiamCoNet" data-buoc="0.2">+</button><b id="wv">${S.width}</b></div></div>
 
   <div class="ph">4. Cảm biến và tính năng S Pen</div>
-  ${showPressure?`<div class="row"><span>Lực nhấn 4096 mức</span><div class="seg"><button class="${S.pressure?"on":""}" onclick="setPen('pressure',true)">Thanh đậm</button><button class="${!S.pressure?"on":""}" onclick="setPen('pressure',false)">Nét đều</button></div></div>`:""}
-  ${showSens?`<div class="row"><span>Độ nhạy lực nhấn</span><div class="seg">${[["nhe","Nhẹ tay"],["vua","Vừa"],["manh","Mạnh tay"]].concat(S.sens==="tu"?[["tu","Theo tay tôi"]]:[]).map(([v,t])=>`<button class="${(S.sens||"vua")===v?"on":""}" onclick="setSens('${v}')">${t}</button>`).join("")}</div></div>
-  <button class="btn ghost" onclick="openPenTest(true)">Đo lực tay của tôi</button>`:""}
-  ${showContrast?`<div class="row"><span>Độ chênh thanh – đậm</span><div class="seg">${[["soft","Nhẹ"],["med","Vừa"],["strong","Mạnh"],["nib","Lá tre"]].map(([v,t])=>`<button class="${S.contrast===v?"on":""}" onclick="setPen('contrast','${v}')">${t}</button>`).join("")}</div></div>`:""}
-  ${showAngle?`<div class="row"><span>Góc vát ngòi thư pháp</span><div class="seg">${[30,38,45,-38].map(a=>`<button class="${(S.nibAngle||38)===a?"on":""}" onclick="setPen('nibAngle',${a})">${a}°</button>`).join("")}</div></div>`:""}
-  ${showTilt?`<div class="row"><span>Cảm biến nghiêng viết</span><div class="seg"><button class="${S.tiltOn?"on":""}" onclick="setPen('tiltOn',true)">Bật</button><button class="${!S.tiltOn?"on":""}" onclick="setPen('tiltOn',false)">Tắt</button></div></div>`:""}
-  <div class="row"><span>Làm mịn nét (chống run tay)</span><div class="seg">${[[0,"Tắt"],[0.32,"Vừa"],[0.58,"Mạnh"]].map(([v,t])=>`<button class="${Math.abs((S.stab||0)-v)<0.05?"on":""}" onclick="setPen('stab',${v})">${t}</button>`).join("")}</div></div>
-  <div class="row"><span>Nút trên thân S Pen</span><div class="seg">${[["eraser","Gôm"],["undo","Hoàn tác"],["fav","Đổi viết"]].map(([v,t])=>`<button class="${(S.sideBtn||"eraser")===v?"on":""}" onclick="setPen('sideBtn','${v}')">${t}</button>`).join("")}</div></div>
-  <div class="row"><span>Thanh viết yêu thích trên trang</span><div class="seg"><button class="${S.favBar?"on":""}" onclick="setPen('favBar',true)">Hiện</button><button class="${!S.favBar?"on":""}" onclick="setPen('favBar',false)">Ẩn</button></div></div>
+  ${showPressure?`<div class="row"><span>Lực nhấn 4096 mức</span><div class="seg"><button class="${S.pressure?"on":""}" data-action="batLucNhan" data-bat="1">Thanh đậm</button><button class="${!S.pressure?"on":""}" data-action="batLucNhan" data-bat="0">Nét đều</button></div></div>`:""}
+  ${showSens?`<div class="row"><span>Độ nhạy lực nhấn</span><div class="seg">${[["nhe","Nhẹ tay"],["vua","Vừa"],["manh","Mạnh tay"]].concat(S.sens==="tu"?[["tu","Theo tay tôi"]]:[]).map(([v,t])=>`<button class="${(S.sens||"vua")===v?"on":""}" data-action="chonDoNhayLuc" data-muc="${escHtml(v)}">${t}</button>`).join("")}</div></div>
+  <button class="btn ghost" data-action="doLucTay">Đo lực tay của tôi</button>`:""}
+  ${showContrast?`<div class="row"><span>Độ chênh thanh – đậm</span><div class="seg">${[["soft","Nhẹ"],["med","Vừa"],["strong","Mạnh"],["nib","Lá tre"]].map(([v,t])=>`<button class="${S.contrast===v?"on":""}" data-action="chonThanhDam" data-muc="${escHtml(v)}">${t}</button>`).join("")}</div></div>`:""}
+  ${showAngle?`<div class="row"><span>Góc vát ngòi thư pháp</span><div class="seg">${[30,38,45,-38].map(a=>`<button class="${(S.nibAngle||38)===a?"on":""}" data-action="chonGocVat" data-goc="${a}">${a}°</button>`).join("")}</div></div>`:""}
+  ${showTilt?`<div class="row"><span>Cảm biến nghiêng viết</span><div class="seg"><button class="${S.tiltOn?"on":""}" data-action="batNghiengViet" data-bat="1">Bật</button><button class="${!S.tiltOn?"on":""}" data-action="batNghiengViet" data-bat="0">Tắt</button></div></div>`:""}
+  <div class="row"><span>Làm mịn nét (chống run tay)</span><div class="seg">${[[0,"Tắt"],[0.32,"Vừa"],[0.58,"Mạnh"]].map(([v,t])=>`<button class="${Math.abs((S.stab||0)-v)<0.05?"on":""}" data-action="chonLamMin" data-muc="${v}">${t}</button>`).join("")}</div></div>
+  <div class="row"><span>Nút trên thân S Pen</span><div class="seg">${[["eraser","Gôm"],["undo","Hoàn tác"],["fav","Đổi viết"]].map(([v,t])=>`<button class="${(S.sideBtn||"eraser")===v?"on":""}" data-action="vietNutThan" data-kieu="${escHtml(v)}">${t}</button>`).join("")}</div></div>
+  <div class="row"><span>Thanh viết yêu thích trên trang</span><div class="seg"><button class="${S.favBar?"on":""}" data-action="vietThanhYeuThich" data-bat="1">Hiện</button><button class="${!S.favBar?"on":""}" data-action="vietThanhYeuThich" data-bat="0">Ẩn</button></div></div>
 
   <div class="prog" style="margin-top:10px">Viết thử bằng S Pen (thử nhấn nhẹ/mạnh hoặc nghiêng viết):</div>
   <canvas id="demo"></canvas>
-  <button class="btn ghost" onclick="demoS=[];demo()">Xóa ô viết thử</button>
-  <button class="btn danger" onclick="confirmClearBtn(this)">Xóa toàn bộ nét trên trang này</button>
-  <button class="btn primary" onclick="closeSheets()">Xong</button>`;
+  <button class="btn ghost" data-action="xoaOVietThu">Xóa ô viết thử</button>
+  <button class="btn danger" data-action="xacNhanXoaTrang">Xóa toàn bộ nét trên trang này</button>
+  <button class="btn primary" data-action="dongBang">Xong</button>`;
   openSheet("pen",forceOpen);demoInit();
 }
+/* Hành động cho bảng chỉnh viết */
+HANH_DONG.chonVietYeuThich=el=>useFav(+el.dataset.i,true);
+HANH_DONG.luuVietYeuThich=el=>saveToFav(+el.dataset.i);
+HANH_DONG.ngoiLaTre=()=>nibPreset();
+HANH_DONG.chonLoaiViet=el=>selectPenType(el.dataset.loai);
+HANH_DONG.chonMauViet=el=>setPen("color",el.dataset.mau);
+HANH_DONG.chonMauVietTuChon=el=>setPen("color",el.value);
+HANH_DONG.chonCoNet=el=>setPenWidth(+el.dataset.w);
+HANH_DONG.tangGiamCoNet=el=>stepWidth(+el.dataset.buoc);
+HANH_DONG.coViet=el=>setPenWidth(+el.value);
+HANH_DONG.batLucNhan=el=>setPen("pressure",el.dataset.bat==="1");
+HANH_DONG.chonDoNhayLuc=el=>setSens(el.dataset.muc);
+HANH_DONG.doLucTay=()=>openPenTest(true);
+HANH_DONG.chonThanhDam=el=>setPen("contrast",el.dataset.muc);
+HANH_DONG.chonGocVat=el=>setPen("nibAngle",+el.dataset.goc);
+HANH_DONG.batNghiengViet=el=>setPen("tiltOn",el.dataset.bat==="1");
+HANH_DONG.chonLamMin=el=>setPen("stab",+el.dataset.muc);
+HANH_DONG.vietNutThan=el=>setPen("sideBtn",el.dataset.kieu);
+HANH_DONG.vietThanhYeuThich=el=>setPen("favBar",el.dataset.bat==="1");
+HANH_DONG.xoaOVietThu=()=>{demoS=[];demo()};
+HANH_DONG.xacNhanXoaTrang=el=>confirmClearBtn(el);
 function stepEraser(d){S.eraserR=Math.min(36,Math.max(8,Math.round((S.eraserR||16)+d)));saveS();const inp=document.getElementById("eRange"),ev=document.getElementById("ev");if(inp)inp.value=S.eraserR;if(ev)ev.textContent=S.eraserR+"px"}
 function setEraserMode(m){S.eraseMode=["part","stroke","vung"].includes(m)?m:"part";saveS();eraserTap(true)}
 HANH_DONG.kieuGom=el=>setEraserMode(el.dataset.kieu);
@@ -122,12 +145,15 @@ function eraserTap(forceOpen=false){
   document.getElementById("eraserBox").innerHTML=`<h3>Gôm và xóa trang</h3>
   <div class="row"><span>Kiểu xóa</span><div class="seg">${[["part","Xóa từng đoạn"],["stroke","Xóa cả nét"],["vung","Khoanh vùng"]].map(([v,t])=>`<button type="button" class="${S.eraseMode===v?"on":""}" data-action="kieuGom" data-kieu="${v}">${t}</button>`).join("")}</div></div>
   <div class="prog" style="margin-top:6px">${{part:"<b>Xóa từng đoạn</b>: đưa gôm tới đâu xóa tới đó, như cục gôm thật.",stroke:"<b>Xóa cả nét</b>: chạm vào nét nào là xóa trọn nét đó.",vung:"<b>Khoanh vùng</b>: vẽ một vòng quanh chỗ cần xóa, nhấc viết là các nét bên trong được xóa."}[S.eraseMode]||""}</div>
-  <div class="row"><span>Cỡ đầu gôm</span><div class="stepper"><button onclick="stepEraser(-4)">−</button><input id="eRange" type="range" min="8" max="36" step="2" value="${S.eraserR||16}" oninput="S.eraserR=+this.value;saveS();document.getElementById('ev').textContent=this.value+'px'"><button onclick="stepEraser(4)">+</button><b id="ev">${S.eraserR||16}px</b></div></div>
+  <div class="row"><span>Cỡ đầu gôm</span><div class="stepper"><button data-action="tangGiamCoGom" data-buoc="-4">−</button><input id="eRange" type="range" min="8" max="36" step="2" value="${S.eraserR||16}" data-nhap="coGom"><button data-action="tangGiamCoGom" data-buoc="4">+</button><b id="ev">${S.eraserR||16}px</b></div></div>
   <div class="row"><span>Gôm xong tự quay về viết</span><div class="seg"><button type="button" class="${S.gomVeViet?"on":""}" data-action="gomVeViet" data-bat="1">Bật</button><button type="button" class="${S.gomVeViet?"":"on"}" data-action="gomVeViet" data-bat="0">Tắt</button></div></div>
-  <button class="btn danger" onclick="confirmClearBtn(this)">Xóa cả trang</button>
-  <button class="btn primary" onclick="closeSheets()">Xong</button>`;
+  <button class="btn danger" data-action="xacNhanXoaTrang">Xóa cả trang</button>
+  <button class="btn primary" data-action="dongBang">Xong</button>`;
   openSheet("eraserSheet",forceOpen);
 }
+/* Hành động cho bảng gôm */
+HANH_DONG.tangGiamCoGom=el=>stepEraser(+el.dataset.buoc);
+HANH_DONG.coGom=el=>{S.eraserR=+el.value;saveS();document.getElementById("ev").textContent=el.value+"px"};
 let demoS=[];
 function demoInit(){const c=document.getElementById("demo");if(!c)return;const r=c.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,3);
   c.width=r.width*d;c.height=r.height*d;let s=null;
@@ -158,7 +184,7 @@ function openPenTest(calib){
   <canvas id="ptest"></canvas>
   <div style="font-size:13.5px;color:var(--muted)">Lực nhấn hiện tại: <b id="pLbl">0%</b></div><div class="meter"><div id="pBar" style="width:0%"></div></div>
   <div style="font-size:13.5px;color:var(--muted)">Độ nghiêng viết: <b id="tLbl">0°</b></div><div class="meter"><div id="tBar" style="width:0%"></div></div>
-  <div class="kv" id="pres"></div>${calib?`<button class="btn primary" id="calOk" onclick="applyCalib()">Dùng lực tay này</button><button class="btn ghost" onclick="closeSheets()">Hủy</button>`:`<button class="btn primary" onclick="closeSheets()">Đóng</button>`}`;
+  <div class="kv" id="pres"></div>${calib?`<button class="btn primary" id="calOk" data-action="apDungLucTay">Dùng lực tay này</button><button class="btn ghost" data-action="dongBang">Hủy</button>`:`<button class="btn primary" data-action="dongBang">Đóng</button>`}`;
   openSheet("gen");calR=R;
   const c=document.getElementById("ptest"),d=Math.min(devicePixelRatio||1,3),r=c.getBoundingClientRect();c.width=r.width*d;c.height=r.height*d;
   const x=c.getContext("2d");x.setTransform(d,0,0,d,0,0);let last=null,evTimes=[];
@@ -184,6 +210,8 @@ function openPenTest(calib){
     out()};
   const up=()=>{last=null;R.pNow=0;out()};
   c.onpointerdown=e=>{e.preventDefault();try{c.setPointerCapture(e.pointerId)}catch(_){}h(e)};c.onpointermove=h;c.onpointerup=c.onpointercancel=up;out()}
+/* Hành động cho bảng đo lực tay */
+HANH_DONG.apDungLucTay=()=>applyCalib();
 let calR=null;
 function pctl(a,q){const b=a.slice().sort((x,y)=>x-y);return b[Math.min(b.length-1,Math.floor(q*b.length))]}
 function applyCalib(){

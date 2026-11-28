@@ -118,22 +118,32 @@ function renderAnimCtrl(){
     const curI=animState.list.indexOf(animState.ch),hasNext=curI>=0&&curI<animState.list.length-1;
     let h="";
     if(doneAll&&hasNext){
-      h+=`<button class="play" onclick="quizNextChar()">Chữ tiếp theo ›</button>`;
+      h+=`<button class="play" data-action="toChuTiep">Chữ tiếp theo ›</button>`;
     }else{
-      h+=`<button class="play" onclick="quizShowHint()">${ic("play")}Gợi ý nét</button>`;
+      h+=`<button class="play" data-action="goiYNet">${ic("play")}Gợi ý nét</button>`;
     }
-    h+=`<button onclick="quizReset()">${ic("replay")}Tô lại</button>`;
-    h+=`<button id="animZoomBtn" onclick="toggleAnimZoom()">${animState.big?ic("collapse")+"Thu gọn":ic("zbox")+"Phóng to"}</button>`;
+    h+=`<button data-action="toLaiChu">${ic("replay")}Tô lại</button>`;
+    h+=`<button id="animZoomBtn" data-action="phongToVietCham">${animState.big?ic("collapse")+"Thu gọn":ic("zbox")+"Phóng to"}</button>`;
     box.innerHTML=h;return;
   }
   const memOn=!!animState.mem;
-  box.innerHTML=`<button class="${memOn?"":"play"}" id="animPlayBtn" onclick="toggleAnimPlay()">${animState.playing?ic("pause")+"Tạm dừng":ic("play")+"Tiếp tục"}</button>
-    <button id="animSpdBtn" onclick="toggleAnimSpeed()">Tốc độ: ${animState.slow?"Chậm":"Vừa"}</button>
-    <button onclick="initAnim(animState.ch,true)">${ic("replay")}Viết lại</button>
-    <button id="animZoomBtn" onclick="toggleAnimZoom()">${animState.big?ic("collapse")+"Thu gọn":ic("zbox")+"Phóng to"}</button>
-    <button id="animMemBtn" class="${memOn?"play":""}" onclick="toggleAnimMem()">${ic(animState.mem==="hide"?"eye":"eyeoff")}Nhìn rồi tự viết</button>`
-    +(animState.mem==="hide"?`<button onclick="clearAnimMem()">${ic("eraser")}Xóa nét</button>`:"");
+  box.innerHTML=`<button class="${memOn?"":"play"}" id="animPlayBtn" data-action="chayDungVietCham">${animState.playing?ic("pause")+"Tạm dừng":ic("play")+"Tiếp tục"}</button>
+    <button id="animSpdBtn" data-action="tocDoVietCham">Tốc độ: ${animState.slow?"Chậm":"Vừa"}</button>
+    <button data-action="vietLaiMau">${ic("replay")}Viết lại</button>
+    <button id="animZoomBtn" data-action="phongToVietCham">${animState.big?ic("collapse")+"Thu gọn":ic("zbox")+"Phóng to"}</button>
+    <button id="animMemBtn" class="${memOn?"play":""}" data-action="nhinRoiTuViet">${ic(animState.mem==="hide"?"eye":"eyeoff")}Nhìn rồi tự viết</button>`
+    +(animState.mem==="hide"?`<button data-action="xoaNetTuViet">${ic("eraser")}Xóa nét</button>`:"");
 }
+/* Hành động cho thanh điều khiển viết chậm và tự tô */
+HANH_DONG.toChuTiep=()=>quizNextChar();
+HANH_DONG.goiYNet=()=>quizShowHint();
+HANH_DONG.toLaiChu=()=>quizReset();
+HANH_DONG.phongToVietCham=()=>toggleAnimZoom();
+HANH_DONG.chayDungVietCham=()=>toggleAnimPlay();
+HANH_DONG.tocDoVietCham=()=>toggleAnimSpeed();
+HANH_DONG.vietLaiMau=()=>initAnim(animState.ch,true);
+HANH_DONG.nhinRoiTuViet=()=>toggleAnimMem();
+HANH_DONG.xoaNetTuViet=()=>clearAnimMem();
 function resetAnimMem(){animState.mem=false;ANIM_HOLD=ANIM_HOLD_DEF;animState.memStrokes=[];animState.memLive=null;animState.memGeom=null}
 function toggleAnimMem(){
   if(!animState.ch||animState.mode!=="watch")return;

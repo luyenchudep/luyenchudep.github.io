@@ -25,11 +25,11 @@ function khoDangChon(){return pdfOpt.preset==="tunhap"?khoTuNhap(pdfOpt.wMm,pdfO
 /* ================== MÀN TẠO TẬP VIẾT PDF ==================
    Chọn mọi mục của cấu hình vở (docs/KIEN_TRUC.md mục 5.3), rồi tạo PDF hoặc chép đường link.
    Mỗi lần đổi một lựa chọn, màn được vẽ lại từ pdfOpt; ô gõ chữ và ô nhập số ghi thẳng vào pdfOpt khi gõ. */
-function nutChon(ds,dangChon,lenh){return ds.map(([v,t])=>`<button class="${dangChon===v?"on":""}" onclick="${lenh(v)};openPdfModal(true)">${t}</button>`).join("")}
+function nutChon(ds,dangChon,hanhDong){return ds.map(([v,t])=>`<button class="${dangChon===v?"on":""}" data-action="${escHtml(hanhDong)}" data-gt="${typeof v==="boolean"?(v?"1":"0"):escHtml(v)}">${t}</button>`).join("")}
 function chonKhoTuNhap(){pdfOpt.preset="tunhap";if(!pdfOpt.wMm)pdfOpt.wMm=100;if(!pdfOpt.hMm)pdfOpt.hMm=150}
-function datKhoTuNhap(truong,gt){pdfOpt[truong]=Number(gt);const o=document.getElementById("pdfKhoMoTa");if(o){try{const k=khoTuNhap(pdfOpt.wMm,pdfOpt.hMm);o.innerHTML=`<b>${k.name}:</b> ${k.desc}`}catch(e){o.textContent=e.message}}}
-function chonBaiPdfUi(id,co){const s=new Set(pdfOpt.lessons);co?s.add(id):s.delete(id);pdfOpt.lessons=LESSONS.slice(0,NREAL).map(l=>l.id).filter(x=>s.has(x));const o=document.getElementById("pdfSoBai");if(o)o.textContent=`Đã chọn ${pdfOpt.lessons.length} bài`}
-function datChuTuGo(gt){pdfOpt.text=gt.slice(0,TU_GO_TOI_DA);const o=document.getElementById("pdfSoChu");if(o)o.textContent=`${pdfOpt.text.length}/${TU_GO_TOI_DA} ký tự`}
+function datKhoTuNhap(truong,gt){pdfOpt[truong]=Number(gt);const o=document.getElementById("pdfKhoMoTa");if(o){try{const k=khoTuNhap(pdfOpt.wMm,pdfOpt.hMm);o.innerHTML=`<b>${escHtml(k.name)}:</b> ${escHtml(k.desc)}`}catch(e){o.textContent=e.message}}veXemTruocPdf()}
+function chonBaiPdfUi(id,co){const s=new Set(pdfOpt.lessons);co?s.add(id):s.delete(id);pdfOpt.lessons=LESSONS.slice(0,NREAL).map(l=>l.id).filter(x=>s.has(x));const o=document.getElementById("pdfSoBai");if(o)o.textContent=`Đã chọn ${pdfOpt.lessons.length} bài`;veXemTruocPdf()}
+function datChuTuGo(gt){pdfOpt.text=gt.slice(0,TU_GO_TOI_DA);const o=document.getElementById("pdfSoChu");if(o)o.textContent=`${pdfOpt.text.length}/${TU_GO_TOI_DA} ký tự`;veXemTruocPdf()}
 
 function openPdfModal(keepScroll=false){
   if(pdfOpt.busy){toast("Đang tạo PDF — chờ xong rồi đổi tùy chọn");return}
@@ -45,33 +45,45 @@ function openPdfModal(keepScroll=false){
     :nd==="weak"?`Các chữ trong Luyện thêm (${WEAK.length||"chưa có, sẽ lấy Bài ôn"}).`
     :nd==="free"?"Nội dung Bài tự do hoặc Tên riêng đã lưu."
     :"Gõ hoặc dán nội dung cần tập, mỗi dòng một dòng tập.";
-  const dsBai=nd!=="pick"?"":`<div class="pdfDsBai">${COURSE.map(p=>`<details${p.lessons.some(l=>pdfOpt.lessons.includes(l.id))?" open":""}><summary>${escHtml(p.part)}</summary>${p.lessons.map(l=>`<label class="pdfBai"><input type="checkbox" ${pdfOpt.lessons.includes(l.id)?"checked":""} onchange="chonBaiPdfUi('${l.id}',this.checked)"> ${escHtml(l.t)}</label>`).join("")}</details>`).join("")}</div>`;
-  const oTuGo=nd!=="type"?"":`<textarea id="pdfText" class="pdfText" maxlength="${TU_GO_TOI_DA}" placeholder="VD: Học ăn, học nói, học gói, học mở." oninput="datChuTuGo(this.value)">${escHtml(pdfOpt.text)}</textarea><div class="prog" id="pdfSoChu" style="text-align:right">${pdfOpt.text.length}/${TU_GO_TOI_DA} ký tự</div>`;
-  const oKho=pdfOpt.preset!=="tunhap"?"":`<div class="row"><span>Khổ tự nhập (mm)</span><div class="pdfKhoNhap"><input type="number" min="40" max="500" step="0.1" value="${pdfOpt.wMm}" oninput="datKhoTuNhap('wMm',this.value)" aria-label="Rộng (mm)"> × <input type="number" min="40" max="500" step="0.1" value="${pdfOpt.hMm}" oninput="datKhoTuNhap('hMm',this.value)" aria-label="Cao (mm)"></div></div>`;
+  const dsBai=nd!=="pick"?"":`<div class="pdfDsBai">${COURSE.map(p=>`<details${p.lessons.some(l=>pdfOpt.lessons.includes(l.id))?" open":""}><summary>${escHtml(p.part)}</summary>${p.lessons.map(l=>`<label class="pdfBai"><input type="checkbox" ${pdfOpt.lessons.includes(l.id)?"checked":""} data-doi="pdfChonBai" data-id="${escHtml(l.id)}"> ${escHtml(l.t)}</label>`).join("")}</details>`).join("")}</div>`;
+  const oTuGo=nd!=="type"?"":`<textarea id="pdfText" class="pdfText" maxlength="${TU_GO_TOI_DA}" placeholder="VD: Học ăn, học nói, học gói, học mở." data-nhap="pdfTuGo">${escHtml(pdfOpt.text)}</textarea><div class="prog" id="pdfSoChu" style="text-align:right">${pdfOpt.text.length}/${TU_GO_TOI_DA} ký tự</div>`;
+  const oKho=pdfOpt.preset!=="tunhap"?"":`<div class="row"><span>Khổ tự nhập (mm)</span><div class="pdfKhoNhap"><input type="number" min="40" max="500" step="0.1" value="${pdfOpt.wMm}" data-nhap="pdfKhoTuNhap" data-truong="wMm" aria-label="Rộng (mm)"> × <input type="number" min="40" max="500" step="0.1" value="${pdfOpt.hMm}" data-nhap="pdfKhoTuNhap" data-truong="hMm" aria-label="Cao (mm)"></div></div>`;
   document.getElementById("genBox").innerHTML=`<h3>${ic("download")} Tạo tập viết PDF</h3>
   <div class="prog">Tạo tập viết PDF ngay trên máy, không cần mạng. Chọn nội dung và khổ giấy, rồi tạo file hoặc chép đường link để gửi cho người khác.</div>
   <aside class="pdfXem" aria-label="Xem trước trang đầu"><div class="pdfXemKhung"><canvas id="pdfXemCv"></canvas></div><div class="prog" id="pdfXemTxt">Đang dựng trang xem trước…</div></aside>
-  <div class="row"><span>Nội dung</span><div class="seg">${nutChon([["cur","Bài này"],["pick","Chọn bài"],["part","Cả phần"],["all","Cả giáo trình"],["weak","Luyện thêm"],["free","Bài tự do"],["type","Tự gõ"]],nd,v=>`pdfOpt.scope='${v}'`)}</div></div>
+  <div class="row"><span>Nội dung</span><div class="seg">${nutChon([["cur","Bài này"],["pick","Chọn bài"],["part","Cả phần"],["all","Cả giáo trình"],["weak","Luyện thêm"],["free","Bài tự do"],["type","Tự gõ"]],nd,"pdfNoiDung")}</div></div>
   <div class="prog" style="margin:4px 0 8px">${moTaNd}</div>${dsBai}${oTuGo}
-  <div class="row"><span>Khổ giấy hoặc máy</span><select aria-label="Khổ giấy hoặc máy" style="flex:1;min-width:0;max-width:100%;padding:10px 12px;border-radius:12px;border:1px solid currentColor;background:transparent;color:inherit;font:inherit" onchange="if(this.value==='tunhap')chonKhoTuNhap();else pdfOpt.preset=this.value;openPdfModal(true)">${nhomKho().map(([ten,ds])=>`<optgroup label="${ten}">${ds.map(v=>`<option value="${v}"${pdfOpt.preset===v?" selected":""}>${escHtml(KHO_TRANG[v].ten)}</option>`).join("")}</optgroup>`).join("")}<optgroup label="Khác"><option value="tunhap"${pdfOpt.preset==="tunhap"?" selected":""}>Tự nhập kích thước (mm)</option></optgroup></select></div>
+  <div class="row"><span>Khổ giấy hoặc máy</span><select aria-label="Khổ giấy hoặc máy" style="flex:1;min-width:0;max-width:100%;padding:10px 12px;border-radius:12px;border:1px solid currentColor;background:transparent;color:inherit;font:inherit" data-doi="pdfKhoGiay">${nhomKho().map(([ten,ds])=>`<optgroup label="${ten}">${ds.map(v=>`<option value="${v}"${pdfOpt.preset===v?" selected":""}>${escHtml(KHO_TRANG[v].ten)}</option>`).join("")}</optgroup>`).join("")}<optgroup label="Khác"><option value="tunhap"${pdfOpt.preset==="tunhap"?" selected":""}>Tự nhập kích thước (mm)</option></optgroup></select></div>
   ${oKho}<div class="prog" id="pdfKhoMoTa" style="margin:4px 0 8px">${pr?`<b>${escHtml(pr.name)}:</b> ${escHtml(pr.desc)}`:escHtml(loiKho)}</div>
-  <div class="row"><span>Cách tập trên dòng</span><div class="seg">${nutChon([["to","② Tô"],["nho","③ Chép"]],pdfOpt.mode,v=>`pdfOpt.mode='${v}'`)}</div></div>
-  ${SCRIPT==="th"?"":`<div class="row"><span>Kiểu dòng kẻ</span><div class="seg">${nutChon([["french","Lưới xiên Pháp"],["oly4","4 ô li Việt Nam"]],pdfOpt.grid,v=>`pdfOpt.grid='${v}'`)}</div></div>`}
-  <div class="row"><span>Chừa lề thanh công cụ</span><div class="seg">${nutChon([["left","Lề trái (tay phải)"],["right","Lề phải (tay trái)"]],pdfOpt.barSide,v=>`pdfOpt.barSide='${v}'`)}</div></div>
-  <div class="row"><span>Mũi tên thứ tự nét ở chữ mẫu</span><div class="seg">${nutChon([[true,"Bật"],[false,"Tắt"]],pdfOpt.arrows,v=>`pdfOpt.arrows=${v}`)}</div></div>
+  <div class="row"><span>Cách tập trên dòng</span><div class="seg">${nutChon([["to","② Tô"],["nho","③ Chép"]],pdfOpt.mode,"pdfCachTap")}</div></div>
+  ${SCRIPT==="th"?"":`<div class="row"><span>Kiểu dòng kẻ</span><div class="seg">${nutChon([["french","Lưới xiên Pháp"],["oly4","4 ô li Việt Nam"]],pdfOpt.grid,"pdfDongKe")}</div></div>`}
+  <div class="row"><span>Chừa lề thanh công cụ</span><div class="seg">${nutChon([["left","Lề trái (tay phải)"],["right","Lề phải (tay trái)"]],pdfOpt.barSide,"pdfLeCongCu")}</div></div>
+  <div class="row"><span>Mũi tên thứ tự nét ở chữ mẫu</span><div class="seg">${nutChon([[true,"Bật"],[false,"Tắt"]],pdfOpt.arrows,"pdfMuiTen")}</div></div>
   <div id="pdfProg" class="prog" style="display:none;color:var(--accent);font-weight:700;margin-top:8px"></div>
-  <button class="btn primary" id="pdfGoBtn" onclick="generateWorkbookPdf()">${ic("download")}Tạo và tải file PDF</button>
-  <button class="btn ghost" onclick="chepLinkCfg()">Chép đường link cấu hình này</button>
-  <button class="btn ghost" onclick="closeSheets()">Đóng</button>`;
+  <button class="btn primary" id="pdfGoBtn" data-action="taoPdf">${ic("download")}Tạo và tải file PDF</button>
+  <button class="btn ghost" data-action="chepLinkPdf">Chép đường link cấu hình này</button>
+  <button class="btn ghost" data-action="dongBang">Đóng</button>`;
   openSheet("gen",keepScroll);
   veXemTruocPdf();
 }
+/* Hành động cho màn tạo tập viết PDF */
+HANH_DONG.pdfNoiDung=el=>{pdfOpt.scope=el.dataset.gt;openPdfModal(true)};
+HANH_DONG.pdfCachTap=el=>{pdfOpt.mode=el.dataset.gt;openPdfModal(true)};
+HANH_DONG.pdfDongKe=el=>{pdfOpt.grid=el.dataset.gt;openPdfModal(true)};
+HANH_DONG.pdfLeCongCu=el=>{pdfOpt.barSide=el.dataset.gt;openPdfModal(true)};
+HANH_DONG.pdfMuiTen=el=>{pdfOpt.arrows=el.dataset.gt==="1";openPdfModal(true)};
+HANH_DONG.pdfChonBai=el=>chonBaiPdfUi(el.dataset.id,el.checked);
+HANH_DONG.pdfTuGo=el=>datChuTuGo(el.value);
+HANH_DONG.pdfKhoTuNhap=el=>datKhoTuNhap(el.dataset.truong,el.value);
+HANH_DONG.pdfKhoGiay=el=>{if(el.value==="tunhap")chonKhoTuNhap();else pdfOpt.preset=el.value;openPdfModal(true)};
+HANH_DONG.taoPdf=()=>generateWorkbookPdf();
+HANH_DONG.chepLinkPdf=()=>chepLinkCfg();
 /* Xem trước trang nội dung đầu tiên (không tạo file) */
 let _xemPdfLan=0;
 async function veXemTruocPdf(){
   const lan=++_xemPdfLan,cv=document.getElementById("pdfXemCv"),txt=document.getElementById("pdfXemTxt");if(!cv)return;
-  await new Promise(r=>setTimeout(r,60));if(lan!==_xemPdfLan||pdfBusyFlag)return;
+  await new Promise(r=>setTimeout(r,220));if(lan!==_xemPdfLan)return;   /* chờ ngừng gõ; đang tạo PDF thì exportPdf tự xếp hàng chạy sau */
   try{const r=await exportPdf(pdfCfgTuManHinh(),{xemTruoc:(w,h)=>{cv.width=w;cv.height=h;return cv.getContext("2d")}});
-    if(lan===_xemPdfLan&&txt)txt.textContent=r&&r.xemTruoc?`${r.tenKho} · trang đầu trong ${r.soTrang} trang`:"";}
+    if(lan===_xemPdfLan&&txt)txt.textContent=!r||!r.xemTruoc?"":r.soBai>1?`${r.tenKho} · trang đầu của bài 1 trong ${r.soBai} bài (trang 1 là mục lục)`:`${r.tenKho} · trang đầu trong ${r.soTrang} trang`;}
   catch(e){if(lan===_xemPdfLan&&txt)txt.textContent="Chưa xem trước được: "+e.message}
 }

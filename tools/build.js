@@ -52,7 +52,33 @@ function gop() {
     }
   })(SRC);
   if (conLai.length) throw new Error('Có file trong src/ chưa được gộp: ' + conLai.join(', '));
-  return ra;
+  return ganCsp(ra);
+}
+
+/* Chính sách bảo mật nội dung (CSP): chỉ cho chạy đúng khối <script> của app, nhận ra bằng mã băm SHA-256.
+   Mã chèn vào trang (VD qua link hay file sao lưu bị sửa) không chạy được, kể cả thuộc tính on…=.
+   Style vẫn cho phép viết trực tiếp vì app dùng nhiều style="…" có giá trị tính lúc chạy; CSS không chạy được mã. */
+function ganCsp(ra) {
+  const CHO = '<!-- @csp -->\n';
+  if (ra.split(CHO).length !== 2) throw new Error('Khuôn src/app.html phải có đúng một dòng <!-- @csp --> trong <head>');
+  const khoi = [...ra.matchAll(/<script>([\s\S]*?)<\/script>/g)];
+  if (khoi.length !== 1 || ra.split('<script').length !== 2) throw new Error('App phải có đúng một khối <script> (để tính mã băm CSP)');
+  const bam = require('crypto').createHash('sha256').update(khoi[0][1], 'utf8').digest('base64');
+  const csp = [
+    "default-src 'none'",
+    `script-src 'sha256-${bam}'`,
+    "style-src 'unsafe-inline'",
+    'font-src data:',
+    'img-src data: blob:',
+    'manifest-src data:',
+    "connect-src 'none'",
+    "object-src 'none'",
+    "base-uri 'none'",
+    "form-action 'none'",
+    "frame-src 'none'",
+    "worker-src 'none'",
+  ].join('; ');
+  return ra.replace(CHO, `<meta http-equiv="Content-Security-Policy" content="${csp}">\n`);
 }
 
 try {
