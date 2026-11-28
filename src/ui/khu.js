@@ -60,12 +60,18 @@ DT_DOC.addEventListener("change", () => { datCongCu(); setTimeout(resize, 30); }
 
 /* Ngăn kéo Xem (màn rộng): nổi đè lên trang viết, không làm hẹp trang; tự đóng khi đặt viết xuống trang; ghim được */
 const laManRong = () => document.body.classList.contains("split");
-function moNganXem(mo) { document.body.classList.toggle("xemMo", mo); if (mo) renderSidePane(); }
+function moNganXem(mo) {
+  const truoc = document.body.classList.contains("xemMo");
+  document.body.classList.toggle("xemMo", mo); if (mo) renderSidePane();
+  const x = document.getElementById("mXem"); if (x) x.classList.toggle("on", mo);
+  if (S.xemGhim && truoc !== mo) setTimeout(resize, 30);   /* bảng ghim nằm cạnh trang nên trang đổi bề ngang */
+}
 HANH_DONG.moXem = () => {
   if (!laManRong()) { openCard(); return; }
-  if (S.xemGhim) { renderSidePane(); return; }
   moNganXem(!document.body.classList.contains("xemMo"));
 };
+/* Chọn Tô hay Chép thì đóng bảng Xem */
+{ const datCheDoCu = setMode; setMode = function (...a) { moNganXem(false); return datCheDoCu.apply(this, a); }; }
 HANH_DONG.dongXem = () => { if (S.xemGhim) { S.xemGhim = false; saveS(); apGhimXem(); } moNganXem(false); };
 HANH_DONG.ghimXem = () => { S.xemGhim = !S.xemGhim; saveS(); apGhimXem(); if (S.xemGhim) moNganXem(true); };
 function apGhimXem() {

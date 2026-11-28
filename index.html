@@ -749,6 +749,15 @@ body.eink.congCuNoi footer{box-shadow:none;border:2px solid #000}
 body.tapTrung #thoatTT{display:inline-flex}
 body.tapTrung header,body.tapTrung #navKhu,body.tapTrung #navMo,body.tapTrung #sidePane{display:none!important}
 #sideTabs[hidden]{display:none}
+
+/* Bảng Xem chỉ hiện khi đang mở (chọn Xem); ghim chỉ quyết định nằm cạnh hay nổi đè lên trang */
+@media (min-width:860px){ body.split.xemGhim:not(.xemMo) #sidePane{display:none} }
+/* Bảng Xem đang mở thì ẩn thanh công cụ nổi cho khỏi che bảng (đặt viết xuống trang là bảng tự đóng) */
+body.xemMo.congCuNoi footer{display:none}
+/* Đang mở bảng Xem thì chỉ nút Xem sáng */
+body.xemMo #modes button.on:not(#mXem){background:transparent;color:var(--muted);box-shadow:none}
+body.xemMo #modes button.on:not(#mXem) .n{border-color:currentColor;color:inherit;background:transparent}
+body.xemMo #navMo{display:none}
 </style>
 </head>
 <body>
@@ -11018,12 +11027,18 @@ DT_DOC.addEventListener("change", () => { datCongCu(); setTimeout(resize, 30); }
 
 /* Ngăn kéo Xem (màn rộng): nổi đè lên trang viết, không làm hẹp trang; tự đóng khi đặt viết xuống trang; ghim được */
 const laManRong = () => document.body.classList.contains("split");
-function moNganXem(mo) { document.body.classList.toggle("xemMo", mo); if (mo) renderSidePane(); }
+function moNganXem(mo) {
+  const truoc = document.body.classList.contains("xemMo");
+  document.body.classList.toggle("xemMo", mo); if (mo) renderSidePane();
+  const x = document.getElementById("mXem"); if (x) x.classList.toggle("on", mo);
+  if (S.xemGhim && truoc !== mo) setTimeout(resize, 30);   /* bảng ghim nằm cạnh trang nên trang đổi bề ngang */
+}
 HANH_DONG.moXem = () => {
   if (!laManRong()) { openCard(); return; }
-  if (S.xemGhim) { renderSidePane(); return; }
   moNganXem(!document.body.classList.contains("xemMo"));
 };
+/* Chọn Tô hay Chép thì đóng bảng Xem */
+{ const datCheDoCu = setMode; setMode = function (...a) { moNganXem(false); return datCheDoCu.apply(this, a); }; }
 HANH_DONG.dongXem = () => { if (S.xemGhim) { S.xemGhim = false; saveS(); apGhimXem(); } moNganXem(false); };
 HANH_DONG.ghimXem = () => { S.xemGhim = !S.xemGhim; saveS(); apGhimXem(); if (S.xemGhim) moNganXem(true); };
 function apGhimXem() {

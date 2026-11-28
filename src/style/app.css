@@ -718,3 +718,12 @@ body.eink.congCuNoi footer{box-shadow:none;border:2px solid #000}
 body.tapTrung #thoatTT{display:inline-flex}
 body.tapTrung header,body.tapTrung #navKhu,body.tapTrung #navMo,body.tapTrung #sidePane{display:none!important}
 #sideTabs[hidden]{display:none}
+
+/* Bảng Xem chỉ hiện khi đang mở (chọn Xem); ghim chỉ quyết định nằm cạnh hay nổi đè lên trang */
+@media (min-width:860px){ body.split.xemGhim:not(.xemMo) #sidePane{display:none} }
+/* Bảng Xem đang mở thì ẩn thanh công cụ nổi cho khỏi che bảng (đặt viết xuống trang là bảng tự đóng) */
+body.xemMo.congCuNoi footer{display:none}
+/* Đang mở bảng Xem thì chỉ nút Xem sáng */
+body.xemMo #modes button.on:not(#mXem){background:transparent;color:var(--muted);box-shadow:none}
+body.xemMo #modes button.on:not(#mXem) .n{border-color:currentColor;color:inherit;background:transparent}
+body.xemMo #navMo{display:none}
