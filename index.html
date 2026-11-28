@@ -8493,6 +8493,8 @@ function xuLyGom(){
   }
   if(changed){strokes=next;if(live)live.changed=true;if(typeof zbox!=="undefined"&&zbox.live)zbox.live.changed=true;renderInk()}
 }
+/* Chốt mọi thao tác đang dở (nét đang viết, gôm đang kéo, điểm gôm còn chờ) trước khi đổi trang */
+function chotThaoTac(){if(live)endStroke();if(typeof zbox!=="undefined"&&zbox.live)endZBoxStroke();if(gomHen||gomCho.length)gomXong();gomTruoc=null}
 /* Gôm hết các điểm còn chờ ngay (gọi khi nhấc viết) */
 function gomXong(){if(gomHen){cancelAnimationFrame(gomHen);gomHen=0}xuLyGom();gomTruoc=null}
 /* Khoanh vùng để xóa: nét có từ một nửa số điểm trở lên nằm trong vòng khoanh thì bị xóa */
@@ -8867,6 +8869,7 @@ function applySplit(){
 }
 function renderSidePane(){
   if(!document.body.classList.contains("split"))return;
+  const pane=document.getElementById("sidePane");if(!pane||pane.offsetWidth<120)return;   /* bảng đang ẩn: không vẽ */
   const box=document.getElementById("sideBody");if(!box)return;
   if(sideTab==="list"){
     let h=`<div class="row" style="border:0;padding:4px 0 8px"><span>Kiểu chữ</span><div class="seg">${DS_KIEU_CHU.map(([v,t,m])=>[v,t.replace(" 10°",""),m]).map(([v,t,m])=>`<button class="${SCRIPT===v?"on":""}" title="${m||t}" onclick="setScript('${v}')">${t}</button>`).join("")}</div></div>`;
@@ -8960,7 +8963,7 @@ function leaveCard(m){
   const key=t||pageItemOf(pages,cur.page);
   if(!(key&&jumpToItem(key,m)))setMode(m);
 }
-function setMode(m){
+function setMode(m){chotThaoTac();
   if(m!==cur.mode&&pages.length){const key=pageItemOf(pages,cur.page);
     if(key){const r=computePages(LESSONS[cur.li],m,S.scale,H,0,false),pi=findItemPage(r.pages,key);if(pi>=0)cur.page=pi}}
   flushSave();cur.mode=m;comparing=false;show();if(m==="nho")toast(LESSONS[cur.li].id==="review"?"Viết theo trí nhớ · xong chạm So sánh":"Nhìn mẫu đầu dòng rồi chép tiếp · xong chạm So sánh")}
@@ -9028,7 +9031,7 @@ function show(){
   requestAnimationFrame(()=>{const rh=document.querySelector("header").offsetHeight;if(Math.abs(rh-lastHeader)>2){lastHeader=rh;resize()}});
 }
 let lastHeader=0;
-function go(d){
+function go(d){chotThaoTac();
   flushSave();
   const last=NREAL-1,l=LESSONS[cur.li];comparing=false;
   if(d>0){if(cur.page<pages.length-1)cur.page++;
@@ -9037,7 +9040,7 @@ function go(d){
   else{if(cur.page>0)cur.page--;else if(cur.li>0&&cur.li<=last){cur.li--;cur.page=9999}else return}
   show();
 }
-function openLesson(i,mode){flushSave();if(LESSONS[i].id==="review")buildReview(true);if(LESSONS[i].id==="luyen"){luyenRounds=1;buildLuyen(true)}
+function openLesson(i,mode){chotThaoTac();flushSave();if(LESSONS[i].id==="review")buildReview(true);if(LESSONS[i].id==="luyen"){luyenRounds=1;buildLuyen(true)}
   let md=mode||(LESSONS[i].id==="review"?"nho":"to"),pg0=0,resumeKey=null;
   const q=POS[LESSONS[i].id];
   if(!mode&&q&&i<NREAL&&!done.has(LESSONS[i].id)){md=q.m||"to";
@@ -9312,6 +9315,7 @@ function cardItems(l){
     if(out.length>=3)break}
   return out}
 function drawCard(cv,items,fam){
+  if(!cv.parentElement||cv.parentElement.clientWidth<80)return;   /* khung đang ẩn hoặc quá hẹp: không vẽ */
   const Wc=cv.parentElement.clientWidth-2,d=Math.min(devicePixelRatio||1,3),F=FONTS[fam||SC.font],th=SCRIPT==="th";
   let xh=Math.min(44,Wc/7.5);
   /* Tiểu học: từ dài (tên riêng) thì thu nhỏ cho vừa khung; có chữ hoa thì dòng cao hơn cho dấu mũ, dấu thanh */
@@ -10699,7 +10703,13 @@ function chonBaiPdf(c) {
   return [LESSONS.find(l => l.id === "free") || LESSONS[0]];   // "tudo"
 }
 
-async function exportPdf(cfg, tuyChon = {}) {
+let _hangPdf = Promise.resolve();
+function exportPdf(cfg, tuyChon = {}) {
+  const lan = _hangPdf.then(() => exportPdfMot(cfg, tuyChon));
+  _hangPdf = lan.catch(() => {});
+  return lan;
+}
+async function exportPdfMot(cfg, tuyChon = {}) {
   const c = chuanHoaPdfCfg(cfg);
   const baoTienDo = typeof tuyChon.onProgress === "function" ? tuyChon.onProgress : () => {};
   pdfBusyFlag = true; exporting = true;

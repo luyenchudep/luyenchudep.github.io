@@ -74,7 +74,13 @@ function chonBaiPdf(c) {
   return [LESSONS.find(l => l.id === "free") || LESSONS[0]];   // "tudo"
 }
 
-async function exportPdf(cfg, tuyChon = {}) {
+let _hangPdf = Promise.resolve();
+function exportPdf(cfg, tuyChon = {}) {
+  const lan = _hangPdf.then(() => exportPdfMot(cfg, tuyChon));
+  _hangPdf = lan.catch(() => {});
+  return lan;
+}
+async function exportPdfMot(cfg, tuyChon = {}) {
   const c = chuanHoaPdfCfg(cfg);
   const baoTienDo = typeof tuyChon.onProgress === "function" ? tuyChon.onProgress : () => {};
   pdfBusyFlag = true; exporting = true;

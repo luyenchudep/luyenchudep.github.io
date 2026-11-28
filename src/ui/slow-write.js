@@ -14,6 +14,7 @@ function cardItems(l){
     if(out.length>=3)break}
   return out}
 function drawCard(cv,items,fam){
+  if(!cv.parentElement||cv.parentElement.clientWidth<80)return;   /* khung đang ẩn hoặc quá hẹp: không vẽ */
   const Wc=cv.parentElement.clientWidth-2,d=Math.min(devicePixelRatio||1,3),F=FONTS[fam||SC.font],th=SCRIPT==="th";
   let xh=Math.min(44,Wc/7.5);
   /* Tiểu học: từ dài (tên riêng) thì thu nhỏ cho vừa khung; có chữ hoa thì dòng cao hơn cho dấu mũ, dấu thanh */
