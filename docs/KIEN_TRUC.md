@@ -1,6 +1,6 @@
 # Kiến trúc và kế hoạch phát triển ứng dụng Tập viết S Pen
 
-Bản tài liệu 0.6 · Cập nhật 27/11/2026 · Áp dụng cho mã nguồn từ bản 0.12.0
+Bản tài liệu 0.7 · Cập nhật 29/11/2026 · Áp dụng cho mã nguồn từ bản 0.13.0
 
 Tài liệu này mô tả ứng dụng được tổ chức thế nào, dữ liệu nằm ở đâu, và các bản sắp tới sẽ làm gì. Ai muốn góp ý hay góp mã thì đọc tài liệu này trước.
 
@@ -204,7 +204,7 @@ Chưa làm: `ghichep`, `font`, `z`, `gray`, `a5x2`. Trường `links` chưa đ�
 - Mở link: nếu kiểu chữ trong link khác kiểu đang mở thì đổi kiểu rồi tải lại trang (giữ link); sau đó mở đúng bài, mở màn Xuất PDF đã điền sẵn tùy chọn, rồi xóa phần `#cfg=` khỏi thanh địa chỉ. Link hỏng hoặc cấu hình sai thì báo bằng lời dễ hiểu, app vẫn mở bình thường.
 - Màn **Tạo tập viết PDF** (thay màn Xuất PDF cũ, `openPdfModal` trong `src/engine/pdf-export.js`) chọn được: nội dung (Bài này, Chọn bài, Cả phần, Cả giáo trình, Luyện thêm, Bài tự do, Tự gõ), khổ giấy (6 khổ có sẵn và Tự nhập theo mm), Tô hay Chép, kiểu dòng kẻ, lề thanh công cụ, mũi tên. Có nút tạo PDF và nút chép đường link.
 
-### 5.4. Phông chữ của người dùng (bản 0.13)
+### 5.4. Phông chữ của người dùng (bản 0.14)
 
 | Mục | Cách làm |
 |---|---|
@@ -276,8 +276,10 @@ src/
   ui/trace-quiz.js         // tự tô từng nét
   ui/pen.js                // viết S Pen, viết yêu thích, kiểm tra S Pen
   ui/float-bar.js          // bảng nổi
+font/                      // font Sao Mai Tập Viết (.ttf nét liền, nét đứt), mau.html, README.md, OFL.txt
 tools/build.js             // gộp src/ thành index.html (--check để kiểm)
-tools/kiem-tieuhoc.js      // 10 phép kiểm dữ liệu, bộ vẽ và nối chữ Tiểu học
+tools/kiem-tieuhoc.js      // 13 phép kiểm dữ liệu, chữ hoa, bộ vẽ và độ mượt chỗ nối Sao Mai
+tools/font/sinh-font.js    // sinh hai file font Sao Mai Tập Viết từ dữ liệu nét trong src/data/scripts-th.js
 index.html                 // tệp phát hành, chạy được không cần mạng; không sửa tay
 ```
 
@@ -296,13 +298,15 @@ Người dùng vẫn nhận **một tệp HTML** như hiện nay.
 | | Màn Tạo vở mới, có ô tự gõ nội dung | Mọi mục của `cfg` đều chọn được |
 | **0.12** *(đã xong)* | Ghép giáo trình Tiểu học vào ứng dụng, chọn ngang hàng Thanh đậm và Nét đều 10° | Tô theo nét đứt, xuất tập viết PDF 4 ô li đúng mm |
 | | Xem viết chậm, Tự tô từng nét, cỡ Thường và cỡ Nhỏ, nối chữ cho Tiểu học | Chữ nối đúng mẫu; 1 ô li in ra đúng 2 mm |
-| **0.13** | Chữ hoa cho kiểu Tiểu học | Đủ bảng chữ hoa tiểu học, tô theo nét đứt |
-| | Phông chữ của người dùng | Phông đủ dấu xuất PDF đúng; phông thiếu dấu được báo |
-| | Vẽ thêm khuyết trên cho l, h, k ở chữ thanh đậm | Chữ mẫu đúng kiểu viết thanh đậm truyền thống |
-| | Trang kiểm tra; kiểu dòng kẻ trơn, kẻ chấm | Đạt danh sách kiểm tra ở mục 10 |
-| | In 2 trang A5 trên 1 tờ A4 | Cắt đôi ra đúng khổ A5 |
-| | Mời người dùng thử trên reMarkable, Boox, iPad | Thu được số đo thật và độ xám phù hợp |
-| **0.14** | Màn Trang ghi chép (dòng kẻ, kẻ chấm, Cornell) | Đạt mục 10 trên cả 5 khổ |
+| **0.13** *(đã xong)* | Chữ hoa Sao Mai Tập Viết (29 chữ hoa, 8 nét cơ bản, 16 bài mới, bước dòng 12 ô li) | Đủ bảng chữ hoa tiểu học, tô theo nét đứt, không cắt dấu |
+| | Nối chữ mượt như viết tay, khoảng hở lia viết tùy cặp chữ, sửa dáng chữ thường và chữ hoa sát mẫu | 13/13 phép kiểm đạt, nét nối liền mạch |
+| | Font Sao Mai Tập Viết (hai bản nét liền và nét đứt, giấy phép SIL OFL 1.1, Việt hóa đầy đủ) | Dùng được trong Word, LibreOffice, Canva; đủ 240 ký tự |
+| | Thêm 13 khổ trang cho máy đọc sách (BOOX, Kindle Scribe, Supernote), máy tính bảng (iPad, Galaxy Tab) và giấy B5, Letter | Mở vừa màn hình giữ đúng 1 ô li = 2 mm |
+| | Nút "Nhìn rồi tự viết" trong Xem viết chậm ở cả ba kiểu chữ | Ẩn chữ mẫu sau 2 giây để tự viết theo trí nhớ |
+| **0.14** | Vẽ thêm khuyết trên cho l, h, k ở chữ thanh đậm | Chữ mẫu đúng kiểu viết thanh đậm truyền thống |
+| | Nạp font của người dùng (.ttf, .otf) | Font đủ dấu xuất tập viết PDF đúng; font thiếu dấu được báo |
+| | Trang ghi chép (kẻ dòng, kẻ chấm, kiểu Cornell) | Đạt danh sách kiểm tra ở mục 10 trên các khổ chuẩn |
+| | Trang kiểm tra; in 2 trang A5 trên 1 tờ A4; thử trên reMarkable, Boox, iPad | Đạt mục 10, cắt đôi đúng khổ A5 |
 | **1.0** | GitHub tự tạo bộ vở làm sẵn, trang cuối có link và mã QR | Releases có đủ tệp, đúng tên |
 | | Hướng dẫn dùng cho từng loại máy | |
 

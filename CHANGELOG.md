@@ -1,5 +1,62 @@
 # Những thay đổi qua từng bản
 
+## Bản 0.13.0 (29/11/2026): chữ hoa và font Sao Mai Tập Viết, nối chữ mượt, thêm 13 khổ máy
+
+Kiểu chữ tiểu học từ bản này mang tên **Sao Mai Tập Viết** (nút chọn trong ứng dụng ghi **Sao Mai**), bổ sung đủ **29 chữ hoa** cùng giáo trình 16 bài mới, nối chữ mượt như viết tay, thêm **13 khổ trang** cho máy đọc sách và máy tính bảng, đồng thời phát hành kèm bộ **font Sao Mai Tập Viết** miễn phí để dùng trong Word và các phần mềm soạn thảo.
+
+### Chữ hoa Sao Mai Tập Viết và 16 bài học mới
+
+- **Đủ 29 chữ hoa** theo mẫu chữ viết trong trường tiểu học (`A Ă Â B C D Đ E Ê G H I K L M N O Ô Ơ P Q R S T U Ư V X Y`), cao 5 ô li (riêng *G, Y* có nét khuyết dưới kéo xuống thêm 3 ô li), tách đúng thứ tự nét như sách mẫu; kèm **8 nét cơ bản của chữ hoa** (nét lượn ngang, nét lượn dọc, nét cong trên, nét cong dưới, nét móc ngược trái, nét móc ngược lên, nét móc xuôi phải, nét móc hai đầu của chữ hoa).
+- **Giáo trình Sao Mai Tập Viết tăng lên 48 bài, 11 phần** (tổng cộng 130 bài trên cả ba kiểu chữ), thêm 2 phần mới trước Bài tự do:
+  - **Phần 9 · Chữ hoa (13 bài):** 1 bài luyện 8 nét cơ bản của chữ hoa và 12 bài dạy 29 chữ hoa theo thứ tự bảng chữ cái A → Y (chữ có dấu phụ học chung với chữ gốc). Mỗi bài có dòng tập chữ hoa, dòng tên riêng (VD *Cà Mau, Hà Nội*) và một câu ứng dụng tục ngữ, ca dao quen thuộc.
+  - **Phần 10 · Chữ hoa cỡ Nhỏ (3 bài):** ôn chữ hoa cỡ Nhỏ kèm câu ứng dụng.
+  - Mỗi bài đều có **Sổ tay** ghi điểm đặt viết, thứ tự nét, chỗ viết liền, chỗ lia viết, điểm dừng viết và lỗi hay gặp.
+- **Dòng tập và khung hiển thị chừa đủ chỗ cho chữ hoa:** bài có chữ hoa tự tăng bước dòng lên **12 ô li** ở cỡ Thường (8 ô li trên đường chân, 4 ô li dưới) và **8 ô li** ở cỡ Nhỏ — áp dụng cả trên màn hình lẫn tập viết PDF — nên chữ hoa có dấu mũ kèm dấu thanh (VD *Ẩ, Ổ*) và nét khuyết dưới của *G, Y* không chạm dòng kế hay bị cắt. Đường chân vẫn nằm trên đường kẻ đậm như vở; bài chỉ có chữ thường giữ nguyên dòng cũ.
+- **Dấu thanh trên chữ hoa** đặt đúng giữa nguyên âm, có đủ mũi tên, số thứ tự nét, **Xem viết chậm** và **Tự tô từng nét**. Nét viết của dấu trên chữ hoa được gán đúng dòng khi đổi cỡ hay qua trang, chấm điểm hình dáng tính đúng dòng. **Hộp viết phóng to** canh giữa dải dòng, không còn cắt dấu; **bảng Xem** tăng chiều cao dòng và tự thu nhỏ tên riêng dài cho vừa khung.
+- **Dòng tập một chữ hoa chỉ lặp 4 chữ** để viết kỹ, đỡ mỏi tay.
+- **Sửa dáng các chữ hoa sát mẫu:** *A, Ă, Â* đặt viết ở đường kẻ 3; gạch ngang của *Đ* nằm đúng đường kẻ 3; vòng xoắn đầu chữ *T* nhỏ gọn gần giữa; chân chữ *Q* võng xuống chạm đường chân rồi mới hất lên; vòng xoắn giữa thân *B, R* chạm vào thân nét 1.
+- *Lưu ý:* Phần **Tự do** dời từ vị trí thứ 9 xuống cuối (Phần 11). Nội dung đã gõ ở Bài tự do vẫn còn nguyên; nếu trước đó đang mở Bài tự do ở kiểu Sao Mai thì lần mở tới ứng dụng sẽ vào bài đầu của phần Chữ hoa.
+
+### Nối chữ mượt, chỉnh dáng chữ thường và đổi tên thành Sao Mai Tập Viết
+
+- **Nối chữ mượt như viết tay:** khi hai chữ nối liền trong một tiếng, ứng dụng bỏ đoạn hất cuối của nét móc ở chữ trước và đoạn mở đầu thừa ở chữ sau (nét hất, đoạn đưa lên trước vòng khuyết, đầu nét móc xuôi), thay bằng một đường cong liền mạch, đúng hướng nét ở hai đầu và luôn đi tới. Các tiếng như *khế, tre, chim, tu, mẹ* viết liền một nhịp trên cả dòng mẫu, dòng Tô lẫn tập viết PDF.
+- **Khoảng hở khi lia viết tùy cặp chữ:** đo giữa mép mực hai chữ theo tài liệu dạy tập viết — hai nét cong gặp nhau (*oa, oc, oo*) hở 0,25 thân chữ, các cặp còn lại (*on, no, ba, ca…*) hở 0,33 thân chữ, nhìn đều và thoáng hơn.
+- **Sửa dáng nhiều chữ thường và chữ số sát mẫu tiểu học:** *t* bỏ chóp nhọn bên trái thân; *r, s* có vòng xoắn nhỏ ở đỉnh (*r* đặt viết ở đường kẻ 2); *e, ê* đặt viết gần đường chân tạo vòng khuyết kiểu viết tay; *k* có vòng xoắn nhỏ ở giữa thân; *b, h, k, l* đặt viết đúng đường kẻ 2; *u, ư, y* chạm thân rồi rê thẳng lên không còn chóp nhỏ; dấu râu của *ơ, ư* gắn vào lưng chữ, làm lớn và rõ hơn; gạch ngang của *đ* nằm đúng đường kẻ 4; chữ số *1, 4* đặt viết đúng đường kẻ.
+- **Thêm `f, j, w, z` (thường và hoa), dấu câu và ký hiệu thường dùng** khi tự gõ ở kiểu Sao Mai.
+- **Đổi tên kiểu chữ:** kiểu "Tiểu học" nay là **Sao Mai Tập Viết** (nút chọn trong Danh mục và khung chia đôi màn hình ghi **Sao Mai**). Bài đang học, tiến độ và đường link cấu hình đã chia sẻ trước đây không bị ảnh hưởng.
+
+### Bộ font Sao Mai Tập Viết miễn phí (dùng trong Word, LibreOffice, Canva)
+
+- Phát hành kèm **hai file font** trong thư mục `font/` và đính kèm ở mục **Releases**, lấy đúng hình chữ từ dữ liệu nét trong ứng dụng:
+  - **Sao Mai Tap Viet** (`SaoMaiTapViet-Regular.ttf`, 86 KB): bản **nét liền**, dùng cho chữ mẫu, tiêu đề, dòng nhìn chép.
+  - **Sao Mai Tap Viet Net Dut** (`SaoMaiTapVietNetDut-Regular.ttf`, 267 KB): bản **nét đứt**, dùng cho các dòng tô theo.
+- **Việt hóa đầy đủ (240 ký tự mỗi bản):** đủ 29 chữ thường, 29 chữ hoa, 10 chữ số, toàn bộ nguyên âm có dấu thanh (thường và hoa), thêm `f, j, w, z` (thường và hoa), dấu câu và ký hiệu thường dùng. Khai báo hỗ trợ tiếng Việt với hệ điều hành (trang mã 1258) nên Word không tự đổi font ở chữ có dấu; hỗ trợ cả **Unicode dựng sẵn** lẫn **Unicode tổ hợp** (tự ghép 192 cụm chữ và dấu khi gõ bằng Unikey, EVKey hay bàn phím điện thoại).
+- Kèm hướng dẫn cài đặt trên Windows, macOS, iPad, Android và cỡ chữ chuẩn để in ra 1 ô li = 2 mm trong Word (`35,4 pt` cỡ Thường, `17,7 pt` cỡ Nhỏ) tại `font/README.md`, trang xem mẫu và gõ thử trên nền 4 ô li `font/mau.html`, cùng toàn văn giấy phép mở **SIL Open Font License 1.1** (`font/OFL.txt` — dùng, chia sẻ, sửa và nhúng vào tài liệu miễn phí).
+
+### Thêm 13 khổ máy đọc sách, máy tính bảng và cải tiến cách học
+
+- **13 khổ trang mới cho tập viết PDF**, khớp kích thước thật của màn hình và khổ giấy phổ biến để khi mở vừa màn hình, 1 ô li vẫn là 2 mm:
+  - *Máy đọc sách:* BOOX 10,3" (Go 10.3, Note Air), BOOX 13,3" (Note Max, Tab X C), BOOX 7" (Go 7, Go Color 7), Kindle Scribe 10,2" (2022, 2024), Kindle Scribe 11" (2025, Colorsoft), Supernote Manta, Supernote Nomad.
+  - *Máy tính bảng:* iPad 11", iPad 13", Galaxy Tab 11" (Tab S9, S11), Galaxy Tab Ultra 14,6".
+  - *Giấy in:* B5 (182×257 mm), Letter (215,9×279,4 mm).
+- Màn **Tạo tập viết PDF** đổi phần chọn khổ thành **danh sách thả xuống chia theo nhóm** (Giấy in, Máy đọc sách, Máy tính bảng, Khác – Tự nhập) cho gọn và dễ dò. Các khổ cũ giữ nguyên mã nên đường link cấu hình đã chia sẻ trước đây vẫn mở đúng.
+- **Nút "Nhìn rồi tự viết" trong Xem viết chậm** (có ở cả ba kiểu chữ): chữ mẫu chạy chậm như thường, giữ trên màn hình 2 giây kèm mũi tên rồi ẩn đi, chỉ còn lưới ô li để bạn tự viết theo trí nhớ ngay trên khung đó (có nút Xóa nét; bấm nút lần nữa để xem lại chữ mẫu).
+- **Mục "Luyện thêm" khi chưa có chữ nào:** lời hướng dẫn hiện trong khung canh giữa trang cho dễ thấy.
+- **Luyện tên riêng với kiểu Sao Mai:** dùng một dấu cách giữa các lần lặp tên thay vì ba dấu cách, tránh khoảng trống quá rộng.
+- Hai kiểu **Thanh đậm** và **Nét đều 10°** giữ nguyên dòng tập và tập viết PDF; chỉ thêm nút "Nhìn rồi tự viết" và khung hướng dẫn Luyện thêm.
+
+### Giới hạn hiện có
+
+- **Font Sao Mai Tập Viết** hiện là **chữ rời**, chưa tự nối nét giữa các chữ cái trong cùng một tiếng. Khi cần chữ nối liền tự động và sẵn lưới 4 ô li, bạn dùng mục **Tạo tập viết PDF → Tự gõ** trong ứng dụng.
+- **Chữ có dấu của ngôn ngữ khác** ngoài tiếng Việt và tiếng Anh (VD tiếng Pháp, tiếng Đức) chưa có trong font và kiểu Sao Mai; máy sẽ tự mượn font khác cho những ký tự này.
+- **Xem viết chậm** và **mũi tên thứ tự nét** của kiểu Sao Mai hiện vẫn chạy theo từng chữ, chưa nối liền cả tiếng.
+
+### Dành cho người góp mã
+
+- Dữ liệu 29 chữ hoa, 8 nét cơ bản chữ hoa, ký tự `f, j, w, z`, dấu câu và 16 bài chữ hoa nằm ở `src/data/scripts-th.js`; phần nối chữ mượt, khoảng hở lia viết tùy cặp chữ và bước dòng cho chữ hoa nằm ở `src/engine/th-render.js` và bộ dàn trang.
+- Thêm **công cụ sinh font** `tools/font/sinh-font.js` dựng hai file `.ttf` (nét liền và nét đứt) từ đường tâm nét trong `src/data/scripts-th.js` (dùng opentype.js và Clipper, cài riêng khi sinh font bằng `npm install --prefix tools/font` rồi chạy `node tools/font/sinh-font.js`; không thuộc ứng dụng).
+- Bộ phép thử `node tools/kiem-tieuhoc.js` mở rộng từ 10 lên **13 phép kiểm** (thêm kiểm chữ hoa và dấu thanh trên chữ hoa, kiểm 16 bài chữ hoa cùng sổ tay, và kiểm độ mượt chỗ nối chữ).
+
 ## Bản 0.12.0 (27/11/2026): thêm kiểu chữ Tiểu học, lưới 4 ô li và nối chữ theo mẫu
 
 Bản này bổ sung kiểu chữ thứ ba là **Tiểu học** — chữ viết thường đứng, nét đều theo mẫu chữ dạy ở trường tiểu học — đứng ngang hàng với **Thanh đậm** và **Nét đều 10°** ngay ở mục đổi kiểu chữ. Từ bản này, mọi người dùng đều mở được trực tiếp mà không cần đường link thử nghiệm.
