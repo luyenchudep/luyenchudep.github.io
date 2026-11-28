@@ -117,11 +117,11 @@ Hiện có ba kiểu: `td` (Thanh đậm), `qs` (Nét đều) và `th` (Sao Mai 
 
 ### 5.1.1. Giáo trình tiểu học Sao Mai Tập Viết (`th`)
 
-Khác hai kiểu kia ở chỗ chữ mẫu không lấy từ phông mà vẽ từ **đường tâm nét**, nhờ vậy cho nét đứt để tô đúng kiểu vở tiểu học. Phông Playwrite VN chỉ dùng cho chữ người dùng tự gõ.
+Khác hai kiểu kia ở chỗ chữ mẫu không lấy từ phông mà vẽ từ **đường tâm nét**, nhờ vậy cho nét đứt để tô đúng kiểu vở tiểu học. Chữ người dùng tự gõ cũng vẽ từ đường tâm nét (từ bản 0.13 có đủ `f, j, w, z` và dấu câu), không dùng phông nào.
 
 ```
 SCRIPTS.th = {
-  name: "Tiểu học", font: "PW",     // PW = Playwrite VN, chỉ dùng cho chữ tự gõ
+  name: "Sao Mai Tập Viết", font: "TH",   // TH: không có phông, mọi chữ (kể cả chữ tự gõ) vẽ từ đường tâm nét
   CO: { thuong: 2, nho: 1 },        // số ô li ứng với 1 đơn vị chữ: cỡ Thường (cỡ vừa) và cỡ Nhỏ
   STROKES,  // nét cơ bản, cùng dạng với hai kiểu kia: { w, d: [["M",x,y], ["L",x,y], ["C",x1,y1,x2,y2,x,y]] }
   CHU,      // chữ mẫu vẽ từ đường tâm nét (dưới đây)
