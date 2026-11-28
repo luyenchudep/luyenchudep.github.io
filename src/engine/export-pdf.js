@@ -109,7 +109,9 @@ async function exportPdfMot(cfg, tuyChon = {}) {
     /* Tạo trước danh sách trang cho từng bài học */
     const lessonJobs = [];
     let totalContentPages = 0;
-    for (const l of targetLessons) {
+    /* Xem trước nhiều bài: chỉ dựng bài đầu (không phân trang cả giáo trình mỗi lần đổi lựa chọn) */
+    const xemGon = !!tuyChon.xemTruoc && targetLessons.length > 1;
+    for (const l of (xemGon ? targetLessons.slice(0, 1) : targetLessons)) {
       /* Tiểu học: thân chữ tính theo mm thật (1 ô li = 2 mm), các dòng 4 ô li nối liền nhau */
       const m = SCRIPT === "th" ? sizeForTHPdf(l, pr.pxW / pr.wMm) : sizeFor(l), F = m.F;
       let up = Math.max(l.up || F.asc + .25, F.asc + .05), dn = Math.max(l.dn || F.desc + .1, F.desc + .03);
@@ -135,7 +137,7 @@ async function exportPdfMot(cfg, tuyChon = {}) {
       totalContentPages += lPages.length;
     }
 
-    const needToc = lessonJobs.length > 1;
+    const needToc = targetLessons.length > 1;
     const tocOffset = needToc ? 1 : 0;
     let runningIdx = tocOffset;
     for (const job of lessonJobs) { job.startPageIdx = runningIdx; runningIdx += job.pages.length }
@@ -189,7 +191,10 @@ async function exportPdfMot(cfg, tuyChon = {}) {
         baoTienDo(`Đang vẽ trang ${donePages}/${totalContentPages} (${job.lesson.t})…`);
         await new Promise(r => setTimeout(r, 8));
         /* Xem trước: vẽ lên canvas thường (cùng lệnh vẽ như PDF) rồi dừng ở trang đầu */
-        ctx = tuyChon.xemTruoc ? tuyChon.xemTruoc(W, H) : new PdfCtx(doc, mctx);
+        if (tuyChon.xemTruoc) {   /* canvas xem trước thu nhỏ, cạnh lớn nhất khoảng 900 px (đủ nét, đỡ tốn bộ nhớ) */
+          const kx = Math.min(1, 900 / Math.max(W, H));
+          ctx = tuyChon.xemTruoc(Math.round(W * kx), Math.round(H * kx)); ctx.setTransform(kx, 0, 0, kx, 0, 0);
+        } else ctx = new PdfCtx(doc, mctx);
         ctx.fillStyle = T.paper; ctx.fillRect(0, 0, W, H);
         /* Tiêu đề trang vở */
         ctx.fillStyle = "#000000"; ctx.textBaseline = "alphabetic"; ctx.textAlign = "left";
@@ -200,7 +205,7 @@ async function exportPdfMot(cfg, tuyChon = {}) {
         ctx.font = `500 ${px(22)}px 'QS',sans-serif`; ctx.fillStyle = "#444444";
         ctx.fillText(`${SC.name} · ${job.lesson.id === "review" ? "Bài ôn" : c.mode === "to" ? "Tô" : "Chép"} · ${c.grid === "oly4" ? "4 ô li Việt Nam" : "Lưới xiên Pháp"}`, padL, px(100));
         ctx.textAlign = "right";
-        ctx.fillText(`Trang ${donePages + tocOffset}/${totalContentPages + tocOffset}${needToc && pr.links ? "  ·  ↑ Mục lục" : ""}`, W - padR, px(66));
+        ctx.fillText(`Trang ${donePages + tocOffset}/${xemGon ? "…" : totalContentPages + tocOffset}${needToc && pr.links ? "  ·  ↑ Mục lục" : ""}`, W - padR, px(66));
         ctx.textAlign = "left";
         ctx.strokeStyle = "#CCCCCC"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(padL, px(116)); ctx.lineTo(W - padR, px(116)); ctx.stroke();
 
@@ -229,7 +234,7 @@ async function exportPdfMot(cfg, tuyChon = {}) {
           ctx.fillText("Gợi ý: " + job.lesson.note, padL, H - px(36));
         }
         /* Nút bấm góc trên phải để quay về Trang 1 Mục lục trên reMarkable */
-        if (tuyChon.xemTruoc) return { xemTruoc: true, soTrang: totalContentPages + tocOffset, tenKho: pr.name };
+        if (tuyChon.xemTruoc) return { xemTruoc: true, soTrang: xemGon ? 0 : totalContentPages + tocOffset, soBai: targetLessons.length, coMucLuc: needToc, tenKho: pr.name };
         const backLinks = needToc && pr.links ? [{ rect: [((W - padR - 220) / W) * pr.ptW, pr.ptH - (95 / H) * pr.ptH, ((W - padR) / W) * pr.ptW, pr.ptH - (25 / H) * pr.ptH], targetPage: 0 }] : [];
         pdfPages.push({ content: ctx.out.join("\n"), links: backLinks });
       }
@@ -244,6 +249,7 @@ async function exportPdfMot(cfg, tuyChon = {}) {
     S.theme = saveTheme; W = saveW; H = saveH; layout = saveLayout; T = saveT; S.gridStyle = saveSGrid; S.rowArrows = saveSArrows; S.xBand = saveSXBand; S.scale = saveScale; S.trace = saveSTrace;
     luyenRounds = saveLR; frozenLuyen = saveFL; frozenReview = saveFR; LUYEN.rows = saveLRows; REVIEW.rows = saveRRows;
     pdfBusyFlag = false; exporting = false;
-    pendingResize = false; resize();
+    /* Xem trước không đổi trang viết: chỉ dựng lại khi cửa sổ vừa đổi cỡ trong lúc chạy */
+    if (!tuyChon.xemTruoc || pendingResize) { pendingResize = false; resize(); }
   }
 }

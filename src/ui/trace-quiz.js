@@ -304,22 +304,22 @@ function openCard(focusCh,startMode){stopAnim();LEGEND=S.arrowStyle==="full"?LEG
   if(animList.length){
     h+=`<h4>Học nét chữ</h4><div class="animBox">
     <div class="animTabs">
-      <button id="atWatch" class="${animState.mode==="watch"?"on":""}" onclick="setAnimMode('watch')">${ic("play")}Xem viết chậm</button>
-      <button id="atQuiz" class="${animState.mode==="quiz"?"on":""}" onclick="setAnimMode('quiz')">${ic("pen")}Tự tô từng nét</button>
+      <button id="atWatch" class="${animState.mode==="watch"?"on":""}" data-action="cheDoHocNet" data-chedo="watch">${ic("play")}Xem viết chậm</button>
+      <button id="atQuiz" class="${animState.mode==="quiz"?"on":""}" data-action="cheDoHocNet" data-chedo="quiz">${ic("pen")}Tự tô từng nét</button>
     </div>`;
     if(animList.length>1){
-      h+=`<div class="animChips">${animList.map(ch=>`<button class="animChip" data-ch="${ch}" onclick="initAnim('${ch.replace(/'/g,"\\'")}',true)">${ch[0]==="~"?(STROKE_NAME[ch.slice(1)]||ch.slice(1)):ch}</button>`).join("")}</div>`;
+      h+=`<div class="animChips">${animList.map(ch=>`<button class="animChip" data-ch="${escHtml(ch)}" data-action="chonChuHocNet">${ch[0]==="~"?(STROKE_NAME[ch.slice(1)]||ch.slice(1)):ch}</button>`).join("")}</div>`;
     }
     h+=`<canvas id="animCv"></canvas><div id="animInfo"></div><div class="animCtrl" id="animCtrl"></div>
-    <div style="display:flex;gap:8px;margin-top:10px"><button class="btn primary" style="flex:2;margin:0" onclick="leaveCard('to')"><span class="n">2</span>Tô phần này</button><button class="btn ghost" style="flex:1;margin:0" onclick="leaveCard('nho')"><span class="n">3</span>Chép</button></div></div>`;
+    <div style="display:flex;gap:8px;margin-top:10px"><button class="btn primary" style="flex:2;margin:0" data-action="roiTheHoc" data-chedo="to"><span class="n">2</span>Tô phần này</button><button class="btn ghost" style="flex:1;margin:0" data-action="roiTheHoc" data-chedo="nho"><span class="n">3</span>Chép</button></div></div>`;
   }
   if(items.length&&l.f!=="AL")h+=`<h4>Sơ đồ thứ tự nét</h4>${LEGEND}<canvas id="cardCv"></canvas>`;
   else if(items.length)h+=`<h4>Chữ mẫu</h4><canvas id="cardCv"></canvas><div class="prog">Phần viết nhanh dùng chữ nét đều nên không có mũi tên nhấn/thả.</div>`;
   if(st&&st[1].length)h+=`<h4>Cách viết</h4><ul>${st[1].map(t=>`<li>${t}</li>`).join("")}</ul>`;
   if(st&&st[2].length)h+=`<h4>Lỗi hay gặp</h4><ul>${st[2].map(t=>`<li>${t}</li>`).join("")}</ul>`;
-  h+=`<button class="btn primary" onclick="leaveCard('to')"><span class="n">2</span>Tô</button>
-  <button class="btn ghost" onclick="leaveCard('nho')"><span class="n">3</span>Chép</button>
-  <button class="btn ghost" onclick="openNhapMon()">${ic("book")}Nhập môn · lý thuyết chung</button>`;
+  h+=`<button class="btn primary" data-action="roiTheHoc" data-chedo="to"><span class="n">2</span>Tô</button>
+  <button class="btn ghost" data-action="roiTheHoc" data-chedo="nho"><span class="n">3</span>Chép</button>
+  <button class="btn ghost" data-action="nhapMonTuThe">${ic("book")}Nhập môn · lý thuyết chung</button>`;
   document.getElementById("cardBox").innerHTML=h;openSheet("card");
   const cv=document.getElementById("cardCv");if(cv)drawCard(cv,items,l.f);
   if(animList.length){
@@ -330,10 +330,15 @@ function openCard(focusCh,startMode){stopAnim();LEGEND=S.arrowStyle==="full"?LEG
       if(firstCh!==animList[0]){const b=document.querySelector("#cardBox .animBox");b&&b.scrollIntoView({block:"nearest"})}}},60);
   }
 }
+/* Hành động cho thẻ bài học và phần học nét */
+HANH_DONG.cheDoHocNet=el=>setAnimMode(el.dataset.chedo);
+HANH_DONG.chonChuHocNet=el=>initAnim(el.dataset.ch,true);
+HANH_DONG.roiTheHoc=el=>leaveCard(el.dataset.chedo);
+HANH_DONG.nhapMonTuThe=()=>openNhapMon();
 function openNhapMon(){LEGEND=S.arrowStyle==="full"?LEGEND_FULL:LEGEND_SIMPLE;
   let h=`<h3>${SC.nmTitle}</h3><div class="prog">${SCRIPT==="td"?"Tóm tắt từ giáo trình viết chữ của trường Pháp xưa và các nghiên cứu hiện đại về học viết.":SCRIPT==="th"?"Theo mẫu chữ viết trong trường tiểu học (Quyết định 31/2002/QĐ-BGD&ĐT). Phần cuối dành cho ba mẹ.":"Tóm tắt nguyên tắc viết chữ in rõ ràng và các nghiên cứu hiện đại về học viết."}</div>`;
   NHAPMON.forEach((c,i)=>{h+=`<h4>${i+1}. ${c.t}</h4>`+c.p.map(p=>`<p>${p}</p>`).join("");if(c.demo)h+=LEGEND+`<canvas id="nmCv${i}"></canvas>`});
-  h+=`<button class="btn primary" onclick="closeSheets()">Bắt đầu tập viết</button>`;
+  h+=`<button class="btn primary" data-action="dongBang">Bắt đầu tập viết</button>`;
   document.getElementById("genBox").innerHTML=h;openSheet("gen");
   NHAPMON.forEach((c,i)=>{if(c.demo)drawCard(document.getElementById("nmCv"+i),SCRIPT==="qs"?["~o","a","g"]:c.demo)});
 }

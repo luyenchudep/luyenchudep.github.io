@@ -133,7 +133,7 @@ function openScoreReport(){
     <b>Bám đường chân</b>${m.geo&&m.geo.baseDrift!=null?`Lệch ${m.geo.baseDrift}% thân chữ`:"Chưa đủ dữ liệu"}
   </div>
   <h4>Gợi ý điều chỉnh tay viết</h4><ul>${tips.map(t=>`<li>${t}</li>`).join("")}</ul>
-  <button class="btn primary" onclick="closeSheets()">Tiếp tục tập</button>`;
+  <button class="btn primary" data-action="dongBang">Tiếp tục tập</button>`;
   openSheet("gen");
 }
 

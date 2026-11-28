@@ -49,7 +49,7 @@ async function journalSnap(snap){
 }
 async function openJournal(){
   if(!idb)await openIDB();const box=document.getElementById("genBox");
-  if(!idb){box.innerHTML=`<h3>Nhật ký luyện chữ</h3><p>Trình duyệt này không cho lưu nhật ký.</p><button class="btn" onclick="closeSheets()">Đóng</button>`;openSheet("gen");return}
+  if(!idb){box.innerHTML=`<h3>Nhật ký luyện chữ</h3><p>Trình duyệt này không cho lưu nhật ký.</p><button class="btn" data-action="dongBang">Đóng</button>`;openSheet("gen");return}
   const all=[];await new Promise(res=>{const r=idb.transaction("j").objectStore("j").openCursor();
     r.onsuccess=()=>{const c=r.result;if(c){all.push(c.value);c.continue()}else res()};r.onerror=res});
   const days=[...new Set(all.filter(laBanGhiNhatKy).map(r=>r.d))].sort().reverse();
@@ -57,7 +57,7 @@ async function openJournal(){
   if(!days.length)h+=`<p>Chưa có trang nào. Cứ viết vài nét là nhật ký tự lưu.</p>`;
   for(const d of days){const [y,mo,da]=d.split("-");h+=`<div class="ph">${da}/${mo}/${y}</div><div class="jl">`;
     for(const r of all.filter(r=>r.d===d&&laBanGhiNhatKy(r)))h+=`<figure><img src="${r.img}" alt="" loading="lazy" decoding="async"><figcaption>${escHtml(r.t)}${r.p?" · trang "+(r.p|0):""}${r.m==="nho"?" · Chép":""}</figcaption></figure>`;h+=`</div>`}
-  h+=`<button class="btn" onclick="closeSheets()">Đóng</button>`;box.innerHTML=h;openSheet("gen")}
+  h+=`<button class="btn" data-action="dongBang">Đóng</button>`;box.innerHTML=h;openSheet("gen")}
 
 /* Bảo mật: bản ghi nhật ký có thể đến từ file sao lưu; chỉ nhận ngày đúng dạng và hình nhúng (data:image) */
 const laNgay=d=>typeof d==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(d);
@@ -74,9 +74,11 @@ async function openPaper(){const box=document.getElementById("genBox"),list=awai
   let h=`<h3>Kiểm tra trên giấy</h3><div class="prog">Cứ 2 tuần một lần, bạn viết câu dưới đây <b>bằng viết thật lên giấy</b> theo kiểu chữ ${SC.name.toLowerCase()}, rồi chụp hình lưu lại.</div>
   <div class="goal">${PAPER_TXT}</div>
   <div class="prog">${last?`Lần gần nhất: ${last.split("-").reverse().join("/")}`:"Chưa có lần kiểm tra nào."}${paperDue()?` · <span class="due">đã tới hạn</span>`:""}</div>
-  <button class="btn primary" onclick="document.getElementById('paperFile').click()">Chụp hình trang giấy</button><div class="papers" style="margin-top:14px">`;
+  <button class="btn primary" data-action="chupHinhGiay">Chụp hình trang giấy</button><div class="papers" style="margin-top:14px">`;
   for(const r of list)h+=`<figure><img src="${r.img}" alt="" loading="lazy" decoding="async"><figcaption>${r.d.split("-").reverse().join("/")}</figcaption></figure>`;
-  h+=`</div><button class="btn ghost" onclick="closeSheets()">Đóng</button>`;box.innerHTML=h;openSheet("gen")}
+  h+=`</div><button class="btn ghost" data-action="dongBang">Đóng</button>`;box.innerHTML=h;openSheet("gen")}
+/* Hành động chụp hình trang giấy kiểm tra */
+HANH_DONG.chupHinhGiay=()=>document.getElementById("paperFile").click();
 function savePaper(inp){const f=inp.files[0];inp.value="";if(!f)return;const img=new Image(),u=URL.createObjectURL(f);
   img.onload=async()=>{const w=Math.min(1100,img.width),h=Math.round(img.height*w/img.width),c=document.createElement("canvas");c.width=w;c.height=h;
     c.getContext("2d").drawImage(img,0,0,w,h);URL.revokeObjectURL(u);if(!idb)await openIDB();

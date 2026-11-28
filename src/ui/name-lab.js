@@ -4,10 +4,12 @@ function openNameLab(){
   document.getElementById("genBox").innerHTML=`<h3>${ic("sign")} Luyện tên riêng và chữ ký</h3>
   <div class="prog">Nhập họ tên hoặc chữ ký bạn muốn luyện. Ứng dụng sẽ tự tạo bài tập từ cỡ lớn, ghép tên, tới câu giới thiệu hoàn chỉnh.</div>
   <input id="nameInp" type="text" value="${prev.replace(/"/g,"&quot;")}" placeholder="Ví dụ: Anna · An An · Minh Minh · Đăng Định" style="width:100%;font:inherit;font-size:18px;padding:12px;border:1.5px solid var(--line);border-radius:12px;background:var(--paper);color:var(--ink)">
-  <button class="btn primary" onclick="applyNameLab()">Tạo bài luyện tên và tập ngay</button>
-  <button class="btn ghost" onclick="closeSheets()">Đóng</button>`;
+  <button class="btn primary" data-action="taoBaiTenRieng">Tạo bài luyện tên và tập ngay</button>
+  <button class="btn ghost" data-action="dongBang">Đóng</button>`;
   openSheet("gen");
 }
+/* Hành động tạo bài luyện tên riêng */
+HANH_DONG.taoBaiTenRieng=()=>applyNameLab();
 let nameArm=false;
 function applyNameLab(){
   const nm=(document.getElementById("nameInp").value||"").trim();
