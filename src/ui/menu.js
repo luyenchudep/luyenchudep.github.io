@@ -24,7 +24,7 @@ function partBlock(p,openSet,setName,liStyle){
   const n=p.lessons.length,k=p.lessons.filter(l=>done.has(l.id)).length,isCur=cur.li<NREAL&&LESSONS[cur.li].part===p.part;
   let h=`<details class="part ${isCur?"cur":""}" data-p="${p.part}" ${openSet.has(p.part)?"open":""} ontoggle="${setName}[this.open?'add':'delete'](this.dataset.p)"><summary><span class="pn">${p.part}</span><span class="pc ${k===n?"full":""}">${k}/${n}</span></summary>`;
   for(const l of p.lessons){const idx=LESSONS.indexOf(l);
-    h+=`<div class="li ${idx===cur.li?"cur":""}" onclick="openLesson(${idx})">${ckIcon(l.id)}<span>${idx+1}. ${l.t}</span>${liStyle?"":`<span class="sz">${({L:"cỡ lớn",M:"cỡ vừa",S:"cỡ nhỏ",thuong:"cỡ thường",nho:"cỡ nhỏ"}[l.z]||"")}</span>`}</div>`}
+    h+=`<div class="li ${idx===cur.li?"cur":""}" onclick="openLesson(${idx})">${ckIcon(l.id)}<span>${idx+1}. ${l.t}</span>${liStyle?"":`<span class="sz">${({L:"cỡ lớn",M:"cỡ vừa",S:"cỡ nhỏ",thuong:"cỡ thường",nho:"cỡ nhỏ"}[l.z]||"")}</span><button type="button" class="liPdf" data-action="pdfBai" aria-label="Xuất PDF bài này" title="Xuất PDF bài này">${ic("download")}</button>`}</div>`}
   return h+`</details>`}
 function setMenuTab(t){menuTab=t;openMenu(true);const b=document.getElementById("menuBox");if(b)b.scrollTop=0}
 function openMenu(keepScroll=false){
@@ -33,13 +33,21 @@ function openMenu(keepScroll=false){
   if(!partOpen)partOpen=new Set([curPartName()]);
   const real=LESSONS.slice(0,NREAL),n=real.filter(l=>l.id!=="free").length,k=[...done].filter(id=>real.some(l=>l.id===id&&id!=="free")).length;
   const due=dueItems().length,toolAlert=due>0||paperDue();
-  let h=`<div class="mHead"><h3>Danh mục</h3><div class="seg">${DS_KIEU_CHU.map(([v,t,m])=>`<button class="${SCRIPT===v?"on":""}" title="${m||t}" onclick="setScript('${v}')">${t}</button>`).join("")}</div></div>`;
-  h+=`<div class="mTabs">${[["bai","book","Bài học"],["cong","target","Công cụ"],["cai","sliders","Cài đặt"]].map(([v,icn,t])=>`<button class="${menuTab===v?"on":""}" onclick="setMenuTab('${v}')">${ic(icn)}${t}${v==="cong"&&toolAlert?`<span class="dot"></span>`:""}</button>`).join("")}</div>`;
-  if(menuTab==="bai"){
+  let h=`<div class="mHead"><h3>${menuTab==="cai"?"Hồ sơ":"Giáo trình"}</h3><div class="seg">${DS_KIEU_CHU.map(([v,t,m])=>`<button class="${SCRIPT===v?"on":""}" title="${m||t}" onclick="setScript('${v}')">${t}</button>`).join("")}</div></div>`;
+  /* Chuyển giữa Giáo trình và Hồ sơ bằng thanh 4 khu (bản 0.14) */
+  if(menuTab!=="cai"){
+    const tile=(icon,title,sub,act,badge)=>`<button class="tile" onclick="${act}">${ic(icon)}<b>${title}</b><small>${sub}</small>${badge?`<span class="badge">${badge}</span>`:""}</button>`;
+    h+=`<div class="tiles">`+
+      tile("review","Bài ôn","viết theo trí nhớ",`openLesson(${REVIEW_I},'nho')`,due?due+" chữ":"")+
+      tile("target","Luyện thêm",WEAK.length?WEAK.length+" mục cần luyện":"chữ chấm chưa đạt",`openLesson(${LUYEN_I},'to')`,"")+
+      tile("edit","Bài tự do","tự soạn nội dung","openCustom()","")+
+      tile("sign","Tên và chữ ký","luyện tên riêng","openNameLab()","")+
+      tile("book","Nhập môn","lý thuyết rèn chữ","openNhapMon()","")+
+    `</div>`;
     h+=`<div class="prog" style="margin-bottom:4px">${SC.name} · đã tập ${k}/${n} bài</div><div class="bar"><div style="width:${Math.round(k/n*100)}%"></div></div>`;
     h+=`<button class="hero" onclick="sessStart()"><span class="hIc">${ic("play")}</span><span><b>${sess?"Bắt đầu lại buổi tập":"Buổi tập hôm nay"}</b><small>15 phút · khởi động, bài mới, bài ôn</small></span></button>`;
     for(const p of COURSE)h+=partBlock(p,partOpen,"partOpen",false);
-  }else if(menuTab==="cong"){
+  }else if(false){
     const tile=(icon,title,sub,act,badge)=>`<button class="tile" onclick="${act}">${ic(icon)}<b>${title}</b><small>${sub}</small>${badge?`<span class="badge">${badge}</span>`:""}</button>`;
     h+=`<div class="tiles">`+
       tile("review","Bài ôn","viết theo trí nhớ",`openLesson(${REVIEW_I},'nho')`,due?due+" chữ":"")+
@@ -52,6 +60,9 @@ function openMenu(keepScroll=false){
       tile("download","Tạo tập viết PDF","A4, A5, máy đọc sách, tự gõ","openPdfModal()","")+
     `</div>`;
   }else{
+    const tile2=(icon,title,sub,act,badge)=>`<button class="tile" onclick="${act}">${ic(icon)}<b>${title}</b><small>${sub}</small>${badge?`<span class="badge">${badge}</span>`:""}</button>`;
+    h+=`<div class="prog" style="margin-bottom:4px">${escHtml(SC.name)} · đã tập ${k}/${n} bài</div><div class="bar"><div style="width:${Math.round(k/n*100)}%"></div></div>`;
+    h+=`<div class="tiles">`+tile2("journal","Nhật ký luyện chữ","mỗi ngày một trang","openJournal()","")+tile2("camera","Kiểm tra trên giấy","2 tuần một lần","openPaper()",paperDue()?"tới hạn":"")+`</div>`;
     h+=grp("hien","sliders","Hiển thị",
       `<div class="row"><span>Màu giấy</span><div class="seg">${[["sepia","Ấm"],["light","Sáng"],["dark","Tối"],["eink","Trắng đen"]].map(([v,t])=>`<button class="${S.theme===v?"on":""}" onclick="setTheme('${v}');openMenu(true)">${t}</button>`).join("")}</div></div>`+
       seg("Màu nhấn","accent",[["blue","Xanh mực"],["black","Đen"]])+
@@ -84,7 +95,7 @@ function openMenu(keepScroll=false){
       ${window.self===window.top?`<button class="btn ghost" onclick="savePng()">${ic("image")}Lưu trang này thành hình (PNG)</button>`:""}<div style="height:12px"></div>`);
     h+=`<p class="ver" style="text-align:center;color:var(--muted);font-size:13px;margin:16px 0 4px">${VERSION}</p>`;
   }
-  h+=`<button class="btn" onclick="closeSheets()">Đóng</button>`;
+  h+=`<button class="btn" onclick="closeSheets()">Về trang viết</button>`;
   document.getElementById("menuBox").innerHTML=h;openSheet("menu",keepScroll);
   if(!keepScroll&&menuTab==="bai")setTimeout(()=>{const c=document.querySelector("#menuBox .li.cur");if(c){const b=document.getElementById("menuBox"),r=c.getBoundingClientRect(),br=b.getBoundingClientRect();if(r.bottom>br.bottom-20)c.scrollIntoView({block:"center"})}},30);
 }

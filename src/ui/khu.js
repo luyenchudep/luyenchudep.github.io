@@ -31,13 +31,16 @@ function datKhu(k) {
   khuDang = k;
   document.querySelectorAll("#navKhu .khu").forEach(b => { const on = b.dataset.khu === k; b.classList.toggle("on", on); if (on) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
 }
+/* Các khu mở thành trang đầy đủ (không phải bảng trượt) */
+function datTrang(id) { document.querySelectorAll(".sheet.trang").forEach(s => s.classList.remove("trang")); if (id) { const s = document.getElementById(id); if (s) s.classList.add("trang"); } }
+HANH_DONG.pdfBai = () => { setTimeout(() => { closeSheets(); openPdfModal(); datTrang("gen"); datKhu("pdf"); }, 0); };
 HANH_DONG.moKhu = el => {
   const k = el.dataset.khu;
   if (typeof pdfBusyFlag !== "undefined" && pdfBusyFlag) { toast("Đang tạo PDF, chờ xong rồi chuyển khu"); return; }
   if (k === "luyen") { closeSheets(); datKhu("luyen"); return; }
-  if (k === "giaotrinh") { closeSheets(); openMenu(); datKhu("giaotrinh"); return; }
-  if (k === "pdf") { closeSheets(); openPdfModal(); datKhu("pdf"); return; }
-  if (k === "hoso") { closeSheets(); openMenu(); setMenuTab("cai"); datKhu("hoso"); }
+  if (k === "giaotrinh") { closeSheets(); openMenu(); datTrang("menu"); datKhu("giaotrinh"); return; }
+  if (k === "pdf") { closeSheets(); openPdfModal(); datTrang("gen"); datKhu("pdf"); return; }
+  if (k === "hoso") { closeSheets(); openMenu(); setMenuTab("cai"); datTrang("menu"); datKhu("hoso"); }
 };
 
 /* Ẩn hiện thanh bên (máy tính bảng, máy tính); điện thoại luôn hiện thanh dưới */
@@ -91,7 +94,9 @@ HANH_DONG.anThanhKhu = () => { GS.set("navAn", true); apThanhKhu(); };
 HANH_DONG.hienThanhKhu = () => { GS.set("navAn", false); apThanhKhu(); };
 
 /* Đóng hết bảng thì quay về khu Luyện viết (bọc closeSheets, thay cho theo dõi mọi thay đổi trên trang) */
-{ const dongCu = closeSheets; closeSheets = function (...a) { const kq = dongCu.apply(this, a); if (!document.querySelector(".sheet.open")) datKhu("luyen"); return kq; }; }
+{ const dongCu = closeSheets; closeSheets = function (...a) { const kq = dongCu.apply(this, a); if (!document.querySelector(".sheet.open")) { datKhu("luyen"); datTrang(null); } return kq; }; }
+/* Nút ☰ trên thanh đầu mở khu Giáo trình */
+{ const b = document.getElementById("bMenu"); if (b) { b.removeAttribute("onclick"); b.dataset.action = "moKhu"; b.dataset.khu = "giaotrinh"; } }
 
 dungThanhKhu();
 apGhimXem();
