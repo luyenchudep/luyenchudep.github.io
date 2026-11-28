@@ -5,7 +5,7 @@ function khoPdf(k) {
   return { name: k.ten, ptW: k.wMm * MM_SANG_PT, ptH: k.hMm * MM_SANG_PT, pxW: k.pxW, pxH: k.pxH, bar: k.barPx, mono: k.mono, links: k.links, desc: k.moTa, wMm: k.wMm, hMm: k.hMm };
 }
 /* Chia khổ trang thành nhóm cho màn Tạo tập viết PDF; khổ chưa xếp nhóm thì vào nhóm cuối */
-const NHOM_KHO = [["Giấy in", ["a4", "a5", "b5", "letter"]], ["Máy đọc sách", ["rm2", "rmpp", "rmppm", "boox103", "boox133", "boox7", "scribe102", "scribe11", "manta", "nomad"]], ["Máy tính bảng", ["sn", "ipad11", "ipad13", "tab11", "tab146"]]];
+const NHOM_KHO = [["Giấy in", ["a4", "a5", "b5", "letter"]], ["Máy đọc sách", ["boox7", "rm2", "rmpp", "rmppm", "boox103", "boox133", "scribe102", "scribe11", "manta", "nomad"]], ["Máy tính bảng", ["sn", "ipad11", "ipad13", "tab11", "tab146"]]];
 function nhomKho() {
   const da = new Set(), kq = NHOM_KHO.map(([ten, ds]) => [ten, ds.filter(v => KHO_TRANG[v] && !da.has(v) && da.add(v))]);
   kq[kq.length - 1][1].push(...Object.keys(KHO_TRANG).filter(v => !da.has(v)));
