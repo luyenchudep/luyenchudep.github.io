@@ -710,27 +710,68 @@ body.lefthand:not(.navAn) .sheet{left:0;right:76px}
   body.navAn #navKhu{display:flex}
   .sheet,body:not(.navAn) .sheet,body.lefthand:not(.navAn) .sheet{left:0;right:0;bottom:calc(62px + env(safe-area-inset-bottom))}   /* bảng mở ra nằm trên thanh 4 khu, không bị che */
 }
+
+/* ================== KHÔNG GIAN VIẾT (bản 0.14) ================== */
+/* Ngăn kéo Xem: màn rộng mặc định ẩn, nổi đè lên trang viết khi mở; ghim thì nằm cạnh như cũ */
+#sideHead{display:flex;align-items:center;gap:4px;margin:-4px 0 8px}
+#sideHead b{flex:1 1 auto;font-size:15px}
+#sideHead .ibtn{width:40px;height:40px}
+#sideHead .ibtn.on{background:var(--hl);color:var(--accent)}
+@media (min-width:860px){
+  body.split:not(.xemGhim) #sidePane{position:absolute;top:0;bottom:0;left:0;z-index:20;width:min(380px,85%);max-width:none;
+    transform:translateX(-105%);transition:transform .18s ease-out;box-shadow:6px 0 24px rgba(0,0,0,.16)}
+  body.split.xemMo:not(.xemGhim) #sidePane{transform:none}
+  body.lefthand.split:not(.xemGhim) #sidePane{left:auto;right:0;transform:translateX(105%);box-shadow:-6px 0 24px rgba(0,0,0,.16)}
+  body.lefthand.split.xemMo:not(.xemGhim) #sidePane{transform:none}
+}
+body.eink #sidePane{box-shadow:none!important;border:2px solid #000}
+/* Công cụ viết trong thanh bên */
+#navKhu{overflow-y:auto;scrollbar-width:none}
+body.congCuRail #app{display:flex!important;flex-direction:column}
+body.congCuRail header,body.congCuRail #workspace,body.congCuNoi header,body.congCuNoi #workspace{grid-column:auto;grid-row:auto}
+body.congCuNoi #app{display:flex!important;flex-direction:column}
+body.congCuRail #navKhu footer{display:flex;flex-direction:column;gap:2px;margin-top:auto;padding:8px 0 0;border:0;border-top:1.5px solid var(--line);background:transparent;grid-template-columns:none}
+body.congCuRail #navKhu footer .tb{min-height:54px;padding:2px;border-radius:12px}
+body.congCuRail #navKhu footer .tb i{font-size:11px}
+@media (max-height:640px){
+  body.congCuRail #navKhu .khu span,body.congCuRail #navKhu footer .tb i{display:none}
+  body.congCuRail #navKhu .khu,body.congCuRail #navKhu footer .tb{min-height:44px}
+  body.congCuRail #navKhu .khuAn{height:30px;margin:0}
+}
+/* Thanh công cụ nổi (thanh bên ẩn hoặc Toàn trang viết) */
+body.congCuNoi footer{position:fixed;left:50%;bottom:max(10px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:56;display:flex;flex-direction:row;gap:4px;
+  padding:4px 8px;border:1.5px solid var(--line);border-radius:18px;background:var(--paper);box-shadow:0 6px 20px rgba(0,0,0,.18);width:auto;grid-template-columns:none}
+body.congCuNoi footer .tb{min-width:58px;min-height:52px}
+body.eink.congCuNoi footer{box-shadow:none;border:2px solid #000}
+/* Toàn trang viết */
+#thoatTT{display:none;position:fixed;top:max(8px,env(safe-area-inset-top));right:max(8px,env(safe-area-inset-right));z-index:57;align-items:center;gap:6px;
+  min-height:44px;padding:0 14px;border:1.5px solid var(--line);border-radius:22px;background:var(--paper);color:var(--ink);font:inherit;font-weight:600;cursor:pointer}
+body.tapTrung #thoatTT{display:inline-flex}
+body.tapTrung header,body.tapTrung #navKhu,body.tapTrung #navMo,body.tapTrung #sidePane{display:none!important}
+#sideTabs[hidden]{display:none}
 </style>
 </head>
 <body>
 <nav id="navKhu" aria-label="Các khu của ứng dụng"></nav>
 <button type="button" id="navMo" data-action="hienThanhKhu" aria-label="Hiện thanh điều hướng"></button>
+<button type="button" id="thoatTT" data-action="tapTrung" aria-label="Thoát Toàn trang viết"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg><span>Thoát</span></button>
 <div id="app">
   <header>
     <div id="topbar">
       <button class="ibtn" id="bMenu" onclick="openMenu()" aria-label="Danh mục bài và cài đặt"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
-      <button id="tbox" onclick="openCard()" aria-label="Xem bài học">
+      <button id="tbox" data-action="moXem" aria-label="Xem bài học">
         <div id="tline"><span id="ttext"></span></div>
         <div id="part"><span id="partTxt"></span><span id="pageinfo"></span></div>
       </button>
       <div id="modesRow">
         <div id="modes">
-          <button id="mXem" onclick="openCard()"><span class="n">1</span>Xem</button>
+          <button id="mXem" data-action="moXem"><span class="n">1</span>Xem</button>
           <button id="mTo" onclick="setMode('to')"><span class="n">2</span>Tô</button>
           <button id="mNho" onclick="setMode('nho')"><span class="n">3</span>Chép</button>
         </div>
         <button id="done" onclick="toggleDone()" aria-label="Đánh dấu đã tập"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.4 2.8 2.8L16.2 9.8"/></svg><span class="dl">Đã tập</span></button>
       </div>
+      <button class="ibtn" id="bTapTrung" data-action="tapTrung" aria-label="Toàn trang viết: ẩn hết, chỉ còn trang viết"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
       <button class="ibtn" id="bZBox" onclick="toggleZBox()" aria-label="Hộp viết phóng to tự trượt"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.3 15.3 20 20M10.5 8v5M8 10.5h5"/></svg></button>
       <button class="ibtn" id="bAa" onclick="openAa()" aria-label="Cỡ dòng, màu giấy, toàn màn hình"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19 8.4 5h1.2L15 19M5.2 14.2h7.6"/><circle cx="18.4" cy="15.6" r="2.6"/><path d="M21 12.6V19"/></svg></button>
     </div>
@@ -743,7 +784,12 @@ body.lefthand:not(.navAn) .sheet{left:0;right:76px}
 
   <div id="workspace">
     <aside id="sidePane">
-      <div id="sideTabs">
+      <div id="sideHead">
+        <b>Xem thứ tự nét</b>
+        <button type="button" class="ibtn" id="bGhimXem" data-action="ghimXem" aria-label="Ghim bảng Xem cạnh trang viết"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4h6l-1 6 3 3H7l3-3zM12 13v7"/></svg></button>
+        <button type="button" class="ibtn" data-action="dongXem" aria-label="Đóng bảng Xem"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      </div>
+      <div id="sideTabs" hidden>
         <button id="stXem" class="on" onclick="setSideTab('xem')"><span class="n">1</span>Xem</button>
         <button id="stList" onclick="setSideTab('list')"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg>Mục lục</button>
       </div>
@@ -7128,7 +7174,7 @@ const soTrong=(v,a,b,md)=>{v=Number(v);return Number.isFinite(v)?Math.min(b,Math
 S.scale=soTrong(S.scale,.5,3,1.25);S.eraserR=soTrong(S.eraserR,4,60,16);S.nibAngle=soTrong(S.nibAngle,0,90,38);S.stab=soTrong(S.stab,0,1,.32);S.pFull=soTrong(S.pFull,.05,1,.38);
 S.width=soTrong(S.width,.3,30,(SC.pen&&SC.pen.width)||2.6);S.activeFav=soTrong(S.activeFav,0,3,0)|0;S.targetFav=soTrong(S.targetFav,0,3,0)|0;
 if(!laMauHex(S.color)&&!laMaMau(S.color))S.color="k";
-if(!["part","stroke","vung"].includes(S.eraseMode))S.eraseMode="part";S.gomVeViet=S.gomVeViet===true;
+if(!["part","stroke","vung"].includes(S.eraseMode))S.eraseMode="part";S.gomVeViet=S.gomVeViet===true;S.xemGhim=S.xemGhim===true;
 S.favs=S.favs.map((f,i)=>{const d=DEFAULT_FAVS[i]||DEFAULT_FAVS[0];if(!f||typeof f!=="object")return Object.assign({},d);
   return Object.assign({},f,{name:typeof f.name==="string"?f.name.replace(/[<>"'&]/g,"").slice(0,40):d.name,color:laMauHex(f.color)||laMaMau(f.color)?f.color:d.color,width:soTrong(f.width,.3,30,d.width)})});
 const FAV_RENAME={"Bi nước đen":"Gel đen","Bút chì":"Viết chì","Bút máy":"Viết máy","Bút lông":"Viết lông","Bút bi nước":"Viết gel"};
@@ -10945,6 +10991,7 @@ function datKhu(k) {
 }
 HANH_DONG.moKhu = el => {
   const k = el.dataset.khu;
+  if (typeof pdfBusyFlag !== "undefined" && pdfBusyFlag) { toast("Đang tạo PDF, chờ xong rồi chuyển khu"); return; }
   if (k === "luyen") { closeSheets(); datKhu("luyen"); return; }
   if (k === "giaotrinh") { closeSheets(); openMenu(); datKhu("giaotrinh"); return; }
   if (k === "pdf") { closeSheets(); openPdfModal(); datKhu("pdf"); return; }
@@ -10952,15 +10999,54 @@ HANH_DONG.moKhu = el => {
 };
 
 /* Ẩn hiện thanh bên (máy tính bảng, máy tính); điện thoại luôn hiện thanh dưới */
-function apThanhKhu() { document.body.classList.toggle("navAn", !!GS.get("navAn", false)); setTimeout(resize, 30); }
+function apThanhKhu() { document.body.classList.toggle("navAn", !!GS.get("navAn", false)); datCongCu(); setTimeout(resize, 30); }
+
+/* Công cụ viết (Trước, Viết, Gôm, Hoàn tác, Sau):
+   - điện thoại dọc: hàng dưới trang như cũ;
+   - máy tính bảng, máy tính: nằm trong thanh bên, dưới 4 khu (một thanh dọc thay vì hai);
+   - thanh bên ẩn hoặc Toàn trang viết: thanh nhỏ nổi ở cạnh dưới trang. */
+const DT_DOC = matchMedia("(max-width:700px) and (orientation:portrait)");
+function datCongCu() {
+  const f = document.querySelector("footer"); if (!f) return;
+  const b = document.body, noi = b.classList.contains("navAn") || b.classList.contains("tapTrung");
+  const dich = DT_DOC.matches ? document.getElementById("app") : noi ? b : document.getElementById("navKhu");
+  if (f.parentElement !== dich) dich.appendChild(f);
+  b.classList.toggle("congCuRail", dich.id === "navKhu");
+  b.classList.toggle("congCuNoi", dich === b);
+}
+DT_DOC.addEventListener("change", () => { datCongCu(); setTimeout(resize, 30); });
+
+/* Ngăn kéo Xem (màn rộng): nổi đè lên trang viết, không làm hẹp trang; tự đóng khi đặt viết xuống trang; ghim được */
+const laManRong = () => document.body.classList.contains("split");
+function moNganXem(mo) { document.body.classList.toggle("xemMo", mo); if (mo) renderSidePane(); }
+HANH_DONG.moXem = () => {
+  if (!laManRong()) { openCard(); return; }
+  if (S.xemGhim) { renderSidePane(); return; }
+  moNganXem(!document.body.classList.contains("xemMo"));
+};
+HANH_DONG.dongXem = () => { if (S.xemGhim) { S.xemGhim = false; saveS(); apGhimXem(); } moNganXem(false); };
+HANH_DONG.ghimXem = () => { S.xemGhim = !S.xemGhim; saveS(); apGhimXem(); if (S.xemGhim) moNganXem(true); };
+function apGhimXem() {
+  document.body.classList.toggle("xemGhim", !!S.xemGhim);
+  const b = document.getElementById("bGhimXem"); if (b) { b.classList.toggle("on", !!S.xemGhim); b.setAttribute("aria-pressed", S.xemGhim ? "true" : "false"); }
+  setTimeout(resize, 30);
+}
+document.getElementById("ink").addEventListener("pointerdown", () => { if (!S.xemGhim && document.body.classList.contains("xemMo")) moNganXem(false); }, true);
+
+/* Toàn trang viết: ẩn thanh đầu, thanh bên, bảng Xem; công cụ thành thanh nổi; nút Thoát ở góc */
+HANH_DONG.tapTrung = () => {
+  document.body.classList.toggle("tapTrung");
+  if (document.body.classList.contains("tapTrung")) moNganXem(false);
+  datCongCu(); setTimeout(resize, 30);
+};
 HANH_DONG.anThanhKhu = () => { GS.set("navAn", true); apThanhKhu(); };
 HANH_DONG.hienThanhKhu = () => { GS.set("navAn", false); apThanhKhu(); };
 
-/* Đóng hết bảng thì quay về khu Luyện viết */
-new MutationObserver(() => { if (!document.querySelector(".sheet.open")) datKhu("luyen"); })
-  .observe(document.body, { subtree: true, attributes: true, attributeFilter: ["class"] });
+/* Đóng hết bảng thì quay về khu Luyện viết (bọc closeSheets, thay cho theo dõi mọi thay đổi trên trang) */
+{ const dongCu = closeSheets; closeSheets = function (...a) { const kq = dongCu.apply(this, a); if (!document.querySelector(".sheet.open")) datKhu("luyen"); return kq; }; }
 
 dungThanhKhu();
+apGhimXem();
 apThanhKhu();
 /* ================== KHỞI ĐỘNG ================== */
 function resize(){
