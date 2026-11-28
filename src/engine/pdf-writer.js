@@ -153,14 +153,14 @@ async function pdfDeflate(u8){
 function pdfUtf16Hex(s){let h="";for(let i=0;i<s.length;i++)h+=s.charCodeAt(i).toString(16).padStart(4,"0").toUpperCase();return h}
 function pdfB64(b64){const bin=atob(b64),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return a}
 /* Đóng gói PDF 1.4: phông TrueType nhúng (Type0/Identity-H, có bảng ToUnicode để chọn và tìm được chữ), độ trong suốt, liên kết mục lục */
-async function assembleVectorPdf(doc,pages,ptW,ptH,W,H,title,a5x2){
+async function assembleVectorPdf(doc,pages,ptW,ptH,W,H,title,a5x2,danhDau){
   /* In 2 trang A5 trên 1 tờ A4 nằm ngang: gộp từng cặp trang (1-2, 3-4…) thành một tờ; bỏ link (giấy in không bấm được) */
   if(a5x2){const A4W=297*MM_SANG_PT,A4H=210*MM_SANG_PT,ox=(A4W-2*ptW)/2,oy=(A4H-ptH)/2,sx=ptW/W,sy=ptH/H,to=[];
     const dat=(c,x)=>`q ${pdfN4(sx)} 0 0 ${pdfN4(-sy)} ${pdfN4(x)} ${pdfN4(oy+ptH)} cm\n${c}\nQ`;
     for(let i=0;i<pages.length;i+=2){
       const cat=`q 0.6 G 0.4 w [3 3] 0 d ${pdfN4(A4W/2)} 0 m ${pdfN4(A4W/2)} ${pdfN4(A4H)} l S Q`;
       to.push({content:dat(pages[i].content,ox)+"\n"+(pages[i+1]?dat(pages[i+1].content,ox+ptW):"")+"\n"+cat,links:[],tho:true})}
-    pages=to;ptW=A4W;ptH=A4H}
+    pages=to;ptW=A4W;ptH=A4H;if(danhDau)danhDau=danhDau.map(d=>({...d,trang:Math.floor(d.trang/2)}))}
   const te=new TextEncoder(),chunks=[],offsets=[];let byteLen=0,nextId=1;
   const push=u=>{chunks.push(u);byteLen+=u.length};
   const pushStr=s=>push(te.encode(s));
@@ -208,7 +208,14 @@ async function assembleVectorPdf(doc,pages,ptW,ptH,W,H,title,a5x2){
     obj(pageIds[i],`<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 ${ptW.toFixed(2)} ${ptH.toFixed(2)}] /Resources ${resId} 0 R /Contents ${cId} 0 R${ann.length?` /Annots [${ann.join(" ")}]`:""} >>`);
   }
   obj(pagesId,`<< /Type /Pages /Count ${pages.length} /Kids [${pageIds.map(id=>id+" 0 R").join(" ")}] >>`);
-  obj(catId,`<< /Type /Catalog /Pages ${pagesId} 0 R >>`);
+  /* Đánh dấu trang: mỗi mục một dòng (tiêu đề tiếng Việt mã UTF-16BE), bấm vào là tới trang đó */
+  let outl="";
+  const dd=(danhDau||[]).filter(d=>d&&d.ten&&d.trang>=0&&d.trang<pages.length);
+  if(dd.length){const rootId=alloc(),ids=dd.map(()=>alloc());
+    dd.forEach((d,i)=>obj(ids[i],`<< /Title <FEFF${pdfUtf16Hex(String(d.ten).slice(0,200))}> /Parent ${rootId} 0 R${i?` /Prev ${ids[i-1]} 0 R`:""}${i<dd.length-1?` /Next ${ids[i+1]} 0 R`:""} /Dest [${pageIds[d.trang]} 0 R /Fit] >>`));
+    obj(rootId,`<< /Type /Outlines /First ${ids[0]} 0 R /Last ${ids[ids.length-1]} 0 R /Count ${dd.length} >>`);
+    outl=` /Outlines ${rootId} 0 R /PageMode /UseOutlines`}
+  obj(catId,`<< /Type /Catalog /Pages ${pagesId} 0 R${outl} >>`);
   obj(infoId,`<< /Title <FEFF${pdfUtf16Hex(title||"Tập viết")}> /Creator <FEFF${pdfUtf16Hex("Tập viết S Pen "+APP_VER)}> /Producer (Tap viet S Pen ${APP_VER}) >>`);
   const xref=byteLen,n=nextId;
   let x=`xref\n0 ${n}\n0000000000 65535 f \n`;for(let i=1;i<n;i++)x+=String(offsets[i]||0).padStart(10,"0")+" 00000 n \n";

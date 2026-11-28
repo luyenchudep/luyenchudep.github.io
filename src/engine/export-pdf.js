@@ -261,7 +261,9 @@ async function exportPdfMot(cfg, tuyChon = {}) {
     baoTienDo("Đang tạo file PDF…");
     await new Promise(r => setTimeout(r, 10));
     const tieuDe = `Tập viết · ${SC.name} · ${lessonJobs.length > 1 ? tenNhom : lessonJobs[0].lesson.t}`;
-    const blob = await assembleVectorPdf(doc, pdfPages, pr.ptW, pr.ptH, W, H, tieuDe, c.a5x2);
+    /* Đánh dấu trang cho tập nhiều bài: Mục lục và từng bài (hiện ở khung bên của trình đọc PDF, máy đọc sách) */
+    const danhDau = needToc ? [{ ten: "Mục lục", trang: 0 }, ...lessonJobs.map(j => { const i = LESSONS.indexOf(j.lesson); return { ten: i >= 0 && i < NREAL ? `Bài ${i + 1} · ${j.lesson.t}` : j.lesson.t, trang: j.startPageIdx }; })] : null;
+    const blob = await assembleVectorPdf(doc, pdfPages, pr.ptW, pr.ptH, W, H, tieuDe, c.a5x2, danhDau);
     return { blob, soTrang: c.a5x2 ? Math.ceil(pdfPages.length / 2) : pdfPages.length, tieuDe, cfg: c };
   } finally {
     S.theme = saveTheme; W = saveW; H = saveH; layout = saveLayout; T = saveT; S.gridStyle = saveSGrid; S.rowArrows = saveSArrows; S.xBand = saveSXBand; S.scale = saveScale; S.trace = saveSTrace;
