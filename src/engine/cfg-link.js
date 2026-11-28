@@ -13,8 +13,17 @@ function byteTuB64url(s) {
   const u8 = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u8[i] = b.charCodeAt(i);
   return u8;
 }
-async function quaLuong(u8, luong) {
-  return new Uint8Array(await new Response(new Blob([u8]).stream().pipeThrough(luong)).arrayBuffer());
+/* Bảo mật: giới hạn số byte sau khi giải nén để link nén nhỏ không bung ra quá lớn làm treo máy */
+const CFG_GIAI_NEN_TOI_DA = 64 * 1024;
+async function quaLuong(u8, luong, toiDa = Infinity) {
+  const doc = new Blob([u8]).stream().pipeThrough(luong).getReader(), phan = []; let tong = 0;
+  for (;;) {
+    const { done, value } = await doc.read(); if (done) break;
+    tong += value.length; if (tong > toiDa) { doc.cancel(); throw new Error("Cấu hình trong đường link lớn quá"); }
+    phan.push(value);
+  }
+  const ra = new Uint8Array(tong); let o = 0; for (const x of phan) { ra.set(x, o); o += x.length; }
+  return ra;
 }
 
 async function maHoaCfg(cfg) {
@@ -30,8 +39,8 @@ async function giaiMaCfg(ma) {
   let cfg;
   try {
     let u8 = byteTuB64url(ma.slice(1));
-    if (ma[0] === "z") u8 = await quaLuong(u8, new DecompressionStream("deflate-raw"));
-    cfg = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(u8));
+    if (ma[0] === "z") u8 = await quaLuong(u8, new DecompressionStream("deflate-raw"), CFG_GIAI_NEN_TOI_DA);
+    cfg = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(u8), (k, v) => k === "__proto__" || k === "constructor" || k === "prototype" ? undefined : v);
   } catch (e) { throw new Error("Đường link cấu hình bị hỏng hoặc chép thiếu"); }
   if (!cfg || typeof cfg !== "object" || Array.isArray(cfg)) throw new Error("Đường link cấu hình không hợp lệ");
   return cfg;
@@ -52,8 +61,9 @@ async function apDungCfgTuLink() {
   try { cfg = await giaiMaCfg(m[1]); }
   catch (e) { boLink(); toast(e.message); return; }
   if (cfg.script && cfg.script !== SCRIPT) {
-    if (KIEU_CHU.includes(cfg.script)) { GS.set("script", cfg.script); location.reload(); return; }
-    boLink(); toast(`Bản này chưa có kiểu chữ "${cfg.script}"`); return;
+    /* Không lưu được (trình duyệt chặn bộ nhớ) thì không tải lại, tránh vòng tải lại mãi */
+    if (KIEU_CHU.includes(cfg.script)) { if (GS.set("script", cfg.script)) { location.reload(); return; } boLink(); toast("Trình duyệt không cho lưu nên chưa đổi được kiểu chữ từ đường link"); return; }
+    boLink(); toast("Bản này chưa có kiểu chữ trong đường link"); return;
   }
   boLink();
   let c;

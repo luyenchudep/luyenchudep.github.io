@@ -27,7 +27,9 @@ function today(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth
 function seeded(seed){let s=0;for(const c of seed)s=(s*31+c.charCodeAt(0))>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
 /* lịch ôn cách quãng: mỗi chữ có bậc 0..4 → ôn lại sau 1, 3, 7, 14, 30 ngày */
 const GAP=[1,3,7,14,30];
-let SR=store.get("sr",{}),WEAK=store.get("weak",[]);
+let SR=store.get("sr",{}),WEAK=store.get("weak",[]);   /* Bảo mật: dữ liệu lưu có thể bị sửa; ép đúng kiểu */
+if(!SR||typeof SR!=="object"||Array.isArray(SR))SR={};
+WEAK=Array.isArray(WEAK)?WEAK.filter(w=>typeof w==="string"&&w.length<=24).slice(0,40):[];
 function addDays(n){const d=new Date();d.setDate(d.getDate()+n);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function itemsOf(l){const out=[];for(const r of l.rows||[]){if(r[0]==="rep")out.push(r[1]);else if(r[0]==="stroke")out.push("~"+r[1])}return out}
 function schedule(l){if(l.f)return;for(const it of itemsOf(l))if(!SR[it])SR[it]={lv:0,due:addDays(1)};store.set("sr",SR)}

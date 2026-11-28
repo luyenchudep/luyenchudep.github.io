@@ -14,18 +14,25 @@ const TU_GO_TOI_DA = 2000;   // số ký tự tối đa của nội dung tự g�
 const PDF_CFG_MAC_DINH = { v: 1, scope: "bai", lessons: [], mode: "to", grid: "french", arrows: true, preset: "rm2", barSide: "left" };
 
 /* Kiểm và điền giá trị mặc định. Sai thì báo lỗi bằng lời dễ hiểu. */
+const PDF_CFG_KHOA = ["v", "script", "scope", "lessons", "mode", "grid", "arrows", "preset", "barSide", "wMm", "hMm", "text"];
 function chuanHoaPdfCfg(cfg) {
-  const c = Object.assign({}, PDF_CFG_MAC_DINH, cfg || {});
+  /* Bảo mật: cfg có thể đến từ đường link người khác gửi; chỉ chép các trường đã biết (bỏ __proto__, constructor…) */
+  const vao = cfg && typeof cfg === "object" && !Array.isArray(cfg) ? cfg : {}, c = Object.assign({}, PDF_CFG_MAC_DINH);
+  for (const k of PDF_CFG_KHOA) if (Object.prototype.hasOwnProperty.call(vao, k)) c[k] = vao[k];
+  c.lessons = Array.isArray(c.lessons) ? [...new Set(c.lessons.filter(x => typeof x === "string" && /^[A-Za-z0-9_-]{1,24}$/.test(x)))].slice(0, 200) : [];
+  if (typeof c.preset !== "string") c.preset = PDF_CFG_MAC_DINH.preset;
   if (c.v !== 1) throw new Error(`Không đọc được cấu hình phiên bản ${c.v}`);
   if (!c.script) c.script = SCRIPT;
   if (c.script !== SCRIPT) throw new Error(`Cấu hình dùng kiểu chữ "${c.script}" nhưng app đang mở kiểu "${SCRIPT}". Hãy đổi kiểu chữ rồi xuất lại.`);
-  if (c.preset === "tunhap") khoTuNhap(c.wMm, c.hMm);   // báo lỗi nếu khổ tự nhập sai
-  else if (!PDF_PRESETS[c.preset]) throw new Error(`Chưa có khổ giấy "${c.preset}"`);
+  if (c.preset === "tunhap") { c.wMm = Number(c.wMm); c.hMm = Number(c.hMm); khoTuNhap(c.wMm, c.hMm); }   // báo lỗi nếu khổ tự nhập sai
+  else if (!Object.prototype.hasOwnProperty.call(PDF_PRESETS, c.preset)) throw new Error(`Chưa có khổ giấy "${String(c.preset).slice(0, 30)}"`);
+  else { delete c.wMm; delete c.hMm; }
   if (!["to", "nho"].includes(c.mode)) throw new Error(`Cách tập không hợp lệ: "${c.mode}"`);
   if (!["french", "oly4"].includes(c.grid)) throw new Error(`Kiểu dòng kẻ không hợp lệ: "${c.grid}"`);
   if (!["left", "right"].includes(c.barSide)) throw new Error(`Lề thanh công cụ không hợp lệ: "${c.barSide}"`);
   if (!["bai", "phan", "tatca", "luyenthem", "tudo", "tugo"].includes(c.scope))
     throw new Error(`Chưa hỗ trợ phạm vi "${c.scope}" (có: bai, phan, tatca, luyenthem, tudo, tugo)`);
+  if (c.scope !== "tugo") delete c.text;
   if (c.scope === "tugo") {
     c.text = typeof c.text === "string" ? c.text : "";
     if (!c.text.trim()) throw new Error("Chưa gõ nội dung để tập");

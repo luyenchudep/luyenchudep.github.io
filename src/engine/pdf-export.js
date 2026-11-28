@@ -21,7 +21,6 @@ function khoTuNhap(wMm, hMm) {
 const pdfOpt={preset:"rm2",wMm:null,hMm:null,scope:"cur",lessons:[],text:"",mode:"to",grid:null,barSide:"left",arrows:true,busy:false};
 /* Khổ đang chọn ở màn Tạo tập viết PDF (kể cả khổ tự nhập) */
 function khoDangChon(){return pdfOpt.preset==="tunhap"?khoTuNhap(pdfOpt.wMm,pdfOpt.hMm):PDF_PRESETS[pdfOpt.preset]}
-const escHtml=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);
 
 /* ================== MÀN TẠO TẬP VIẾT PDF ==================
    Chọn mọi mục của cấu hình vở (docs/KIEN_TRUC.md mục 5.3), rồi tạo PDF hoặc chép đường link.
