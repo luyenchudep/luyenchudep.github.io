@@ -1,6 +1,6 @@
 # Kiến trúc và kế hoạch phát triển ứng dụng Tập viết S Pen
 
-Bản tài liệu 0.8 · Cập nhật 28/11/2026 · Áp dụng cho mã nguồn từ bản 0.14.0
+Bản tài liệu 0.8 · Cập nhật 29/11/2026 · Áp dụng cho mã nguồn từ bản 0.14.0
 
 Tài liệu này mô tả ứng dụng được tổ chức thế nào, dữ liệu nằm ở đâu, và các bản sắp tới sẽ làm gì. Ai muốn góp ý hay góp mã thì đọc tài liệu này trước.
 

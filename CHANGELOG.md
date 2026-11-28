@@ -1,6 +1,6 @@
 # Những thay đổi qua từng bản
 
-## Bản 0.14.0 (28/11/2026): giao diện mới 4 khu, gôm nhanh và khoanh vùng, xem trước PDF, tăng cường bảo mật
+## Bản 0.14.0 (29/11/2026): giao diện mới 4 khu, gôm nhanh và khoanh vùng, xem trước PDF, tăng cường bảo mật
 
 Bản này làm mới toàn bộ giao diện thành 4 khu rõ ràng (**Luyện viết**, **Giáo trình**, **Tập viết PDF**, **Hồ sơ**) để dành tối đa chỗ cho trang viết, thêm chế độ **Toàn trang viết** và bảng **Xem** dạng ngăn kéo. Công cụ **Gôm** được viết lại cho nhanh hơn rõ rệt kèm kiểu xóa **Khoanh vùng**, màn **Tập viết PDF** có thêm khung xem trước trang và nút tải nhanh trên từng bài. Đồng thời, ứng dụng tăng cường nhiều lớp bảo mật cho đường link cấu hình, file sao lưu và dữ liệu lưu trên máy.
 
@@ -49,7 +49,7 @@ Bản này làm mới toàn bộ giao diện thành 4 khu rõ ràng (**Luyện v
 - **Hộp viết phóng to và các bảng:** dời thanh công cụ nổi lên trên hộp viết phóng to cho khỏi che chỗ viết; đang mở bảng thì thanh công cụ nổi và nút Thoát không đè lên bảng; đang mở Giáo trình, Hồ sơ hay Tập viết PDF thì tạm ẩn 5 nút viết trong thanh bên để khỏi lỡ tay lật trang bên dưới; mở Nhật ký từ Hồ sơ giữ khu Hồ sơ sáng; mở bảng khác vào chỗ trang Tập viết PDF không còn lộ khung hai cột trống; bảng chọn nhanh viết yêu thích và các bảng mở ra nằm đúng cạnh thanh bên.
 - **Điện thoại, máy đọc sách và cài đặt:** sửa bố cục điện thoại xoay ngang (không còn hai thanh dọc chồng nhau, 4 khu và 5 nút viết vừa một cột, ô đo điểm không bị thanh nổi che) và chừa vùng tai thỏ, chia ô công cụ thành 2 cột trên điện thoại; trên máy đọc sách, khu đang chọn đảo màu rõ hơn và bỏ vạch đen ở mép trên trang; giảm tải khi đang Xem viết chậm hoặc Tự tô từng nét; giữ đúng góc vát tay trái −38° và trạng thái chưa chọn viết yêu thích sau khi tải lại.
 
-## Bản 0.13.0 (29/11/2026): chữ hoa và font Sao Mai Tập Viết, nối chữ mượt, thêm 13 khổ máy
+## Bản 0.13.0 (28/11/2026): chữ hoa và font Sao Mai Tập Viết, nối chữ mượt, thêm 13 khổ máy
 
 Kiểu chữ tiểu học từ bản này mang tên **Sao Mai Tập Viết** (nút chọn trong ứng dụng ghi **Sao Mai**), bổ sung đủ **29 chữ hoa** cùng giáo trình 16 bài mới, nối chữ mượt như viết tay, thêm **13 khổ trang** cho máy đọc sách và máy tính bảng, đồng thời phát hành kèm bộ **font Sao Mai Tập Viết** miễn phí để dùng trong Word và các phần mềm soạn thảo.
 
