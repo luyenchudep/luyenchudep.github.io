@@ -153,7 +153,14 @@ async function pdfDeflate(u8){
 function pdfUtf16Hex(s){let h="";for(let i=0;i<s.length;i++)h+=s.charCodeAt(i).toString(16).padStart(4,"0").toUpperCase();return h}
 function pdfB64(b64){const bin=atob(b64),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return a}
 /* Đóng gói PDF 1.4: phông TrueType nhúng (Type0/Identity-H, có bảng ToUnicode để chọn và tìm được chữ), độ trong suốt, liên kết mục lục */
-async function assembleVectorPdf(doc,pages,ptW,ptH,W,H,title){
+async function assembleVectorPdf(doc,pages,ptW,ptH,W,H,title,a5x2){
+  /* In 2 trang A5 trên 1 tờ A4 nằm ngang: gộp từng cặp trang (1-2, 3-4…) thành một tờ; bỏ link (giấy in không bấm được) */
+  if(a5x2){const A4W=297*MM_SANG_PT,A4H=210*MM_SANG_PT,ox=(A4W-2*ptW)/2,oy=(A4H-ptH)/2,sx=ptW/W,sy=ptH/H,to=[];
+    const dat=(c,x)=>`q ${pdfN4(sx)} 0 0 ${pdfN4(-sy)} ${pdfN4(x)} ${pdfN4(oy+ptH)} cm\n${c}\nQ`;
+    for(let i=0;i<pages.length;i+=2){
+      const cat=`q 0.6 G 0.4 w [3 3] 0 d ${pdfN4(A4W/2)} 0 m ${pdfN4(A4W/2)} ${pdfN4(A4H)} l S Q`;
+      to.push({content:dat(pages[i].content,ox)+"\n"+(pages[i+1]?dat(pages[i+1].content,ox+ptW):"")+"\n"+cat,links:[],tho:true})}
+    pages=to;ptW=A4W;ptH=A4H}
   const te=new TextEncoder(),chunks=[],offsets=[];let byteLen=0,nextId=1;
   const push=u=>{chunks.push(u);byteLen+=u.length};
   const pushStr=s=>push(te.encode(s));
@@ -197,7 +204,7 @@ async function assembleVectorPdf(doc,pages,ptW,ptH,W,H,title){
   for(let i=0;i<pages.length;i++){const pg=pages[i],cId=alloc(),ann=[];
     for(const lk of (pg.links||[])){const aid=alloc();
       obj(aid,`<< /Type /Annot /Subtype /Link /Rect [${lk.rect.map(v=>v.toFixed(1)).join(" ")}] /Border [0 0 0] /Dest [${pageIds[lk.targetPage]} 0 R /Fit] >>`);ann.push(`${aid} 0 R`)}
-    await stream(cId,"",te.encode(`q ${pdfN4(sx)} 0 0 ${pdfN4(-sy)} 0 ${pdfN4(ptH)} cm\n${pg.content}\nQ`));
+    await stream(cId,"",te.encode(pg.tho?pg.content:`q ${pdfN4(sx)} 0 0 ${pdfN4(-sy)} 0 ${pdfN4(ptH)} cm\n${pg.content}\nQ`));
     obj(pageIds[i],`<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 ${ptW.toFixed(2)} ${ptH.toFixed(2)}] /Resources ${resId} 0 R /Contents ${cId} 0 R${ann.length?` /Annots [${ann.join(" ")}]`:""} >>`);
   }
   obj(pagesId,`<< /Type /Pages /Count ${pages.length} /Kids [${pageIds.map(id=>id+" 0 R").join(" ")}] >>`);
@@ -212,10 +219,13 @@ async function assembleVectorPdf(doc,pages,ptW,ptH,W,H,title){
 /* Nút "Tạo và tải file PDF": dựng cfg từ màn Xuất PDF (pdfOpt) và bài đang mở, gọi exportPdf(cfg) rồi tải file về */
 function pdfCfgTuManHinh(){
   const l=LESSONS[cur.li];
-  const scope={cur:"bai",pick:"bai",part:"phan",all:"tatca",weak:"luyenthem",free:"tudo",type:"tugo"}[pdfOpt.scope];
+  const scope={cur:"bai",pick:"bai",part:"phan",all:"tatca",weak:"luyenthem",free:"tudo",type:"tugo",note:"ghichep",test:"kiemtra"}[pdfOpt.scope];
   const c={v:1,script:SCRIPT,scope,lessons:pdfOpt.scope==="pick"?pdfOpt.lessons.slice():[l.id],mode:pdfOpt.mode,grid:pdfOpt.grid||S.gridStyle||"french",arrows:pdfOpt.arrows,preset:pdfOpt.preset,barSide:pdfOpt.barSide};
   if(pdfOpt.preset==="tunhap"){c.wMm=pdfOpt.wMm;c.hMm=pdfOpt.hMm}
   if(pdfOpt.scope==="type")c.text=pdfOpt.text;
+  if(pdfOpt.scope==="note"||pdfOpt.scope==="test"){c.lessons=[];delete c.mode;delete c.arrows}
+  if(pdfOpt.scope==="note"){c.trang=pdfOpt.trang;if(pdfOpt.trang!=="oly4")c.buoc=pdfOpt.buoc[pdfOpt.trang];c.soTrang=pdfOpt.soTrang;c.dauTrang=pdfOpt.dauTrang}
+  if(pdfOpt.preset==="a5"&&pdfOpt.a5x2)c.a5x2=true;
   return c;
 }
 async function generateWorkbookPdf(){

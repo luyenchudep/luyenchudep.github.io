@@ -14,7 +14,10 @@ const TU_GO_TOI_DA = 2000;   // số ký tự tối đa của nội dung tự g�
 const PDF_CFG_MAC_DINH = { v: 1, scope: "bai", lessons: [], mode: "to", grid: "french", arrows: true, preset: "rm2", barSide: "left" };
 
 /* Kiểm và điền giá trị mặc định. Sai thì báo lỗi bằng lời dễ hiểu. */
-const PDF_CFG_KHOA = ["v", "script", "scope", "lessons", "mode", "grid", "arrows", "preset", "barSide", "wMm", "hMm", "text"];
+const PDF_CFG_KHOA = ["v", "script", "scope", "lessons", "mode", "grid", "arrows", "preset", "barSide", "wMm", "hMm", "text", "trang", "buoc", "soTrang", "dauTrang", "a5x2"];
+/* Trang ghi chép (bản 0.15): kiểu trang, khoảng cách (mm) cho phép và mặc định */
+const KIEU_GHI_CHEP = { dong: { ten: "Kẻ dòng", min: 5, max: 15, md: 7 }, cham: { ten: "Kẻ chấm", min: 3, max: 10, md: 5 }, cornell: { ten: "Cornell", min: 5, max: 15, md: 7 }, oly4: { ten: "4 ô li trống", min: 2, max: 2, md: 2 } };
+const GHI_CHEP_TOI_DA = 100;   // số trang ghi chép tối đa một file
 function chuanHoaPdfCfg(cfg) {
   /* Bảo mật: cfg có thể đến từ đường link người khác gửi; chỉ chép các trường đã biết (bỏ __proto__, constructor…) */
   const vao = cfg && typeof cfg === "object" && !Array.isArray(cfg) ? cfg : {}, c = Object.assign({}, PDF_CFG_MAC_DINH);
@@ -30,8 +33,21 @@ function chuanHoaPdfCfg(cfg) {
   if (!["to", "nho"].includes(c.mode)) throw new Error(`Cách tập không hợp lệ: "${c.mode}"`);
   if (!["french", "oly4"].includes(c.grid)) throw new Error(`Kiểu dòng kẻ không hợp lệ: "${c.grid}"`);
   if (!["left", "right"].includes(c.barSide)) throw new Error(`Lề thanh công cụ không hợp lệ: "${c.barSide}"`);
-  if (!["bai", "phan", "tatca", "luyenthem", "tudo", "tugo"].includes(c.scope))
-    throw new Error(`Chưa hỗ trợ phạm vi "${c.scope}" (có: bai, phan, tatca, luyenthem, tudo, tugo)`);
+  if (!["bai", "phan", "tatca", "luyenthem", "tudo", "tugo", "ghichep", "kiemtra"].includes(c.scope))
+    throw new Error(`Chưa hỗ trợ phạm vi "${String(c.scope).slice(0, 20)}" (có: bai, phan, tatca, luyenthem, tudo, tugo, ghichep, kiemtra)`);
+  if (c.scope === "ghichep") {
+    if (!Object.prototype.hasOwnProperty.call(KIEU_GHI_CHEP, c.trang ?? "dong")) throw new Error(`Kiểu trang ghi chép không hợp lệ: "${String(c.trang).slice(0, 20)}"`);
+    c.trang = c.trang ?? "dong";
+    const g = KIEU_GHI_CHEP[c.trang], b = c.buoc == null ? g.md : Number(c.buoc);
+    if (!(b >= g.min && b <= g.max)) throw new Error(`Khoảng cách của ${g.ten} phải từ ${g.min} tới ${g.max} mm`);
+    c.buoc = Math.round(b * 10) / 10;
+    const n = c.soTrang == null ? 20 : Number(c.soTrang);
+    if (!(Number.isInteger(n) && n >= 1 && n <= GHI_CHEP_TOI_DA)) throw new Error(`Số trang ghi chép phải từ 1 tới ${GHI_CHEP_TOI_DA}`);
+    c.soTrang = n; c.dauTrang = c.dauTrang !== false;
+  } else { delete c.trang; delete c.buoc; delete c.soTrang; delete c.dauTrang; }
+  if (c.scope === "ghichep" || c.scope === "kiemtra") { c.lessons = []; delete c.text; }
+  /* In 2 trang A5 trên 1 tờ A4 nằm ngang: chỉ có ở khổ A5 */
+  if (c.a5x2 === true && c.preset === "a5") c.a5x2 = true; else delete c.a5x2;
   if (c.scope !== "tugo") delete c.text;
   if (c.scope === "tugo") {
     c.text = typeof c.text === "string" ? c.text : "";
@@ -89,10 +105,11 @@ async function exportPdfMot(cfg, tuyChon = {}) {
   const saveLR = luyenRounds, saveFL = frozenLuyen, saveFR = frozenReview, saveLRows = LUYEN.rows, saveRRows = REVIEW.rows;
   const saveTheme = S.theme, saveW = W, saveH = H, saveLayout = layout, saveT = T, saveSGrid = S.gridStyle, saveSArrows = S.rowArrows, saveSXBand = S.xBand, saveScale = S.scale, saveSTrace = S.trace;
   try {
-    const pr = c.preset === "tunhap" ? khoTuNhap(c.wMm, c.hMm) : PDF_PRESETS[c.preset];
+    const pr0 = c.preset === "tunhap" ? khoTuNhap(c.wMm, c.hMm) : PDF_PRESETS[c.preset];
+    const pr = c.a5x2 ? Object.assign({}, pr0, { links: false }) : pr0;   // giấy in ra không bấm được: bỏ link mục lục
     /* Trang nhỏ hơn A5 (dưới 1240 điểm ảnh ngang): thu nhỏ chữ tiêu đề và lề theo tỷ lệ; các khổ cũ giữ nguyên (k = 1) */
     const k = Math.min(1, pr.pxW / 1240), px = v => v * k;
-    const targetLessons = chonBaiPdf(c);
+    const targetLessons = c.scope === "ghichep" || c.scope === "kiemtra" ? [] : chonBaiPdf(c);
 
     const mctx = document.createElement("canvas").getContext("2d"), doc = new PdfDoc(); let ctx = null;
     const pdfTheme = pr.mono ? THEMES.eink : THEMES.light;
@@ -105,6 +122,7 @@ async function exportPdfMot(cfg, tuyChon = {}) {
     const padL = c.barSide === "left" ? pr.bar : px(68);
     const padR = c.barSide === "right" ? pr.bar : px(68);
     const padT = px(138), padB = px(86);
+    if (c.scope === "ghichep" || c.scope === "kiemtra") return await xuatTrangKhongBai(c, pr, doc, mctx, { padL, padR }, tuyChon, baoTienDo);
 
     /* Tạo trước danh sách trang cho từng bài học */
     const lessonJobs = [];
@@ -234,7 +252,7 @@ async function exportPdfMot(cfg, tuyChon = {}) {
           ctx.fillText("Gợi ý: " + job.lesson.note, padL, H - px(36));
         }
         /* Nút bấm góc trên phải để quay về Trang 1 Mục lục trên reMarkable */
-        if (tuyChon.xemTruoc) return { xemTruoc: true, soTrang: xemGon ? 0 : totalContentPages + tocOffset, soBai: targetLessons.length, coMucLuc: needToc, tenKho: pr.name };
+        if (tuyChon.xemTruoc) return { xemTruoc: true, soTrang: xemGon ? 0 : totalContentPages + tocOffset, soTo: c.a5x2 && !xemGon ? Math.ceil((totalContentPages + tocOffset) / 2) : 0, soBai: targetLessons.length, coMucLuc: needToc, tenKho: pr.name };
         const backLinks = needToc && pr.links ? [{ rect: [((W - padR - 220) / W) * pr.ptW, pr.ptH - (95 / H) * pr.ptH, ((W - padR) / W) * pr.ptW, pr.ptH - (25 / H) * pr.ptH], targetPage: 0 }] : [];
         pdfPages.push({ content: ctx.out.join("\n"), links: backLinks });
       }
@@ -243,8 +261,8 @@ async function exportPdfMot(cfg, tuyChon = {}) {
     baoTienDo("Đang tạo file PDF…");
     await new Promise(r => setTimeout(r, 10));
     const tieuDe = `Tập viết · ${SC.name} · ${lessonJobs.length > 1 ? tenNhom : lessonJobs[0].lesson.t}`;
-    const blob = await assembleVectorPdf(doc, pdfPages, pr.ptW, pr.ptH, W, H, tieuDe);
-    return { blob, soTrang: pdfPages.length, tieuDe, cfg: c };
+    const blob = await assembleVectorPdf(doc, pdfPages, pr.ptW, pr.ptH, W, H, tieuDe, c.a5x2);
+    return { blob, soTrang: c.a5x2 ? Math.ceil(pdfPages.length / 2) : pdfPages.length, tieuDe, cfg: c };
   } finally {
     S.theme = saveTheme; W = saveW; H = saveH; layout = saveLayout; T = saveT; S.gridStyle = saveSGrid; S.rowArrows = saveSArrows; S.xBand = saveSXBand; S.scale = saveScale; S.trace = saveSTrace;
     luyenRounds = saveLR; frozenLuyen = saveFL; frozenReview = saveFR; LUYEN.rows = saveLRows; REVIEW.rows = saveRRows;
@@ -252,4 +270,28 @@ async function exportPdfMot(cfg, tuyChon = {}) {
     /* Xem trước không đổi trang viết: chỉ dựng lại khi cửa sổ vừa đổi cỡ trong lúc chạy */
     if (!tuyChon.xemTruoc || pendingResize) { pendingResize = false; resize(); }
   }
+}
+
+/* Trang ghi chép, trang kiểm tra: vẽ bằng engine/trang-ghi-chep.js theo mm thật (1 mm = pr.pxW / pr.wMm điểm ảnh).
+   Gọi từ exportPdfMot khi W, H đã gán theo khổ; biến chung được khôi phục ở khối finally của hàm gọi. */
+async function xuatTrangKhongBai(c, pr, doc, mctx, le, tuyChon, baoTienDo) {
+  const mm = pr.pxW / pr.wMm, ghiChep = c.scope === "ghichep", n = ghiChep ? c.soTrang : 1;
+  const vung = { l: le.padL, r: le.padR, t: 10 * mm, b: 10 * mm };
+  const pdfPages = [];
+  for (let i = 0; i < n; i++) {
+    if (n > 1) { baoTienDo(`Đang vẽ trang ${i + 1}/${n}…`); if (i % 10 === 0) await new Promise(r => setTimeout(r, 0)); }
+    let ctx;
+    if (tuyChon.xemTruoc) { const kx = Math.min(1, 900 / Math.max(W, H)); ctx = tuyChon.xemTruoc(Math.round(W * kx), Math.round(H * kx)); ctx.setTransform(kx, 0, 0, kx, 0, 0); }
+    else ctx = new PdfCtx(doc, mctx);
+    ctx.fillStyle = "#FFFFFF"; ctx.fillRect(0, 0, W, H);
+    if (ghiChep) veTrangGhiChep(ctx, W, H, mm, { kieu: c.trang, buoc: c.buoc, le: vung, dauTrang: c.dauTrang, so: i + 1, tong: n });
+    else veTrangKiemTra(ctx, W, H, mm, { le: vung, tenKho: pr.name, wMm: pr.wMm, hMm: pr.hMm });
+    if (tuyChon.xemTruoc) return { xemTruoc: true, soTrang: n, soTo: c.a5x2 ? Math.ceil(n / 2) : 0, soBai: 0, coMucLuc: false, tenKho: pr.name };
+    pdfPages.push({ content: ctx.out.join("\n"), links: [] });
+  }
+  baoTienDo("Đang tạo file PDF…");
+  await new Promise(r => setTimeout(r, 10));
+  const tieuDe = ghiChep ? `Trang ghi chép · ${KIEU_GHI_CHEP[c.trang].ten}${c.trang === "oly4" ? "" : " " + String(c.buoc).replace(".", ",") + " mm"}` : `Trang kiểm tra · ${pr.name}`;
+  const blob = await assembleVectorPdf(doc, pdfPages, pr.ptW, pr.ptH, W, H, tieuDe, c.a5x2);
+  return { blob, soTrang: c.a5x2 ? Math.ceil(pdfPages.length / 2) : pdfPages.length, tieuDe, cfg: c };
 }
