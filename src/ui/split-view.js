@@ -17,6 +17,7 @@ function applySplit(){
 }
 function renderSidePane(){
   if(!document.body.classList.contains("split"))return;
+  const pane=document.getElementById("sidePane");if(!pane||pane.offsetWidth<120)return;   /* bảng đang ẩn: không vẽ */
   const box=document.getElementById("sideBody");if(!box)return;
   if(sideTab==="list"){
     let h=`<div class="row" style="border:0;padding:4px 0 8px"><span>Kiểu chữ</span><div class="seg">${DS_KIEU_CHU.map(([v,t,m])=>[v,t.replace(" 10°",""),m]).map(([v,t,m])=>`<button class="${SCRIPT===v?"on":""}" title="${m||t}" onclick="setScript('${v}')">${t}</button>`).join("")}</div></div>`;

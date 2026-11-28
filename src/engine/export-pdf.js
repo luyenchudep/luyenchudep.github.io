@@ -74,7 +74,13 @@ function chonBaiPdf(c) {
   return [LESSONS.find(l => l.id === "free") || LESSONS[0]];   // "tudo"
 }
 
-async function exportPdf(cfg, tuyChon = {}) {
+let _hangPdf = Promise.resolve();
+function exportPdf(cfg, tuyChon = {}) {
+  const lan = _hangPdf.then(() => exportPdfMot(cfg, tuyChon));
+  _hangPdf = lan.catch(() => {});
+  return lan;
+}
+async function exportPdfMot(cfg, tuyChon = {}) {
   const c = chuanHoaPdfCfg(cfg);
   const baoTienDo = typeof tuyChon.onProgress === "function" ? tuyChon.onProgress : () => {};
   pdfBusyFlag = true; exporting = true;
@@ -140,7 +146,7 @@ async function exportPdf(cfg, tuyChon = {}) {
 
     const pdfPages = [];
     /* Trang 1: Mục lục có link bấm nhảy trang (cho reMarkable & Tablet) */
-    if (needToc) {
+    if (needToc && !tuyChon.xemTruoc) {
       baoTienDo("Đang vẽ trang mục lục…");
       await new Promise(r => setTimeout(r, 10));
       ctx = new PdfCtx(doc, mctx);
@@ -182,7 +188,8 @@ async function exportPdf(cfg, tuyChon = {}) {
         donePages++;
         baoTienDo(`Đang vẽ trang ${donePages}/${totalContentPages} (${job.lesson.t})…`);
         await new Promise(r => setTimeout(r, 8));
-        ctx = new PdfCtx(doc, mctx);
+        /* Xem trước: vẽ lên canvas thường (cùng lệnh vẽ như PDF) rồi dừng ở trang đầu */
+        ctx = tuyChon.xemTruoc ? tuyChon.xemTruoc(W, H) : new PdfCtx(doc, mctx);
         ctx.fillStyle = T.paper; ctx.fillRect(0, 0, W, H);
         /* Tiêu đề trang vở */
         ctx.fillStyle = "#000000"; ctx.textBaseline = "alphabetic"; ctx.textAlign = "left";
@@ -222,6 +229,7 @@ async function exportPdf(cfg, tuyChon = {}) {
           ctx.fillText("Gợi ý: " + job.lesson.note, padL, H - px(36));
         }
         /* Nút bấm góc trên phải để quay về Trang 1 Mục lục trên reMarkable */
+        if (tuyChon.xemTruoc) return { xemTruoc: true, soTrang: totalContentPages + tocOffset, tenKho: pr.name };
         const backLinks = needToc && pr.links ? [{ rect: [((W - padR - 220) / W) * pr.ptW, pr.ptH - (95 / H) * pr.ptH, ((W - padR) / W) * pr.ptW, pr.ptH - (25 / H) * pr.ptH], targetPage: 0 }] : [];
         pdfPages.push({ content: ctx.out.join("\n"), links: backLinks });
       }

@@ -595,6 +595,8 @@ function xuLyGom(){
   }
   if(changed){strokes=next;if(live)live.changed=true;if(typeof zbox!=="undefined"&&zbox.live)zbox.live.changed=true;renderInk()}
 }
+/* Chốt mọi thao tác đang dở (nét đang viết, gôm đang kéo, điểm gôm còn chờ) trước khi đổi trang */
+function chotThaoTac(){if(live)endStroke();if(typeof zbox!=="undefined"&&zbox.live)endZBoxStroke();if(gomHen||gomCho.length)gomXong();gomTruoc=null}
 /* Gôm hết các điểm còn chờ ngay (gọi khi nhấc viết) */
 function gomXong(){if(gomHen){cancelAnimationFrame(gomHen);gomHen=0}xuLyGom();gomTruoc=null}
 /* Khoanh vùng để xóa: nét có từ một nửa số điểm trở lên nằm trong vòng khoanh thì bị xóa */

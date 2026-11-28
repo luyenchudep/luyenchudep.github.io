@@ -25,7 +25,7 @@ function show(){
   requestAnimationFrame(()=>{const rh=document.querySelector("header").offsetHeight;if(Math.abs(rh-lastHeader)>2){lastHeader=rh;resize()}});
 }
 let lastHeader=0;
-function go(d){
+function go(d){chotThaoTac();
   flushSave();
   const last=NREAL-1,l=LESSONS[cur.li];comparing=false;
   if(d>0){if(cur.page<pages.length-1)cur.page++;
@@ -34,7 +34,7 @@ function go(d){
   else{if(cur.page>0)cur.page--;else if(cur.li>0&&cur.li<=last){cur.li--;cur.page=9999}else return}
   show();
 }
-function openLesson(i,mode){flushSave();if(LESSONS[i].id==="review")buildReview(true);if(LESSONS[i].id==="luyen"){luyenRounds=1;buildLuyen(true)}
+function openLesson(i,mode){chotThaoTac();flushSave();if(LESSONS[i].id==="review")buildReview(true);if(LESSONS[i].id==="luyen"){luyenRounds=1;buildLuyen(true)}
   let md=mode||(LESSONS[i].id==="review"?"nho":"to"),pg0=0,resumeKey=null;
   const q=POS[LESSONS[i].id];
   if(!mode&&q&&i<NREAL&&!done.has(LESSONS[i].id)){md=q.m||"to";

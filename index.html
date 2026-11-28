@@ -758,6 +758,27 @@ body.xemMo.congCuNoi footer{display:none}
 body.xemMo #modes button.on:not(#mXem){background:transparent;color:var(--muted);box-shadow:none}
 body.xemMo #modes button.on:not(#mXem) .n{border-color:currentColor;color:inherit;background:transparent}
 body.xemMo #navMo{display:none}
+
+/* ================== KHU DẠNG TRANG (Giáo trình, Hồ sơ, Tập viết PDF) ================== */
+.sheet.trang{background:var(--bg);align-items:stretch;justify-content:stretch;top:0}
+.sheet.trang .box{max-width:none;width:100%;height:100%;max-height:none;border-radius:0;animation:none;padding:22px max(18px,calc((100% - 980px)/2)) calc(28px + env(safe-area-inset-bottom))}
+.sheet.trang .box::before{display:none}
+.sheet.trang .tiles{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}
+.li .liPdf{margin-left:auto;flex:0 0 auto;width:40px;height:40px;border:0;border-radius:10px;background:transparent;color:var(--muted);display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.li .liPdf:hover,.li .liPdf:focus-visible{background:var(--soft);color:var(--accent)}
+.li .sz + .liPdf{margin-left:8px}
+/* Xem trước trang PDF */
+.pdfXem{margin:8px 0 12px;text-align:center}
+.pdfXemKhung{background:var(--soft);border-radius:14px;padding:12px;display:flex;justify-content:center}
+#pdfXemCv{max-width:100%;max-height:52vh;width:auto;height:auto;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.18)}
+body.eink #pdfXemCv{box-shadow:none;border:1px solid #000}
+@media (min-width:1000px){
+  .sheet.trang #genBox{display:grid;grid-template-columns:minmax(0,1fr) 360px;column-gap:24px;align-content:start}
+  .sheet.trang #genBox > *{grid-column:1}
+  .sheet.trang #genBox > .pdfXem{grid-column:2;grid-row:1 / span 60;position:sticky;top:0;align-self:start;margin-top:0}
+  .sheet.trang #pdfXemCv{max-height:70vh}
+}
+#menu.sheet.trang .box,#gen.sheet.trang .box{height:auto;align-self:stretch}
 </style>
 </head>
 <body>
@@ -8472,6 +8493,8 @@ function xuLyGom(){
   }
   if(changed){strokes=next;if(live)live.changed=true;if(typeof zbox!=="undefined"&&zbox.live)zbox.live.changed=true;renderInk()}
 }
+/* Chốt mọi thao tác đang dở (nét đang viết, gôm đang kéo, điểm gôm còn chờ) trước khi đổi trang */
+function chotThaoTac(){if(live)endStroke();if(typeof zbox!=="undefined"&&zbox.live)endZBoxStroke();if(gomHen||gomCho.length)gomXong();gomTruoc=null}
 /* Gôm hết các điểm còn chờ ngay (gọi khi nhấc viết) */
 function gomXong(){if(gomHen){cancelAnimationFrame(gomHen);gomHen=0}xuLyGom();gomTruoc=null}
 /* Khoanh vùng để xóa: nét có từ một nửa số điểm trở lên nằm trong vòng khoanh thì bị xóa */
@@ -8846,6 +8869,7 @@ function applySplit(){
 }
 function renderSidePane(){
   if(!document.body.classList.contains("split"))return;
+  const pane=document.getElementById("sidePane");if(!pane||pane.offsetWidth<120)return;   /* bảng đang ẩn: không vẽ */
   const box=document.getElementById("sideBody");if(!box)return;
   if(sideTab==="list"){
     let h=`<div class="row" style="border:0;padding:4px 0 8px"><span>Kiểu chữ</span><div class="seg">${DS_KIEU_CHU.map(([v,t,m])=>[v,t.replace(" 10°",""),m]).map(([v,t,m])=>`<button class="${SCRIPT===v?"on":""}" title="${m||t}" onclick="setScript('${v}')">${t}</button>`).join("")}</div></div>`;
@@ -8939,7 +8963,7 @@ function leaveCard(m){
   const key=t||pageItemOf(pages,cur.page);
   if(!(key&&jumpToItem(key,m)))setMode(m);
 }
-function setMode(m){
+function setMode(m){chotThaoTac();
   if(m!==cur.mode&&pages.length){const key=pageItemOf(pages,cur.page);
     if(key){const r=computePages(LESSONS[cur.li],m,S.scale,H,0,false),pi=findItemPage(r.pages,key);if(pi>=0)cur.page=pi}}
   flushSave();cur.mode=m;comparing=false;show();if(m==="nho")toast(LESSONS[cur.li].id==="review"?"Viết theo trí nhớ · xong chạm So sánh":"Nhìn mẫu đầu dòng rồi chép tiếp · xong chạm So sánh")}
@@ -9007,7 +9031,7 @@ function show(){
   requestAnimationFrame(()=>{const rh=document.querySelector("header").offsetHeight;if(Math.abs(rh-lastHeader)>2){lastHeader=rh;resize()}});
 }
 let lastHeader=0;
-function go(d){
+function go(d){chotThaoTac();
   flushSave();
   const last=NREAL-1,l=LESSONS[cur.li];comparing=false;
   if(d>0){if(cur.page<pages.length-1)cur.page++;
@@ -9016,7 +9040,7 @@ function go(d){
   else{if(cur.page>0)cur.page--;else if(cur.li>0&&cur.li<=last){cur.li--;cur.page=9999}else return}
   show();
 }
-function openLesson(i,mode){flushSave();if(LESSONS[i].id==="review")buildReview(true);if(LESSONS[i].id==="luyen"){luyenRounds=1;buildLuyen(true)}
+function openLesson(i,mode){chotThaoTac();flushSave();if(LESSONS[i].id==="review")buildReview(true);if(LESSONS[i].id==="luyen"){luyenRounds=1;buildLuyen(true)}
   let md=mode||(LESSONS[i].id==="review"?"nho":"to"),pg0=0,resumeKey=null;
   const q=POS[LESSONS[i].id];
   if(!mode&&q&&i<NREAL&&!done.has(LESSONS[i].id)){md=q.m||"to";
@@ -9193,7 +9217,7 @@ function partBlock(p,openSet,setName,liStyle){
   const n=p.lessons.length,k=p.lessons.filter(l=>done.has(l.id)).length,isCur=cur.li<NREAL&&LESSONS[cur.li].part===p.part;
   let h=`<details class="part ${isCur?"cur":""}" data-p="${p.part}" ${openSet.has(p.part)?"open":""} ontoggle="${setName}[this.open?'add':'delete'](this.dataset.p)"><summary><span class="pn">${p.part}</span><span class="pc ${k===n?"full":""}">${k}/${n}</span></summary>`;
   for(const l of p.lessons){const idx=LESSONS.indexOf(l);
-    h+=`<div class="li ${idx===cur.li?"cur":""}" onclick="openLesson(${idx})">${ckIcon(l.id)}<span>${idx+1}. ${l.t}</span>${liStyle?"":`<span class="sz">${({L:"cỡ lớn",M:"cỡ vừa",S:"cỡ nhỏ",thuong:"cỡ thường",nho:"cỡ nhỏ"}[l.z]||"")}</span>`}</div>`}
+    h+=`<div class="li ${idx===cur.li?"cur":""}" onclick="openLesson(${idx})">${ckIcon(l.id)}<span>${idx+1}. ${l.t}</span>${liStyle?"":`<span class="sz">${({L:"cỡ lớn",M:"cỡ vừa",S:"cỡ nhỏ",thuong:"cỡ thường",nho:"cỡ nhỏ"}[l.z]||"")}</span><button type="button" class="liPdf" data-action="pdfBai" aria-label="Xuất PDF bài này" title="Xuất PDF bài này">${ic("download")}</button>`}</div>`}
   return h+`</details>`}
 function setMenuTab(t){menuTab=t;openMenu(true);const b=document.getElementById("menuBox");if(b)b.scrollTop=0}
 function openMenu(keepScroll=false){
@@ -9202,13 +9226,21 @@ function openMenu(keepScroll=false){
   if(!partOpen)partOpen=new Set([curPartName()]);
   const real=LESSONS.slice(0,NREAL),n=real.filter(l=>l.id!=="free").length,k=[...done].filter(id=>real.some(l=>l.id===id&&id!=="free")).length;
   const due=dueItems().length,toolAlert=due>0||paperDue();
-  let h=`<div class="mHead"><h3>Danh mục</h3><div class="seg">${DS_KIEU_CHU.map(([v,t,m])=>`<button class="${SCRIPT===v?"on":""}" title="${m||t}" onclick="setScript('${v}')">${t}</button>`).join("")}</div></div>`;
-  h+=`<div class="mTabs">${[["bai","book","Bài học"],["cong","target","Công cụ"],["cai","sliders","Cài đặt"]].map(([v,icn,t])=>`<button class="${menuTab===v?"on":""}" onclick="setMenuTab('${v}')">${ic(icn)}${t}${v==="cong"&&toolAlert?`<span class="dot"></span>`:""}</button>`).join("")}</div>`;
-  if(menuTab==="bai"){
+  let h=`<div class="mHead"><h3>${menuTab==="cai"?"Hồ sơ":"Giáo trình"}</h3><div class="seg">${DS_KIEU_CHU.map(([v,t,m])=>`<button class="${SCRIPT===v?"on":""}" title="${m||t}" onclick="setScript('${v}')">${t}</button>`).join("")}</div></div>`;
+  /* Chuyển giữa Giáo trình và Hồ sơ bằng thanh 4 khu (bản 0.14) */
+  if(menuTab!=="cai"){
+    const tile=(icon,title,sub,act,badge)=>`<button class="tile" onclick="${act}">${ic(icon)}<b>${title}</b><small>${sub}</small>${badge?`<span class="badge">${badge}</span>`:""}</button>`;
+    h+=`<div class="tiles">`+
+      tile("review","Bài ôn","viết theo trí nhớ",`openLesson(${REVIEW_I},'nho')`,due?due+" chữ":"")+
+      tile("target","Luyện thêm",WEAK.length?WEAK.length+" mục cần luyện":"chữ chấm chưa đạt",`openLesson(${LUYEN_I},'to')`,"")+
+      tile("edit","Bài tự do","tự soạn nội dung","openCustom()","")+
+      tile("sign","Tên và chữ ký","luyện tên riêng","openNameLab()","")+
+      tile("book","Nhập môn","lý thuyết rèn chữ","openNhapMon()","")+
+    `</div>`;
     h+=`<div class="prog" style="margin-bottom:4px">${SC.name} · đã tập ${k}/${n} bài</div><div class="bar"><div style="width:${Math.round(k/n*100)}%"></div></div>`;
     h+=`<button class="hero" onclick="sessStart()"><span class="hIc">${ic("play")}</span><span><b>${sess?"Bắt đầu lại buổi tập":"Buổi tập hôm nay"}</b><small>15 phút · khởi động, bài mới, bài ôn</small></span></button>`;
     for(const p of COURSE)h+=partBlock(p,partOpen,"partOpen",false);
-  }else if(menuTab==="cong"){
+  }else if(false){
     const tile=(icon,title,sub,act,badge)=>`<button class="tile" onclick="${act}">${ic(icon)}<b>${title}</b><small>${sub}</small>${badge?`<span class="badge">${badge}</span>`:""}</button>`;
     h+=`<div class="tiles">`+
       tile("review","Bài ôn","viết theo trí nhớ",`openLesson(${REVIEW_I},'nho')`,due?due+" chữ":"")+
@@ -9221,6 +9253,9 @@ function openMenu(keepScroll=false){
       tile("download","Tạo tập viết PDF","A4, A5, máy đọc sách, tự gõ","openPdfModal()","")+
     `</div>`;
   }else{
+    const tile2=(icon,title,sub,act,badge)=>`<button class="tile" onclick="${act}">${ic(icon)}<b>${title}</b><small>${sub}</small>${badge?`<span class="badge">${badge}</span>`:""}</button>`;
+    h+=`<div class="prog" style="margin-bottom:4px">${escHtml(SC.name)} · đã tập ${k}/${n} bài</div><div class="bar"><div style="width:${Math.round(k/n*100)}%"></div></div>`;
+    h+=`<div class="tiles">`+tile2("journal","Nhật ký luyện chữ","mỗi ngày một trang","openJournal()","")+tile2("camera","Kiểm tra trên giấy","2 tuần một lần","openPaper()",paperDue()?"tới hạn":"")+`</div>`;
     h+=grp("hien","sliders","Hiển thị",
       `<div class="row"><span>Màu giấy</span><div class="seg">${[["sepia","Ấm"],["light","Sáng"],["dark","Tối"],["eink","Trắng đen"]].map(([v,t])=>`<button class="${S.theme===v?"on":""}" onclick="setTheme('${v}');openMenu(true)">${t}</button>`).join("")}</div></div>`+
       seg("Màu nhấn","accent",[["blue","Xanh mực"],["black","Đen"]])+
@@ -9253,7 +9288,7 @@ function openMenu(keepScroll=false){
       ${window.self===window.top?`<button class="btn ghost" onclick="savePng()">${ic("image")}Lưu trang này thành hình (PNG)</button>`:""}<div style="height:12px"></div>`);
     h+=`<p class="ver" style="text-align:center;color:var(--muted);font-size:13px;margin:16px 0 4px">${VERSION}</p>`;
   }
-  h+=`<button class="btn" onclick="closeSheets()">Đóng</button>`;
+  h+=`<button class="btn" onclick="closeSheets()">Về trang viết</button>`;
   document.getElementById("menuBox").innerHTML=h;openSheet("menu",keepScroll);
   if(!keepScroll&&menuTab==="bai")setTimeout(()=>{const c=document.querySelector("#menuBox .li.cur");if(c){const b=document.getElementById("menuBox"),r=c.getBoundingClientRect(),br=b.getBoundingClientRect();if(r.bottom>br.bottom-20)c.scrollIntoView({block:"center"})}},30);
 }
@@ -9280,6 +9315,7 @@ function cardItems(l){
     if(out.length>=3)break}
   return out}
 function drawCard(cv,items,fam){
+  if(!cv.parentElement||cv.parentElement.clientWidth<80)return;   /* khung đang ẩn hoặc quá hẹp: không vẽ */
   const Wc=cv.parentElement.clientWidth-2,d=Math.min(devicePixelRatio||1,3),F=FONTS[fam||SC.font],th=SCRIPT==="th";
   let xh=Math.min(44,Wc/7.5);
   /* Tiểu học: từ dài (tên riêng) thì thu nhỏ cho vừa khung; có chữ hoa thì dòng cao hơn cho dấu mũ, dấu thanh */
@@ -10255,6 +10291,7 @@ function openPdfModal(keepScroll=false){
   const oKho=pdfOpt.preset!=="tunhap"?"":`<div class="row"><span>Khổ tự nhập (mm)</span><div class="pdfKhoNhap"><input type="number" min="40" max="500" step="0.1" value="${pdfOpt.wMm}" oninput="datKhoTuNhap('wMm',this.value)" aria-label="Rộng (mm)"> × <input type="number" min="40" max="500" step="0.1" value="${pdfOpt.hMm}" oninput="datKhoTuNhap('hMm',this.value)" aria-label="Cao (mm)"></div></div>`;
   document.getElementById("genBox").innerHTML=`<h3>${ic("download")} Tạo tập viết PDF</h3>
   <div class="prog">Tạo tập viết PDF ngay trên máy, không cần mạng. Chọn nội dung và khổ giấy, rồi tạo file hoặc chép đường link để gửi cho người khác.</div>
+  <aside class="pdfXem" aria-label="Xem trước trang đầu"><div class="pdfXemKhung"><canvas id="pdfXemCv"></canvas></div><div class="prog" id="pdfXemTxt">Đang dựng trang xem trước…</div></aside>
   <div class="row"><span>Nội dung</span><div class="seg">${nutChon([["cur","Bài này"],["pick","Chọn bài"],["part","Cả phần"],["all","Cả giáo trình"],["weak","Luyện thêm"],["free","Bài tự do"],["type","Tự gõ"]],nd,v=>`pdfOpt.scope='${v}'`)}</div></div>
   <div class="prog" style="margin:4px 0 8px">${moTaNd}</div>${dsBai}${oTuGo}
   <div class="row"><span>Khổ giấy hoặc máy</span><select aria-label="Khổ giấy hoặc máy" style="flex:1;min-width:0;max-width:100%;padding:10px 12px;border-radius:12px;border:1px solid currentColor;background:transparent;color:inherit;font:inherit" onchange="if(this.value==='tunhap')chonKhoTuNhap();else pdfOpt.preset=this.value;openPdfModal(true)">${nhomKho().map(([ten,ds])=>`<optgroup label="${ten}">${ds.map(v=>`<option value="${v}"${pdfOpt.preset===v?" selected":""}>${escHtml(KHO_TRANG[v].ten)}</option>`).join("")}</optgroup>`).join("")}<optgroup label="Khác"><option value="tunhap"${pdfOpt.preset==="tunhap"?" selected":""}>Tự nhập kích thước (mm)</option></optgroup></select></div>
@@ -10268,6 +10305,16 @@ function openPdfModal(keepScroll=false){
   <button class="btn ghost" onclick="chepLinkCfg()">Chép đường link cấu hình này</button>
   <button class="btn ghost" onclick="closeSheets()">Đóng</button>`;
   openSheet("gen",keepScroll);
+  veXemTruocPdf();
+}
+/* Xem trước trang nội dung đầu tiên (không tạo file) */
+let _xemPdfLan=0;
+async function veXemTruocPdf(){
+  const lan=++_xemPdfLan,cv=document.getElementById("pdfXemCv"),txt=document.getElementById("pdfXemTxt");if(!cv)return;
+  await new Promise(r=>setTimeout(r,60));if(lan!==_xemPdfLan||pdfBusyFlag)return;
+  try{const r=await exportPdf(pdfCfgTuManHinh(),{xemTruoc:(w,h)=>{cv.width=w;cv.height=h;return cv.getContext("2d")}});
+    if(lan===_xemPdfLan&&txt)txt.textContent=r&&r.xemTruoc?`${r.tenKho} · trang đầu trong ${r.soTrang} trang`:"";}
+  catch(e){if(lan===_xemPdfLan&&txt)txt.textContent="Chưa xem trước được: "+e.message}
 }
 const PDFF = {
   "QS": {
@@ -10656,7 +10703,13 @@ function chonBaiPdf(c) {
   return [LESSONS.find(l => l.id === "free") || LESSONS[0]];   // "tudo"
 }
 
-async function exportPdf(cfg, tuyChon = {}) {
+let _hangPdf = Promise.resolve();
+function exportPdf(cfg, tuyChon = {}) {
+  const lan = _hangPdf.then(() => exportPdfMot(cfg, tuyChon));
+  _hangPdf = lan.catch(() => {});
+  return lan;
+}
+async function exportPdfMot(cfg, tuyChon = {}) {
   const c = chuanHoaPdfCfg(cfg);
   const baoTienDo = typeof tuyChon.onProgress === "function" ? tuyChon.onProgress : () => {};
   pdfBusyFlag = true; exporting = true;
@@ -10722,7 +10775,7 @@ async function exportPdf(cfg, tuyChon = {}) {
 
     const pdfPages = [];
     /* Trang 1: Mục lục có link bấm nhảy trang (cho reMarkable & Tablet) */
-    if (needToc) {
+    if (needToc && !tuyChon.xemTruoc) {
       baoTienDo("Đang vẽ trang mục lục…");
       await new Promise(r => setTimeout(r, 10));
       ctx = new PdfCtx(doc, mctx);
@@ -10764,7 +10817,8 @@ async function exportPdf(cfg, tuyChon = {}) {
         donePages++;
         baoTienDo(`Đang vẽ trang ${donePages}/${totalContentPages} (${job.lesson.t})…`);
         await new Promise(r => setTimeout(r, 8));
-        ctx = new PdfCtx(doc, mctx);
+        /* Xem trước: vẽ lên canvas thường (cùng lệnh vẽ như PDF) rồi dừng ở trang đầu */
+        ctx = tuyChon.xemTruoc ? tuyChon.xemTruoc(W, H) : new PdfCtx(doc, mctx);
         ctx.fillStyle = T.paper; ctx.fillRect(0, 0, W, H);
         /* Tiêu đề trang vở */
         ctx.fillStyle = "#000000"; ctx.textBaseline = "alphabetic"; ctx.textAlign = "left";
@@ -10804,6 +10858,7 @@ async function exportPdf(cfg, tuyChon = {}) {
           ctx.fillText("Gợi ý: " + job.lesson.note, padL, H - px(36));
         }
         /* Nút bấm góc trên phải để quay về Trang 1 Mục lục trên reMarkable */
+        if (tuyChon.xemTruoc) return { xemTruoc: true, soTrang: totalContentPages + tocOffset, tenKho: pr.name };
         const backLinks = needToc && pr.links ? [{ rect: [((W - padR - 220) / W) * pr.ptW, pr.ptH - (95 / H) * pr.ptH, ((W - padR) / W) * pr.ptW, pr.ptH - (25 / H) * pr.ptH], targetPage: 0 }] : [];
         pdfPages.push({ content: ctx.out.join("\n"), links: backLinks });
       }
@@ -10998,13 +11053,16 @@ function datKhu(k) {
   khuDang = k;
   document.querySelectorAll("#navKhu .khu").forEach(b => { const on = b.dataset.khu === k; b.classList.toggle("on", on); if (on) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
 }
+/* Các khu mở thành trang đầy đủ (không phải bảng trượt) */
+function datTrang(id) { document.querySelectorAll(".sheet.trang").forEach(s => s.classList.remove("trang")); if (id) { const s = document.getElementById(id); if (s) s.classList.add("trang"); } }
+HANH_DONG.pdfBai = () => { setTimeout(() => { closeSheets(); openPdfModal(); datTrang("gen"); datKhu("pdf"); }, 0); };
 HANH_DONG.moKhu = el => {
   const k = el.dataset.khu;
   if (typeof pdfBusyFlag !== "undefined" && pdfBusyFlag) { toast("Đang tạo PDF, chờ xong rồi chuyển khu"); return; }
   if (k === "luyen") { closeSheets(); datKhu("luyen"); return; }
-  if (k === "giaotrinh") { closeSheets(); openMenu(); datKhu("giaotrinh"); return; }
-  if (k === "pdf") { closeSheets(); openPdfModal(); datKhu("pdf"); return; }
-  if (k === "hoso") { closeSheets(); openMenu(); setMenuTab("cai"); datKhu("hoso"); }
+  if (k === "giaotrinh") { closeSheets(); openMenu(); datTrang("menu"); datKhu("giaotrinh"); return; }
+  if (k === "pdf") { closeSheets(); openPdfModal(); datTrang("gen"); datKhu("pdf"); return; }
+  if (k === "hoso") { closeSheets(); openMenu(); setMenuTab("cai"); datTrang("menu"); datKhu("hoso"); }
 };
 
 /* Ẩn hiện thanh bên (máy tính bảng, máy tính); điện thoại luôn hiện thanh dưới */
@@ -11058,7 +11116,9 @@ HANH_DONG.anThanhKhu = () => { GS.set("navAn", true); apThanhKhu(); };
 HANH_DONG.hienThanhKhu = () => { GS.set("navAn", false); apThanhKhu(); };
 
 /* Đóng hết bảng thì quay về khu Luyện viết (bọc closeSheets, thay cho theo dõi mọi thay đổi trên trang) */
-{ const dongCu = closeSheets; closeSheets = function (...a) { const kq = dongCu.apply(this, a); if (!document.querySelector(".sheet.open")) datKhu("luyen"); return kq; }; }
+{ const dongCu = closeSheets; closeSheets = function (...a) { const kq = dongCu.apply(this, a); if (!document.querySelector(".sheet.open")) { datKhu("luyen"); datTrang(null); } return kq; }; }
+/* Nút ☰ trên thanh đầu mở khu Giáo trình */
+{ const b = document.getElementById("bMenu"); if (b) { b.removeAttribute("onclick"); b.dataset.action = "moKhu"; b.dataset.khu = "giaotrinh"; } }
 
 dungThanhKhu();
 apGhimXem();

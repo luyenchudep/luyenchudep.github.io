@@ -41,7 +41,7 @@ function leaveCard(m){
   const key=t||pageItemOf(pages,cur.page);
   if(!(key&&jumpToItem(key,m)))setMode(m);
 }
-function setMode(m){
+function setMode(m){chotThaoTac();
   if(m!==cur.mode&&pages.length){const key=pageItemOf(pages,cur.page);
     if(key){const r=computePages(LESSONS[cur.li],m,S.scale,H,0,false),pi=findItemPage(r.pages,key);if(pi>=0)cur.page=pi}}
   flushSave();cur.mode=m;comparing=false;show();if(m==="nho")toast(LESSONS[cur.li].id==="review"?"Viết theo trí nhớ · xong chạm So sánh":"Nhìn mẫu đầu dòng rồi chép tiếp · xong chạm So sánh")}

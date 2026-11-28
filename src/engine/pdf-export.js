@@ -50,6 +50,7 @@ function openPdfModal(keepScroll=false){
   const oKho=pdfOpt.preset!=="tunhap"?"":`<div class="row"><span>Khổ tự nhập (mm)</span><div class="pdfKhoNhap"><input type="number" min="40" max="500" step="0.1" value="${pdfOpt.wMm}" oninput="datKhoTuNhap('wMm',this.value)" aria-label="Rộng (mm)"> × <input type="number" min="40" max="500" step="0.1" value="${pdfOpt.hMm}" oninput="datKhoTuNhap('hMm',this.value)" aria-label="Cao (mm)"></div></div>`;
   document.getElementById("genBox").innerHTML=`<h3>${ic("download")} Tạo tập viết PDF</h3>
   <div class="prog">Tạo tập viết PDF ngay trên máy, không cần mạng. Chọn nội dung và khổ giấy, rồi tạo file hoặc chép đường link để gửi cho người khác.</div>
+  <aside class="pdfXem" aria-label="Xem trước trang đầu"><div class="pdfXemKhung"><canvas id="pdfXemCv"></canvas></div><div class="prog" id="pdfXemTxt">Đang dựng trang xem trước…</div></aside>
   <div class="row"><span>Nội dung</span><div class="seg">${nutChon([["cur","Bài này"],["pick","Chọn bài"],["part","Cả phần"],["all","Cả giáo trình"],["weak","Luyện thêm"],["free","Bài tự do"],["type","Tự gõ"]],nd,v=>`pdfOpt.scope='${v}'`)}</div></div>
   <div class="prog" style="margin:4px 0 8px">${moTaNd}</div>${dsBai}${oTuGo}
   <div class="row"><span>Khổ giấy hoặc máy</span><select aria-label="Khổ giấy hoặc máy" style="flex:1;min-width:0;max-width:100%;padding:10px 12px;border-radius:12px;border:1px solid currentColor;background:transparent;color:inherit;font:inherit" onchange="if(this.value==='tunhap')chonKhoTuNhap();else pdfOpt.preset=this.value;openPdfModal(true)">${nhomKho().map(([ten,ds])=>`<optgroup label="${ten}">${ds.map(v=>`<option value="${v}"${pdfOpt.preset===v?" selected":""}>${escHtml(KHO_TRANG[v].ten)}</option>`).join("")}</optgroup>`).join("")}<optgroup label="Khác"><option value="tunhap"${pdfOpt.preset==="tunhap"?" selected":""}>Tự nhập kích thước (mm)</option></optgroup></select></div>
@@ -63,4 +64,14 @@ function openPdfModal(keepScroll=false){
   <button class="btn ghost" onclick="chepLinkCfg()">Chép đường link cấu hình này</button>
   <button class="btn ghost" onclick="closeSheets()">Đóng</button>`;
   openSheet("gen",keepScroll);
+  veXemTruocPdf();
+}
+/* Xem trước trang nội dung đầu tiên (không tạo file) */
+let _xemPdfLan=0;
+async function veXemTruocPdf(){
+  const lan=++_xemPdfLan,cv=document.getElementById("pdfXemCv"),txt=document.getElementById("pdfXemTxt");if(!cv)return;
+  await new Promise(r=>setTimeout(r,60));if(lan!==_xemPdfLan||pdfBusyFlag)return;
+  try{const r=await exportPdf(pdfCfgTuManHinh(),{xemTruoc:(w,h)=>{cv.width=w;cv.height=h;return cv.getContext("2d")}});
+    if(lan===_xemPdfLan&&txt)txt.textContent=r&&r.xemTruoc?`${r.tenKho} · trang đầu trong ${r.soTrang} trang`:"";}
+  catch(e){if(lan===_xemPdfLan&&txt)txt.textContent="Chưa xem trước được: "+e.message}
 }
