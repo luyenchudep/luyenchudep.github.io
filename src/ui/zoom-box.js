@@ -143,6 +143,7 @@ zboxCv.addEventListener("pointermove",e=>{
 function endZBoxStroke(e){
   if(!zbox.live)return;
   if(e&&e.pointerId!=null&&e.pointerId!==zbox.live.pid)return;
+  if(zbox.live.erase)gomXong();   /* xử lý hết điểm gôm còn chờ trước khi kết thúc */
   clearZBFx();paperSoundStop();
   const st=zbox.live;zbox.live=null;const redo0=st.redo0;delete st.pid;delete st.redo0;
   if(!st.erase){

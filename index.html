@@ -696,6 +696,9 @@ body.lefthand #navKhu .khuAn .i{transform:scaleX(-1)}
 body.lefthand #navMo{left:auto;right:0;border-left:1.5px solid var(--line);border-right:0;border-radius:12px 0 0 12px}
 body.navAn #navKhu{display:none}
 body.navAn #navMo{display:block}
+/* Bảng mở ra không chui dưới thanh bên */
+body:not(.navAn) .sheet{left:76px}
+body.lefthand:not(.navAn) .sheet{left:0;right:76px}
 /* Điện thoại dọc: thanh 4 khu dưới cùng, luôn hiện */
 @media (max-width:700px) and (orientation:portrait){
   body{flex-direction:column}
@@ -705,7 +708,7 @@ body.navAn #navMo{display:block}
   #navKhu .khu{flex:1 1 0;min-height:50px}
   #navKhu .khuAn,#navMo{display:none!important}
   body.navAn #navKhu{display:flex}
-  .sheet{bottom:calc(62px + env(safe-area-inset-bottom))}   /* bảng mở ra nằm trên thanh 4 khu, không bị che */
+  .sheet,body:not(.navAn) .sheet,body.lefthand:not(.navAn) .sheet{left:0;right:0;bottom:calc(62px + env(safe-area-inset-bottom))}   /* bảng mở ra nằm trên thanh 4 khu, không bị che */
 }
 </style>
 </head>
@@ -7117,12 +7120,15 @@ const S=Object.assign({
 },SC.pen,gset,store.get("pen",{}));
 if(!Array.isArray(S.favs)||S.favs.length!==4)S.favs=DEFAULT_FAVS.map(f=>Object.assign({},f));
 /* Bảo mật: cài đặt có thể bị sửa tay hoặc đến từ file sao lưu; ép đúng kiểu trước khi dùng (nhiều chỗ chèn vào giao diện) */
+/* Bộ xử lý nút chung: data-action="tên" gọi HANH_DONG[tên] (gắn sự kiện ở ui/khu.js) */
+const HANH_DONG=Object.create(null);
 function escHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c])}
 const laMauHex=c=>typeof c==="string"&&/^#[0-9a-fA-F]{6}$/.test(c),laMaMau=c=>typeof c==="string"&&/^[a-z]{1,12}$/.test(c);
 const soTrong=(v,a,b,md)=>{v=Number(v);return Number.isFinite(v)?Math.min(b,Math.max(a,v)):md};
 S.scale=soTrong(S.scale,.5,3,1.25);S.eraserR=soTrong(S.eraserR,4,60,16);S.nibAngle=soTrong(S.nibAngle,0,90,38);S.stab=soTrong(S.stab,0,1,.32);S.pFull=soTrong(S.pFull,.05,1,.38);
 S.width=soTrong(S.width,.3,30,(SC.pen&&SC.pen.width)||2.6);S.activeFav=soTrong(S.activeFav,0,3,0)|0;S.targetFav=soTrong(S.targetFav,0,3,0)|0;
 if(!laMauHex(S.color)&&!laMaMau(S.color))S.color="k";
+if(!["part","stroke","vung"].includes(S.eraseMode))S.eraseMode="part";S.gomVeViet=S.gomVeViet===true;
 S.favs=S.favs.map((f,i)=>{const d=DEFAULT_FAVS[i]||DEFAULT_FAVS[0];if(!f||typeof f!=="object")return Object.assign({},d);
   return Object.assign({},f,{name:typeof f.name==="string"?f.name.replace(/[<>"'&]/g,"").slice(0,40):d.name,color:laMauHex(f.color)||laMaMau(f.color)?f.color:d.color,width:soTrong(f.width,.3,30,d.width)})});
 const FAV_RENAME={"Bi nước đen":"Gel đen","Bút chì":"Viết chì","Bút máy":"Viết máy","Bút lông":"Viết lông","Bút bi nước":"Viết gel"};
@@ -8263,6 +8269,7 @@ ink.addEventListener("pointerdown",e=>{
   if(sideBtn&&S.sideBtn==="fav"){cycleFavPen();return}
   const erase=tool==="eraser"||(sideBtn&&S.sideBtn==="eraser");
   const redo0=redoStack.slice();
+  if(erase&&S.eraseMode==="vung"){live={erase:true,vung:[pos(e)],changed:false,fromTouch:e.pointerType==="touch",pid:e.pointerId,redo0};snapshot();return}
   if(erase){live={erase:true,changed:false,fromTouch:e.pointerType==="touch",pid:e.pointerId,redo0};snapshot();
     if(e.pointerType==="pen"&&tapOnMeas(e)){live.meas={t:Date.now(),x:e.clientX,y:e.clientY};return}
     eraseAt(pos(e));return}
@@ -8292,6 +8299,7 @@ ink.addEventListener("pointermove",e=>{
     return}
   e.preventDefault();
   let evs=e.getCoalescedEvents?e.getCoalescedEvents():[];if(!evs.length)evs=[e];
+  if(live.erase&&live.vung){for(const ev of evs)live.vung.push(pos(ev));veVongKhoanh(live.vung);return}
   if(live.erase){
     if(live.meas){if(Math.hypot(e.clientX-live.meas.x,e.clientY-live.meas.y)<10)return;delete live.meas}
     for(const ev of evs)eraseAt(pos(ev));return}
@@ -8354,9 +8362,12 @@ function endStroke(e){
   if(live.meas&&e&&Date.now()-live.meas.t<450&&Math.hypot(e.clientX-live.meas.x,e.clientY-live.meas.y)<10){
     if(history.length)history.pop();if(live.redo0)redoStack=live.redo0;paperSoundStop();live=null;renderInk();openScoreReport();return}
   delete live.meas;const redo0=live.redo0;delete live.redo0;delete live.pid;
+  if(live.erase){if(live.vung){if(xoaTrongVong(live.vung))live.changed=true;clearFx()}else gomXong()}
+  const gomVua=live.erase&&live.changed&&tool==="eraser";
   if(!live.erase){delete live.fromTouch;live.p=simplifyStroke(live.p,0.32);strokes.push(live)}
   else if(!live.changed&&history.length){history.pop();if(redo0)redoStack=redo0}
   paperSoundStop();live=null;renderInk();saveInk();
+  if(gomVua&&S.gomVeViet)setTool("pen");   /* Tự quay về viết sau khi gôm (Bật/Tắt trong bảng Gôm) */
 }
 ink.addEventListener("pointerup",endStroke);ink.addEventListener("pointercancel",endStroke);
 window.addEventListener("pointerup",e=>{if(e.pointerType==="touch"){touches.delete(e.pointerId);if(touches.size<2)pinch=null}});
@@ -8372,25 +8383,55 @@ function strokeHit(s,q,r2){const p=s.p;if(p.length===1){const dx=p[0][0]-q[0],dy
 function densify(p,step){const out=[p[0]];for(let i=1;i<p.length;i++){const a=p[i-1],b=p[i],d=Math.hypot(b[0]-a[0],b[1]-a[1]);
   if(d>step){const n=Math.ceil(d/step);for(let k=1;k<n;k++){const t=k/n;out.push([a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,(a[2]||.5)+((b[2]||.5)-(a[2]||.5))*t,(a[3]||0)+((b[3]||0)-(a[3]||0))*t])}}
   out.push(b)}return out}
+/* ================== GÔM ==================
+   S Pen gửi tới khoảng 240 điểm mỗi giây. Trước đây mỗi điểm đều dò lại mọi nét và vẽ lại cả trang nên gôm rất chậm.
+   Nay: gom các điểm gôm lại, mỗi khung hình xử lý một lần; nét nào nằm ngoài vùng gôm (theo khung bao) thì bỏ qua ngay;
+   xong mới vẽ lại một lần. Ba kiểu: Xóa từng đoạn (part), Xóa cả nét (stroke), Khoanh vùng để xóa (vung, xử lý lúc nhấc viết). */
+const _khungNet=new WeakMap();
+function khungNet(s){let k=_khungNet.get(s);if(k)return k;let a=1e9,b=1e9,c=-1e9,d=-1e9;for(const p of s.p){if(p[0]<a)a=p[0];if(p[0]>c)c=p[0];if(p[1]<b)b=p[1];if(p[1]>d)d=p[1]}k=[a,b,c,d];_khungNet.set(s,k);return k}
+let gomCho=[],gomHen=0,gomTruoc=null;
 function eraseAt(q,z=view.z){
-  const r=(S.eraserR||16)/Math.max(1,z||1),r2=r*r;
-  let changed=false;
-  if(S.eraseMode==="stroke"){
-    const next=strokes.filter(s=>{const hit=strokeHit(s,q,r2);if(hit)changed=true;return !hit});
-    if(changed){strokes=next;if(live)live.changed=true;renderInk()}
-    return;
-  }
-  /* Xóa từng đoạn: chèn thêm điểm dọc nét rồi cắt, nên tẩy được cả khúc giữa nét thẳng */
-  const next=[];
-  for(const s of strokes){
-    if(!strokeHit(s,q,r2)){next.push(s);continue}
+  const r=(S.eraserR||16)/Math.max(1,z||1);
+  /* Đưa viết nhanh thì hai điểm cách xa: chèn thêm điểm giữa để không sót đoạn */
+  if(gomTruoc&&gomTruoc.r===r){const dx=q[0]-gomTruoc.q[0],dy=q[1]-gomTruoc.q[1],d=Math.hypot(dx,dy),n=Math.floor(d/(r*.5));
+    for(let k=1;k<n;k++)gomCho.push([gomTruoc.q[0]+dx*k/n,gomTruoc.q[1]+dy*k/n,r])}
+  gomCho.push([q[0],q[1],r]);gomTruoc={q,r};
+  if(!gomHen)gomHen=requestAnimationFrame(xuLyGom);
+}
+function xuLyGom(){
+  gomHen=0;if(!gomCho.length)return;
+  const ds=gomCho;gomCho=[];
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const[x,y,r]of ds){x0=Math.min(x0,x-r);y0=Math.min(y0,y-r);x1=Math.max(x1,x+r);y1=Math.max(y1,y+r)}
+  const gan=(p)=>{for(const[x,y,r]of ds){const dx=p[0]-x,dy=p[1]-y;if(dx*dx+dy*dy<r*r)return true}return false};
+  const cham=s=>{const k=khungNet(s);if(k[2]<x0||k[0]>x1||k[3]<y0||k[1]>y1)return false;
+    for(const[x,y,r]of ds)if(strokeHit(s,[x,y],r*r))return true;return false};
+  let changed=false;const next=[];
+  if(S.eraseMode==="stroke"){for(const s of strokes){if(cham(s))changed=true;else next.push(s)}}
+  else for(const s of strokes){
+    if(!cham(s)){next.push(s);continue}
     changed=true;
-    const pts=densify(s.p,Math.max(1,r*.35));let seg=[];
-    for(const p of pts){const dx=p[0]-q[0],dy=p[1]-q[1];
-      if(dx*dx+dy*dy<r2){if(seg.length>1)next.push(Object.assign({},s,{p:seg}));seg=[]}else seg.push(p)}
+    /* Xóa từng đoạn: chèn thêm điểm dọc nét rồi cắt, nên tẩy được cả khúc giữa nét thẳng */
+    const pts=densify(s.p,Math.max(1,ds[0][2]*.35));let seg=[];
+    for(const p of pts){if(gan(p)){if(seg.length>1)next.push(Object.assign({},s,{p:seg}));seg=[]}else seg.push(p)}
     if(seg.length>1)next.push(Object.assign({},s,{p:seg}));
   }
-  if(changed){strokes=next;if(live)live.changed=true;renderInk()}
+  if(changed){strokes=next;if(live)live.changed=true;if(typeof zbox!=="undefined"&&zbox.live)zbox.live.changed=true;renderInk()}
+}
+/* Gôm hết các điểm còn chờ ngay (gọi khi nhấc viết) */
+function gomXong(){if(gomHen){cancelAnimationFrame(gomHen);gomHen=0}xuLyGom();gomTruoc=null}
+/* Khoanh vùng để xóa: nét có từ một nửa số điểm trở lên nằm trong vòng khoanh thì bị xóa */
+function trongVong(p,v){let o=false;for(let i=0,j=v.length-1;i<v.length;j=i++){const a=v[i],b=v[j];if((a[1]>p[1])!==(b[1]>p[1])&&p[0]<(b[0]-a[0])*(p[1]-a[1])/(b[1]-a[1])+a[0])o=!o}return o}
+function xoaTrongVong(v){
+  if(!v||v.length<3)return false;
+  const next=strokes.filter(s=>{let n=0;for(const p of s.p)if(trongVong(p,v))n++;return n*2<s.p.length});
+  if(next.length===strokes.length)return false;
+  strokes=next;renderInk();return true;
+}
+function veVongKhoanh(v){
+  clearFx();if(!v||v.length<2)return;
+  setViewTransform(fctx);
+  fctx.beginPath();v.forEach((p,i)=>i?fctx.lineTo(p[0],p[1]):fctx.moveTo(p[0],p[1]));fctx.closePath();
+  fctx.fillStyle="rgba(201,28,23,.08)";fctx.fill();fctx.strokeStyle="rgba(201,28,23,.85)";fctx.lineWidth=1.6/view.z;fctx.setLineDash([6/view.z,4/view.z]);fctx.stroke();fctx.setLineDash([]);
 }
 
 /* ================== ÂM THANH GIẤY TỔNG HỢP (WEB AUDIO API) ================== */
@@ -8712,6 +8753,7 @@ zboxCv.addEventListener("pointermove",e=>{
 function endZBoxStroke(e){
   if(!zbox.live)return;
   if(e&&e.pointerId!=null&&e.pointerId!==zbox.live.pid)return;
+  if(zbox.live.erase)gomXong();   /* xử lý hết điểm gôm còn chờ trước khi kết thúc */
   clearZBFx();paperSoundStop();
   const st=zbox.live;zbox.live=null;const redo0=st.redo0;delete st.pid;delete st.redo0;
   if(!st.erase){
@@ -10020,15 +10062,18 @@ function penTap(forceOpen=false){
   openSheet("pen",forceOpen);demoInit();
 }
 function stepEraser(d){S.eraserR=Math.min(36,Math.max(8,Math.round((S.eraserR||16)+d)));saveS();const inp=document.getElementById("eRange"),ev=document.getElementById("ev");if(inp)inp.value=S.eraserR;if(ev)ev.textContent=S.eraserR+"px"}
-function setEraserMode(m){S.eraseMode=m;saveS();eraserTap(true)}
+function setEraserMode(m){S.eraseMode=["part","stroke","vung"].includes(m)?m:"part";saveS();eraserTap(true)}
+HANH_DONG.kieuGom=el=>setEraserMode(el.dataset.kieu);
+HANH_DONG.gomVeViet=el=>{S.gomVeViet=el.dataset.bat==="1";saveS();eraserTap(true)};
 function eraserTap(forceOpen=false){
   if(tool!=="eraser"&&!forceOpen){setTool("eraser");return}
   clearArm=false;
   document.getElementById("eraserBox").innerHTML=`<h3>Gôm và xóa trang</h3>
-  <div class="row"><span>Kiểu xóa</span><div class="seg"><button class="${S.eraseMode==="part"?"on":""}" onclick="setEraserMode('part')">Xóa từng đoạn</button><button class="${S.eraseMode==="stroke"?"on":""}" onclick="setEraserMode('stroke')">Xóa cả nét</button></div></div>
-  <div class="prog" style="margin-top:6px"><b>Xóa từng đoạn</b> chỉ xóa đúng chỗ chạm gôm, không làm mất nguyên từ viết liền.</div>
+  <div class="row"><span>Kiểu xóa</span><div class="seg">${[["part","Xóa từng đoạn"],["stroke","Xóa cả nét"],["vung","Khoanh vùng"]].map(([v,t])=>`<button type="button" class="${S.eraseMode===v?"on":""}" data-action="kieuGom" data-kieu="${v}">${t}</button>`).join("")}</div></div>
+  <div class="prog" style="margin-top:6px">${{part:"<b>Xóa từng đoạn</b>: đưa gôm tới đâu xóa tới đó, như cục gôm thật.",stroke:"<b>Xóa cả nét</b>: chạm vào nét nào là xóa trọn nét đó.",vung:"<b>Khoanh vùng</b>: vẽ một vòng quanh chỗ cần xóa, nhấc viết là các nét bên trong được xóa."}[S.eraseMode]||""}</div>
   <div class="row"><span>Cỡ đầu gôm</span><div class="stepper"><button onclick="stepEraser(-4)">−</button><input id="eRange" type="range" min="8" max="36" step="2" value="${S.eraserR||16}" oninput="S.eraserR=+this.value;saveS();document.getElementById('ev').textContent=this.value+'px'"><button onclick="stepEraser(4)">+</button><b id="ev">${S.eraserR||16}px</b></div></div>
-  <button class="btn danger" onclick="confirmClearBtn(this)">Xóa toàn bộ nét trên trang này</button>
+  <div class="row"><span>Gôm xong tự quay về viết</span><div class="seg"><button type="button" class="${S.gomVeViet?"on":""}" data-action="gomVeViet" data-bat="1">Bật</button><button type="button" class="${S.gomVeViet?"":"on"}" data-action="gomVeViet" data-bat="0">Tắt</button></div></div>
+  <button class="btn danger" onclick="confirmClearBtn(this)">Xóa cả trang</button>
   <button class="btn primary" onclick="closeSheets()">Xong</button>`;
   openSheet("eraserSheet",forceOpen);
 }
@@ -10871,7 +10916,6 @@ function placeToast(t){try{const r=document.getElementById("canvasWrap").getBoun
    - Điện thoại dọc: thanh 4 nút dưới cùng.
    Bộ xử lý nút chung: phần tử có data-action="tên" gọi HANH_DONG[tên](phần tử, sự kiện). Giao diện mới dùng cách này
    thay cho onclick="…" trong chuỗi HTML (dễ bảo trì, và để bật được chính sách bảo mật nội dung CSP). */
-const HANH_DONG = Object.create(null);
 document.addEventListener("click", e => {
   const el = e.target.closest("[data-action]");
   if (!el) return;

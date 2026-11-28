@@ -39,12 +39,15 @@ const S=Object.assign({
 },SC.pen,gset,store.get("pen",{}));
 if(!Array.isArray(S.favs)||S.favs.length!==4)S.favs=DEFAULT_FAVS.map(f=>Object.assign({},f));
 /* Bảo mật: cài đặt có thể bị sửa tay hoặc đến từ file sao lưu; ép đúng kiểu trước khi dùng (nhiều chỗ chèn vào giao diện) */
+/* Bộ xử lý nút chung: data-action="tên" gọi HANH_DONG[tên] (gắn sự kiện ở ui/khu.js) */
+const HANH_DONG=Object.create(null);
 function escHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c])}
 const laMauHex=c=>typeof c==="string"&&/^#[0-9a-fA-F]{6}$/.test(c),laMaMau=c=>typeof c==="string"&&/^[a-z]{1,12}$/.test(c);
 const soTrong=(v,a,b,md)=>{v=Number(v);return Number.isFinite(v)?Math.min(b,Math.max(a,v)):md};
 S.scale=soTrong(S.scale,.5,3,1.25);S.eraserR=soTrong(S.eraserR,4,60,16);S.nibAngle=soTrong(S.nibAngle,0,90,38);S.stab=soTrong(S.stab,0,1,.32);S.pFull=soTrong(S.pFull,.05,1,.38);
 S.width=soTrong(S.width,.3,30,(SC.pen&&SC.pen.width)||2.6);S.activeFav=soTrong(S.activeFav,0,3,0)|0;S.targetFav=soTrong(S.targetFav,0,3,0)|0;
 if(!laMauHex(S.color)&&!laMaMau(S.color))S.color="k";
+if(!["part","stroke","vung"].includes(S.eraseMode))S.eraseMode="part";S.gomVeViet=S.gomVeViet===true;
 S.favs=S.favs.map((f,i)=>{const d=DEFAULT_FAVS[i]||DEFAULT_FAVS[0];if(!f||typeof f!=="object")return Object.assign({},d);
   return Object.assign({},f,{name:typeof f.name==="string"?f.name.replace(/[<>"'&]/g,"").slice(0,40):d.name,color:laMauHex(f.color)||laMaMau(f.color)?f.color:d.color,width:soTrong(f.width,.3,30,d.width)})});
 const FAV_RENAME={"Bi nước đen":"Gel đen","Bút chì":"Viết chì","Bút máy":"Viết máy","Bút lông":"Viết lông","Bút bi nước":"Viết gel"};

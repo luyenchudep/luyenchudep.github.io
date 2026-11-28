@@ -665,6 +665,9 @@ body.lefthand #navKhu .khuAn .i{transform:scaleX(-1)}
 body.lefthand #navMo{left:auto;right:0;border-left:1.5px solid var(--line);border-right:0;border-radius:12px 0 0 12px}
 body.navAn #navKhu{display:none}
 body.navAn #navMo{display:block}
+/* Bảng mở ra không chui dưới thanh bên */
+body:not(.navAn) .sheet{left:76px}
+body.lefthand:not(.navAn) .sheet{left:0;right:76px}
 /* Điện thoại dọc: thanh 4 khu dưới cùng, luôn hiện */
 @media (max-width:700px) and (orientation:portrait){
   body{flex-direction:column}
@@ -674,5 +677,5 @@ body.navAn #navMo{display:block}
   #navKhu .khu{flex:1 1 0;min-height:50px}
   #navKhu .khuAn,#navMo{display:none!important}
   body.navAn #navKhu{display:flex}
-  .sheet{bottom:calc(62px + env(safe-area-inset-bottom))}   /* bảng mở ra nằm trên thanh 4 khu, không bị che */
+  .sheet,body:not(.navAn) .sheet,body.lefthand:not(.navAn) .sheet{left:0;right:0;bottom:calc(62px + env(safe-area-inset-bottom))}   /* bảng mở ra nằm trên thanh 4 khu, không bị che */
 }

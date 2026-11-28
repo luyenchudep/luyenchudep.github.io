@@ -113,15 +113,18 @@ function penTap(forceOpen=false){
   openSheet("pen",forceOpen);demoInit();
 }
 function stepEraser(d){S.eraserR=Math.min(36,Math.max(8,Math.round((S.eraserR||16)+d)));saveS();const inp=document.getElementById("eRange"),ev=document.getElementById("ev");if(inp)inp.value=S.eraserR;if(ev)ev.textContent=S.eraserR+"px"}
-function setEraserMode(m){S.eraseMode=m;saveS();eraserTap(true)}
+function setEraserMode(m){S.eraseMode=["part","stroke","vung"].includes(m)?m:"part";saveS();eraserTap(true)}
+HANH_DONG.kieuGom=el=>setEraserMode(el.dataset.kieu);
+HANH_DONG.gomVeViet=el=>{S.gomVeViet=el.dataset.bat==="1";saveS();eraserTap(true)};
 function eraserTap(forceOpen=false){
   if(tool!=="eraser"&&!forceOpen){setTool("eraser");return}
   clearArm=false;
   document.getElementById("eraserBox").innerHTML=`<h3>Gôm và xóa trang</h3>
-  <div class="row"><span>Kiểu xóa</span><div class="seg"><button class="${S.eraseMode==="part"?"on":""}" onclick="setEraserMode('part')">Xóa từng đoạn</button><button class="${S.eraseMode==="stroke"?"on":""}" onclick="setEraserMode('stroke')">Xóa cả nét</button></div></div>
-  <div class="prog" style="margin-top:6px"><b>Xóa từng đoạn</b> chỉ xóa đúng chỗ chạm gôm, không làm mất nguyên từ viết liền.</div>
+  <div class="row"><span>Kiểu xóa</span><div class="seg">${[["part","Xóa từng đoạn"],["stroke","Xóa cả nét"],["vung","Khoanh vùng"]].map(([v,t])=>`<button type="button" class="${S.eraseMode===v?"on":""}" data-action="kieuGom" data-kieu="${v}">${t}</button>`).join("")}</div></div>
+  <div class="prog" style="margin-top:6px">${{part:"<b>Xóa từng đoạn</b>: đưa gôm tới đâu xóa tới đó, như cục gôm thật.",stroke:"<b>Xóa cả nét</b>: chạm vào nét nào là xóa trọn nét đó.",vung:"<b>Khoanh vùng</b>: vẽ một vòng quanh chỗ cần xóa, nhấc viết là các nét bên trong được xóa."}[S.eraseMode]||""}</div>
   <div class="row"><span>Cỡ đầu gôm</span><div class="stepper"><button onclick="stepEraser(-4)">−</button><input id="eRange" type="range" min="8" max="36" step="2" value="${S.eraserR||16}" oninput="S.eraserR=+this.value;saveS();document.getElementById('ev').textContent=this.value+'px'"><button onclick="stepEraser(4)">+</button><b id="ev">${S.eraserR||16}px</b></div></div>
-  <button class="btn danger" onclick="confirmClearBtn(this)">Xóa toàn bộ nét trên trang này</button>
+  <div class="row"><span>Gôm xong tự quay về viết</span><div class="seg"><button type="button" class="${S.gomVeViet?"on":""}" data-action="gomVeViet" data-bat="1">Bật</button><button type="button" class="${S.gomVeViet?"":"on"}" data-action="gomVeViet" data-bat="0">Tắt</button></div></div>
+  <button class="btn danger" onclick="confirmClearBtn(this)">Xóa cả trang</button>
   <button class="btn primary" onclick="closeSheets()">Xong</button>`;
   openSheet("eraserSheet",forceOpen);
 }
