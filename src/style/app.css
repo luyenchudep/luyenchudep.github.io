@@ -679,3 +679,42 @@ body.lefthand:not(.navAn) .sheet{left:0;right:76px}
   body.navAn #navKhu{display:flex}
   .sheet,body:not(.navAn) .sheet,body.lefthand:not(.navAn) .sheet{left:0;right:0;bottom:calc(62px + env(safe-area-inset-bottom))}   /* bảng mở ra nằm trên thanh 4 khu, không bị che */
 }
+
+/* ================== KHÔNG GIAN VIẾT (bản 0.14) ================== */
+/* Ngăn kéo Xem: màn rộng mặc định ẩn, nổi đè lên trang viết khi mở; ghim thì nằm cạnh như cũ */
+#sideHead{display:flex;align-items:center;gap:4px;margin:-4px 0 8px}
+#sideHead b{flex:1 1 auto;font-size:15px}
+#sideHead .ibtn{width:40px;height:40px}
+#sideHead .ibtn.on{background:var(--hl);color:var(--accent)}
+@media (min-width:860px){
+  body.split:not(.xemGhim) #sidePane{position:absolute;top:0;bottom:0;left:0;z-index:20;width:min(380px,85%);max-width:none;
+    transform:translateX(-105%);transition:transform .18s ease-out;box-shadow:6px 0 24px rgba(0,0,0,.16)}
+  body.split.xemMo:not(.xemGhim) #sidePane{transform:none}
+  body.lefthand.split:not(.xemGhim) #sidePane{left:auto;right:0;transform:translateX(105%);box-shadow:-6px 0 24px rgba(0,0,0,.16)}
+  body.lefthand.split.xemMo:not(.xemGhim) #sidePane{transform:none}
+}
+body.eink #sidePane{box-shadow:none!important;border:2px solid #000}
+/* Công cụ viết trong thanh bên */
+#navKhu{overflow-y:auto;scrollbar-width:none}
+body.congCuRail #app{display:flex!important;flex-direction:column}
+body.congCuRail header,body.congCuRail #workspace,body.congCuNoi header,body.congCuNoi #workspace{grid-column:auto;grid-row:auto}
+body.congCuNoi #app{display:flex!important;flex-direction:column}
+body.congCuRail #navKhu footer{display:flex;flex-direction:column;gap:2px;margin-top:auto;padding:8px 0 0;border:0;border-top:1.5px solid var(--line);background:transparent;grid-template-columns:none}
+body.congCuRail #navKhu footer .tb{min-height:54px;padding:2px;border-radius:12px}
+body.congCuRail #navKhu footer .tb i{font-size:11px}
+@media (max-height:640px){
+  body.congCuRail #navKhu .khu span,body.congCuRail #navKhu footer .tb i{display:none}
+  body.congCuRail #navKhu .khu,body.congCuRail #navKhu footer .tb{min-height:44px}
+  body.congCuRail #navKhu .khuAn{height:30px;margin:0}
+}
+/* Thanh công cụ nổi (thanh bên ẩn hoặc Toàn trang viết) */
+body.congCuNoi footer{position:fixed;left:50%;bottom:max(10px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:56;display:flex;flex-direction:row;gap:4px;
+  padding:4px 8px;border:1.5px solid var(--line);border-radius:18px;background:var(--paper);box-shadow:0 6px 20px rgba(0,0,0,.18);width:auto;grid-template-columns:none}
+body.congCuNoi footer .tb{min-width:58px;min-height:52px}
+body.eink.congCuNoi footer{box-shadow:none;border:2px solid #000}
+/* Toàn trang viết */
+#thoatTT{display:none;position:fixed;top:max(8px,env(safe-area-inset-top));right:max(8px,env(safe-area-inset-right));z-index:57;align-items:center;gap:6px;
+  min-height:44px;padding:0 14px;border:1.5px solid var(--line);border-radius:22px;background:var(--paper);color:var(--ink);font:inherit;font-weight:600;cursor:pointer}
+body.tapTrung #thoatTT{display:inline-flex}
+body.tapTrung header,body.tapTrung #navKhu,body.tapTrung #navMo,body.tapTrung #sidePane{display:none!important}
+#sideTabs[hidden]{display:none}

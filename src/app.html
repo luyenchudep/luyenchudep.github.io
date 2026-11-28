@@ -31,22 +31,24 @@
 <body>
 <nav id="navKhu" aria-label="Các khu của ứng dụng"></nav>
 <button type="button" id="navMo" data-action="hienThanhKhu" aria-label="Hiện thanh điều hướng"></button>
+<button type="button" id="thoatTT" data-action="tapTrung" aria-label="Thoát Toàn trang viết"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg><span>Thoát</span></button>
 <div id="app">
   <header>
     <div id="topbar">
       <button class="ibtn" id="bMenu" onclick="openMenu()" aria-label="Danh mục bài và cài đặt"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
-      <button id="tbox" onclick="openCard()" aria-label="Xem bài học">
+      <button id="tbox" data-action="moXem" aria-label="Xem bài học">
         <div id="tline"><span id="ttext"></span></div>
         <div id="part"><span id="partTxt"></span><span id="pageinfo"></span></div>
       </button>
       <div id="modesRow">
         <div id="modes">
-          <button id="mXem" onclick="openCard()"><span class="n">1</span>Xem</button>
+          <button id="mXem" data-action="moXem"><span class="n">1</span>Xem</button>
           <button id="mTo" onclick="setMode('to')"><span class="n">2</span>Tô</button>
           <button id="mNho" onclick="setMode('nho')"><span class="n">3</span>Chép</button>
         </div>
         <button id="done" onclick="toggleDone()" aria-label="Đánh dấu đã tập"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.4 2.8 2.8L16.2 9.8"/></svg><span class="dl">Đã tập</span></button>
       </div>
+      <button class="ibtn" id="bTapTrung" data-action="tapTrung" aria-label="Toàn trang viết: ẩn hết, chỉ còn trang viết"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
       <button class="ibtn" id="bZBox" onclick="toggleZBox()" aria-label="Hộp viết phóng to tự trượt"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.3 15.3 20 20M10.5 8v5M8 10.5h5"/></svg></button>
       <button class="ibtn" id="bAa" onclick="openAa()" aria-label="Cỡ dòng, màu giấy, toàn màn hình"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19 8.4 5h1.2L15 19M5.2 14.2h7.6"/><circle cx="18.4" cy="15.6" r="2.6"/><path d="M21 12.6V19"/></svg></button>
     </div>
@@ -59,7 +61,12 @@
 
   <div id="workspace">
     <aside id="sidePane">
-      <div id="sideTabs">
+      <div id="sideHead">
+        <b>Xem thứ tự nét</b>
+        <button type="button" class="ibtn" id="bGhimXem" data-action="ghimXem" aria-label="Ghim bảng Xem cạnh trang viết"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4h6l-1 6 3 3H7l3-3zM12 13v7"/></svg></button>
+        <button type="button" class="ibtn" data-action="dongXem" aria-label="Đóng bảng Xem"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      </div>
+      <div id="sideTabs" hidden>
         <button id="stXem" class="on" onclick="setSideTab('xem')"><span class="n">1</span>Xem</button>
         <button id="stList" onclick="setSideTab('list')"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg>Mục lục</button>
       </div>

@@ -33,6 +33,7 @@ function datKhu(k) {
 }
 HANH_DONG.moKhu = el => {
   const k = el.dataset.khu;
+  if (typeof pdfBusyFlag !== "undefined" && pdfBusyFlag) { toast("Đang tạo PDF, chờ xong rồi chuyển khu"); return; }
   if (k === "luyen") { closeSheets(); datKhu("luyen"); return; }
   if (k === "giaotrinh") { closeSheets(); openMenu(); datKhu("giaotrinh"); return; }
   if (k === "pdf") { closeSheets(); openPdfModal(); datKhu("pdf"); return; }
@@ -40,13 +41,52 @@ HANH_DONG.moKhu = el => {
 };
 
 /* Ẩn hiện thanh bên (máy tính bảng, máy tính); điện thoại luôn hiện thanh dưới */
-function apThanhKhu() { document.body.classList.toggle("navAn", !!GS.get("navAn", false)); setTimeout(resize, 30); }
+function apThanhKhu() { document.body.classList.toggle("navAn", !!GS.get("navAn", false)); datCongCu(); setTimeout(resize, 30); }
+
+/* Công cụ viết (Trước, Viết, Gôm, Hoàn tác, Sau):
+   - điện thoại dọc: hàng dưới trang như cũ;
+   - máy tính bảng, máy tính: nằm trong thanh bên, dưới 4 khu (một thanh dọc thay vì hai);
+   - thanh bên ẩn hoặc Toàn trang viết: thanh nhỏ nổi ở cạnh dưới trang. */
+const DT_DOC = matchMedia("(max-width:700px) and (orientation:portrait)");
+function datCongCu() {
+  const f = document.querySelector("footer"); if (!f) return;
+  const b = document.body, noi = b.classList.contains("navAn") || b.classList.contains("tapTrung");
+  const dich = DT_DOC.matches ? document.getElementById("app") : noi ? b : document.getElementById("navKhu");
+  if (f.parentElement !== dich) dich.appendChild(f);
+  b.classList.toggle("congCuRail", dich.id === "navKhu");
+  b.classList.toggle("congCuNoi", dich === b);
+}
+DT_DOC.addEventListener("change", () => { datCongCu(); setTimeout(resize, 30); });
+
+/* Ngăn kéo Xem (màn rộng): nổi đè lên trang viết, không làm hẹp trang; tự đóng khi đặt viết xuống trang; ghim được */
+const laManRong = () => document.body.classList.contains("split");
+function moNganXem(mo) { document.body.classList.toggle("xemMo", mo); if (mo) renderSidePane(); }
+HANH_DONG.moXem = () => {
+  if (!laManRong()) { openCard(); return; }
+  if (S.xemGhim) { renderSidePane(); return; }
+  moNganXem(!document.body.classList.contains("xemMo"));
+};
+HANH_DONG.dongXem = () => { if (S.xemGhim) { S.xemGhim = false; saveS(); apGhimXem(); } moNganXem(false); };
+HANH_DONG.ghimXem = () => { S.xemGhim = !S.xemGhim; saveS(); apGhimXem(); if (S.xemGhim) moNganXem(true); };
+function apGhimXem() {
+  document.body.classList.toggle("xemGhim", !!S.xemGhim);
+  const b = document.getElementById("bGhimXem"); if (b) { b.classList.toggle("on", !!S.xemGhim); b.setAttribute("aria-pressed", S.xemGhim ? "true" : "false"); }
+  setTimeout(resize, 30);
+}
+document.getElementById("ink").addEventListener("pointerdown", () => { if (!S.xemGhim && document.body.classList.contains("xemMo")) moNganXem(false); }, true);
+
+/* Toàn trang viết: ẩn thanh đầu, thanh bên, bảng Xem; công cụ thành thanh nổi; nút Thoát ở góc */
+HANH_DONG.tapTrung = () => {
+  document.body.classList.toggle("tapTrung");
+  if (document.body.classList.contains("tapTrung")) moNganXem(false);
+  datCongCu(); setTimeout(resize, 30);
+};
 HANH_DONG.anThanhKhu = () => { GS.set("navAn", true); apThanhKhu(); };
 HANH_DONG.hienThanhKhu = () => { GS.set("navAn", false); apThanhKhu(); };
 
-/* Đóng hết bảng thì quay về khu Luyện viết */
-new MutationObserver(() => { if (!document.querySelector(".sheet.open")) datKhu("luyen"); })
-  .observe(document.body, { subtree: true, attributes: true, attributeFilter: ["class"] });
+/* Đóng hết bảng thì quay về khu Luyện viết (bọc closeSheets, thay cho theo dõi mọi thay đổi trên trang) */
+{ const dongCu = closeSheets; closeSheets = function (...a) { const kq = dongCu.apply(this, a); if (!document.querySelector(".sheet.open")) datKhu("luyen"); return kq; }; }
 
 dungThanhKhu();
+apGhimXem();
 apThanhKhu();
