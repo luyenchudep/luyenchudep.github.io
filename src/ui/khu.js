@@ -4,7 +4,6 @@
    - Điện thoại dọc: thanh 4 nút dưới cùng.
    Bộ xử lý nút chung: phần tử có data-action="tên" gọi HANH_DONG[tên](phần tử, sự kiện). Giao diện mới dùng cách này
    thay cho onclick="…" trong chuỗi HTML (dễ bảo trì, và để bật được chính sách bảo mật nội dung CSP). */
-const HANH_DONG = Object.create(null);
 document.addEventListener("click", e => {
   const el = e.target.closest("[data-action]");
   if (!el) return;

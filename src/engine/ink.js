@@ -447,6 +447,7 @@ ink.addEventListener("pointerdown",e=>{
   if(sideBtn&&S.sideBtn==="fav"){cycleFavPen();return}
   const erase=tool==="eraser"||(sideBtn&&S.sideBtn==="eraser");
   const redo0=redoStack.slice();
+  if(erase&&S.eraseMode==="vung"){live={erase:true,vung:[pos(e)],changed:false,fromTouch:e.pointerType==="touch",pid:e.pointerId,redo0};snapshot();return}
   if(erase){live={erase:true,changed:false,fromTouch:e.pointerType==="touch",pid:e.pointerId,redo0};snapshot();
     if(e.pointerType==="pen"&&tapOnMeas(e)){live.meas={t:Date.now(),x:e.clientX,y:e.clientY};return}
     eraseAt(pos(e));return}
@@ -476,6 +477,7 @@ ink.addEventListener("pointermove",e=>{
     return}
   e.preventDefault();
   let evs=e.getCoalescedEvents?e.getCoalescedEvents():[];if(!evs.length)evs=[e];
+  if(live.erase&&live.vung){for(const ev of evs)live.vung.push(pos(ev));veVongKhoanh(live.vung);return}
   if(live.erase){
     if(live.meas){if(Math.hypot(e.clientX-live.meas.x,e.clientY-live.meas.y)<10)return;delete live.meas}
     for(const ev of evs)eraseAt(pos(ev));return}
@@ -538,9 +540,12 @@ function endStroke(e){
   if(live.meas&&e&&Date.now()-live.meas.t<450&&Math.hypot(e.clientX-live.meas.x,e.clientY-live.meas.y)<10){
     if(history.length)history.pop();if(live.redo0)redoStack=live.redo0;paperSoundStop();live=null;renderInk();openScoreReport();return}
   delete live.meas;const redo0=live.redo0;delete live.redo0;delete live.pid;
+  if(live.erase){if(live.vung){if(xoaTrongVong(live.vung))live.changed=true;clearFx()}else gomXong()}
+  const gomVua=live.erase&&live.changed&&tool==="eraser";
   if(!live.erase){delete live.fromTouch;live.p=simplifyStroke(live.p,0.32);strokes.push(live)}
   else if(!live.changed&&history.length){history.pop();if(redo0)redoStack=redo0}
   paperSoundStop();live=null;renderInk();saveInk();
+  if(gomVua&&S.gomVeViet)setTool("pen");   /* Tự quay về viết sau khi gôm (Bật/Tắt trong bảng Gôm) */
 }
 ink.addEventListener("pointerup",endStroke);ink.addEventListener("pointercancel",endStroke);
 window.addEventListener("pointerup",e=>{if(e.pointerType==="touch"){touches.delete(e.pointerId);if(touches.size<2)pinch=null}});
@@ -556,24 +561,54 @@ function strokeHit(s,q,r2){const p=s.p;if(p.length===1){const dx=p[0][0]-q[0],dy
 function densify(p,step){const out=[p[0]];for(let i=1;i<p.length;i++){const a=p[i-1],b=p[i],d=Math.hypot(b[0]-a[0],b[1]-a[1]);
   if(d>step){const n=Math.ceil(d/step);for(let k=1;k<n;k++){const t=k/n;out.push([a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,(a[2]||.5)+((b[2]||.5)-(a[2]||.5))*t,(a[3]||0)+((b[3]||0)-(a[3]||0))*t])}}
   out.push(b)}return out}
+/* ================== GÔM ==================
+   S Pen gửi tới khoảng 240 điểm mỗi giây. Trước đây mỗi điểm đều dò lại mọi nét và vẽ lại cả trang nên gôm rất chậm.
+   Nay: gom các điểm gôm lại, mỗi khung hình xử lý một lần; nét nào nằm ngoài vùng gôm (theo khung bao) thì bỏ qua ngay;
+   xong mới vẽ lại một lần. Ba kiểu: Xóa từng đoạn (part), Xóa cả nét (stroke), Khoanh vùng để xóa (vung, xử lý lúc nhấc viết). */
+const _khungNet=new WeakMap();
+function khungNet(s){let k=_khungNet.get(s);if(k)return k;let a=1e9,b=1e9,c=-1e9,d=-1e9;for(const p of s.p){if(p[0]<a)a=p[0];if(p[0]>c)c=p[0];if(p[1]<b)b=p[1];if(p[1]>d)d=p[1]}k=[a,b,c,d];_khungNet.set(s,k);return k}
+let gomCho=[],gomHen=0,gomTruoc=null;
 function eraseAt(q,z=view.z){
-  const r=(S.eraserR||16)/Math.max(1,z||1),r2=r*r;
-  let changed=false;
-  if(S.eraseMode==="stroke"){
-    const next=strokes.filter(s=>{const hit=strokeHit(s,q,r2);if(hit)changed=true;return !hit});
-    if(changed){strokes=next;if(live)live.changed=true;renderInk()}
-    return;
-  }
-  /* Xóa từng đoạn: chèn thêm điểm dọc nét rồi cắt, nên tẩy được cả khúc giữa nét thẳng */
-  const next=[];
-  for(const s of strokes){
-    if(!strokeHit(s,q,r2)){next.push(s);continue}
+  const r=(S.eraserR||16)/Math.max(1,z||1);
+  /* Đưa viết nhanh thì hai điểm cách xa: chèn thêm điểm giữa để không sót đoạn */
+  if(gomTruoc&&gomTruoc.r===r){const dx=q[0]-gomTruoc.q[0],dy=q[1]-gomTruoc.q[1],d=Math.hypot(dx,dy),n=Math.floor(d/(r*.5));
+    for(let k=1;k<n;k++)gomCho.push([gomTruoc.q[0]+dx*k/n,gomTruoc.q[1]+dy*k/n,r])}
+  gomCho.push([q[0],q[1],r]);gomTruoc={q,r};
+  if(!gomHen)gomHen=requestAnimationFrame(xuLyGom);
+}
+function xuLyGom(){
+  gomHen=0;if(!gomCho.length)return;
+  const ds=gomCho;gomCho=[];
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const[x,y,r]of ds){x0=Math.min(x0,x-r);y0=Math.min(y0,y-r);x1=Math.max(x1,x+r);y1=Math.max(y1,y+r)}
+  const gan=(p)=>{for(const[x,y,r]of ds){const dx=p[0]-x,dy=p[1]-y;if(dx*dx+dy*dy<r*r)return true}return false};
+  const cham=s=>{const k=khungNet(s);if(k[2]<x0||k[0]>x1||k[3]<y0||k[1]>y1)return false;
+    for(const[x,y,r]of ds)if(strokeHit(s,[x,y],r*r))return true;return false};
+  let changed=false;const next=[];
+  if(S.eraseMode==="stroke"){for(const s of strokes){if(cham(s))changed=true;else next.push(s)}}
+  else for(const s of strokes){
+    if(!cham(s)){next.push(s);continue}
     changed=true;
-    const pts=densify(s.p,Math.max(1,r*.35));let seg=[];
-    for(const p of pts){const dx=p[0]-q[0],dy=p[1]-q[1];
-      if(dx*dx+dy*dy<r2){if(seg.length>1)next.push(Object.assign({},s,{p:seg}));seg=[]}else seg.push(p)}
+    /* Xóa từng đoạn: chèn thêm điểm dọc nét rồi cắt, nên tẩy được cả khúc giữa nét thẳng */
+    const pts=densify(s.p,Math.max(1,ds[0][2]*.35));let seg=[];
+    for(const p of pts){if(gan(p)){if(seg.length>1)next.push(Object.assign({},s,{p:seg}));seg=[]}else seg.push(p)}
     if(seg.length>1)next.push(Object.assign({},s,{p:seg}));
   }
-  if(changed){strokes=next;if(live)live.changed=true;renderInk()}
+  if(changed){strokes=next;if(live)live.changed=true;if(typeof zbox!=="undefined"&&zbox.live)zbox.live.changed=true;renderInk()}
+}
+/* Gôm hết các điểm còn chờ ngay (gọi khi nhấc viết) */
+function gomXong(){if(gomHen){cancelAnimationFrame(gomHen);gomHen=0}xuLyGom();gomTruoc=null}
+/* Khoanh vùng để xóa: nét có từ một nửa số điểm trở lên nằm trong vòng khoanh thì bị xóa */
+function trongVong(p,v){let o=false;for(let i=0,j=v.length-1;i<v.length;j=i++){const a=v[i],b=v[j];if((a[1]>p[1])!==(b[1]>p[1])&&p[0]<(b[0]-a[0])*(p[1]-a[1])/(b[1]-a[1])+a[0])o=!o}return o}
+function xoaTrongVong(v){
+  if(!v||v.length<3)return false;
+  const next=strokes.filter(s=>{let n=0;for(const p of s.p)if(trongVong(p,v))n++;return n*2<s.p.length});
+  if(next.length===strokes.length)return false;
+  strokes=next;renderInk();return true;
+}
+function veVongKhoanh(v){
+  clearFx();if(!v||v.length<2)return;
+  setViewTransform(fctx);
+  fctx.beginPath();v.forEach((p,i)=>i?fctx.lineTo(p[0],p[1]):fctx.moveTo(p[0],p[1]));fctx.closePath();
+  fctx.fillStyle="rgba(201,28,23,.08)";fctx.fill();fctx.strokeStyle="rgba(201,28,23,.85)";fctx.lineWidth=1.6/view.z;fctx.setLineDash([6/view.z,4/view.z]);fctx.stroke();fctx.setLineDash([]);
 }
 
