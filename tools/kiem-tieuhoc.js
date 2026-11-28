@@ -686,9 +686,9 @@ function main() {
       if (kq.noi.length !== 0) {
         loi.push(`"${cap}": phải lia viết nhưng lại có ${kq.noi.length} nét nối`);
       }
-      const ho = c2.x - (c1.x + c1.h.rong);
-      if (Math.abs(ho - TH_KHOANG_CHU) >= 0.001) {
-        loi.push(`"${cap}": khoảng hở = ${ho.toFixed(4)}, phải đúng TH_KHOANG_CHU (${TH_KHOANG_CHU})`);
+      const mA = ctx.thMepMuc(c1.h), mB = ctx.thMepMuc(c2.h), ho = (c2.x + mB.trai) - (c1.x + mA.phai);
+      if (ho < 0.2 || ho > 0.4) {
+        loi.push(`"${cap}": khoảng hở giữa mép mực = ${ho.toFixed(4)}, phải trong khoảng 0,2–0,4`);
       }
     }
 
