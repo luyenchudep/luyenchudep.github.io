@@ -12,8 +12,8 @@ let nameArm=false;
 function applyNameLab(){
   const nm=(document.getElementById("nameInp").value||"").trim();
   if(!nm){toast("Nhập tên bạn muốn luyện trước nha");return}
-  const parts=nm.split(/\s+/),last=parts[parts.length-1];
-  const txt=[nm,`${nm}   ${nm}`,last!==nm?`${last}   ${last}   ${last}`:"",`Trân trọng, ${nm}.`].filter(Boolean).join("\n");
+  const parts=nm.split(/\s+/),last=parts[parts.length-1],sp=SCRIPT==="th"?" ":"   ";
+  const txt=[nm,`${nm}${sp}${nm}`,last!==nm?`${last}${sp}${last}${sp}${last}`:"",`Trân trọng, ${nm}.`].filter(Boolean).join("\n");
   const old=store.get("custom","");
   if(old.trim()&&old!==txt&&old!==store.get("nameLabTxt","")&&!nameArm){
     nameArm=true;const bt=document.querySelector("#genBox .btn.primary");

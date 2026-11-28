@@ -11,7 +11,11 @@ FONTS.TH = { x: 1, asc: 2.5, desc: 1.5, slant: 0, fam: "TH", wt: 500 };   // tr�
 const TH_LA = () => SCRIPT === "th";
 const laPhongTH = fam => (fam || SC.font) === "TH";
 
-const TH_KHOANG_CHU = 0.2;   // khoảng giữa hai chữ trong một tiếng khi lia viết (đơn vị chữ): hở nhẹ, khoảng 0,4 ô li ở cỡ Thường
+const TH_KHOANG_CHU = 0.2;   // khoảng giữa hai chữ khi có chữ chưa có hình xen giữa (đơn vị chữ)
+/* Khoảng hở khi lia viết, đo giữa mép mực hai chữ (đơn vị chữ, 1 ô li cỡ Thường = 0,5): hai nét cong gặp nhau (oa, oc, oo) hở 0,25;
+   còn lại (no, on, ac, ba…) hở 0,33, theo khoảng cách con chữ trong tài liệu dạy tập viết */
+const TH_LIA_CONG = 0.25, TH_LIA = 0.33;
+const TH_NET_CONG = ["congkin", "conghophai", "conghotrai"];
 const TH_KHOANG_TIENG = 0.8; // khoảng giữa hai tiếng: rộng bằng một chữ o
 const TH_DY_NANG = -0.5;   // dời ô dấu nặng xuống nửa đơn vị: chấm nằm khoảng 0,25 dưới đường chân
 const TH_DAU = { "́": "dausac", "̀": "dauhuyen", "̉": "dauhoi", "̃": "daunga", "̣": "daunang" };
@@ -162,6 +166,22 @@ function thCatCuoi(h) {
   _thCatC.set(h, kq);
   return kq;
 }
+/* Mép mực trái, phải của thân chữ (bỏ dấu) và chữ có mở đầu, kết thúc bằng nét cong không */
+const _thMep = new Map();
+function thMepMuc(h) {
+  if (_thMep.has(h)) return _thMep.get(h);
+  const ns = h.nets.filter(n => !n.dau); let trai = 1e9, phai = -1e9;
+  for (const n of ns) {
+    let p = null;
+    for (const g of n.d) {
+      if (g[0] === "C") for (let t = 0.1; t <= 1.001; t += 0.1) { const s = 1 - t, x = s * s * s * p[0] + 3 * s * s * t * g[1] + 3 * s * t * t * g[3] + t * t * t * g[5]; trai = Math.min(trai, x); phai = Math.max(phai, x); }
+      const q = [g[g.length - 2], g[g.length - 1]]; trai = Math.min(trai, q[0]); phai = Math.max(phai, q[0]); p = q;
+    }
+  }
+  const kq = { trai, phai, congDau: TH_NET_CONG.includes(ns[0].loai), congCuoi: TH_NET_CONG.includes(ns[ns.length - 1].loai) };
+  _thMep.set(h, kq);
+  return kq;
+}
 function danChuoiTH(s) {
   const o = [], noi = []; let x = 0, truoc = null;
   for (const ch of String(s ?? "").normalize("NFC")) {
@@ -189,7 +209,10 @@ function danChuoiTH(s) {
           const k = Math.min(0.32, dai * 0.45, khoang / (Math.max(A.huongDung[0], 0) + Math.max(B.huongDat[0], 0) + 1e-6));
           noi.push({ d: [["M", pA[0], pA[1]], ["C", pA[0] + A.huongDung[0] * k, pA[1] + A.huongDung[1] * k, pB[0] - B.huongDat[0] * k, pB[1] - B.huongDat[1] * k, pB[0], pB[1]]] });
         }
-      } else c.x = truoc.x + truoc.h.rong + TH_KHOANG_CHU;
+      } else {
+        const A = thMepMuc(truoc.h), B = thMepMuc(c.h);
+        c.x = truoc.x + A.phai + (A.congCuoi && B.congDau ? TH_LIA_CONG : TH_LIA) - B.trai;
+      }
     }
     o.push(c); x = c.x + c.h.rong; truoc = c;
   }

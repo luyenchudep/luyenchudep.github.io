@@ -37,7 +37,7 @@ function drawCard(cv,items,fam){
   T=save;layout=saveL}
 
 /* Hoạt ảnh bút viết chậm & Tự tô từng nét tương tác kiểu Hanzi Writer */
-let animState={ch:null,mode:"watch",list:[],playing:false,slow:true,big:false,progress:0,t:0,dur:0,tl:[],strokes:[],bounds:null};
+let animState={ch:null,mode:"watch",list:[],playing:false,slow:true,big:false,progress:0,t:0,dur:0,tl:[],strokes:[],bounds:null,mem:false,memStrokes:[],memLive:null,memGeom:null};
 let quiz={idx:0,misses:0,live:null,failPts:null,failUntil:0,hint:null,geom:null,timer:0,doneSet:new Set(),msg:"",msgKind:""};
 function animableItems(items){
   const res=[];
@@ -92,7 +92,7 @@ function sliceRun(run,dist){
 }
 /* Bút viết chậm: tốc độ đều theo chiều dài nét; cọ thu hẹp nét lên để giảm lem tại giao điểm */
 const ANIM_V={slow:1.5,mid:2.7};
-const ANIM_PAUSE=.4,ANIM_HOLD=1.8;
+const ANIM_PAUSE=.4,ANIM_HOLD_DEF=1.8,ANIM_MEM_HOLD=2;let ANIM_HOLD=ANIM_HOLD_DEF;
 function animTimeline(){
   const v=animState.slow?ANIM_V.slow:ANIM_V.mid;let t=0;const tl=[];
   for(const st of animState.strokes){const d=Math.max(.3,st.totalLen/v);tl.push({s:t,e:t+d});t+=d+ANIM_PAUSE}
@@ -125,10 +125,63 @@ function renderAnimCtrl(){
     h+=`<button id="animZoomBtn" onclick="toggleAnimZoom()">${animState.big?ic("collapse")+"Thu gọn":ic("zbox")+"Phóng to"}</button>`;
     box.innerHTML=h;return;
   }
-  box.innerHTML=`<button class="play" id="animPlayBtn" onclick="toggleAnimPlay()">${animState.playing?ic("pause")+"Tạm dừng":ic("play")+"Tiếp tục"}</button>
+  const memOn=!!animState.mem;
+  box.innerHTML=`<button class="${memOn?"":"play"}" id="animPlayBtn" onclick="toggleAnimPlay()">${animState.playing?ic("pause")+"Tạm dừng":ic("play")+"Tiếp tục"}</button>
     <button id="animSpdBtn" onclick="toggleAnimSpeed()">Tốc độ: ${animState.slow?"Chậm":"Vừa"}</button>
     <button onclick="initAnim(animState.ch,true)">${ic("replay")}Viết lại</button>
-    <button id="animZoomBtn" onclick="toggleAnimZoom()">${animState.big?ic("collapse")+"Thu gọn":ic("zbox")+"Phóng to"}</button>`;
+    <button id="animZoomBtn" onclick="toggleAnimZoom()">${animState.big?ic("collapse")+"Thu gọn":ic("zbox")+"Phóng to"}</button>
+    <button id="animMemBtn" class="${memOn?"play":""}" onclick="toggleAnimMem()">${ic(animState.mem==="hide"?"eye":"eyeoff")}Nhìn rồi tự viết</button>`
+    +(animState.mem==="hide"?`<button onclick="clearAnimMem()">${ic("eraser")}Xóa nét</button>`:"");
+}
+function resetAnimMem(){animState.mem=false;ANIM_HOLD=ANIM_HOLD_DEF;animState.memStrokes=[];animState.memLive=null;animState.memGeom=null}
+function toggleAnimMem(){
+  if(!animState.ch||animState.mode!=="watch")return;
+  if(animState.mem){initAnim(animState.ch,true);return}
+  stopAnim();
+  animState.mem="watch";ANIM_HOLD=99;animState.memStrokes=[];animState.memLive=null;animState.memGeom=null;
+  animState.t=0;animState.progress=0;animState.playing=true;
+  const cv=document.getElementById("animCv");if(cv){bindMemCanvas(cv);cv.classList.remove("quizOn")}
+  renderAnimCtrl();lastAnimT=0;animLoop();
+}
+function clearAnimMem(){animState.memStrokes=[];animState.memLive=null;drawAnimFrame()}
+function bindMemCanvas(cv){
+  if(!cv||cv._memBound)return;cv._memBound=true;
+  const ptOf=e=>{const r=cv.getBoundingClientRect(),p=rawP(e);
+    return [Math.round((e.clientX-r.left)*10)/10,Math.round((e.clientY-r.top)*10)/10,Math.round(p*1000)/1000,tiltMagOf(e)]};
+  cv.addEventListener("pointerdown",e=>{
+    if(animState.mode!=="watch"||animState.mem!=="hide"||!animState.memGeom)return;
+    if(animState.memLive&&e.pointerId!==animState.memLive.pid)return;
+    if(e.pointerType==="pen"&&!GS.get("penSeen",false))GS.set("penSeen",true);
+    const allow=e.pointerType==="pen"||e.pointerType==="mouse"||!S.penOnly||!GS.get("penSeen",false);
+    if(!allow){if(e.pointerType==="touch")toast("Dùng S Pen để viết · đang bật Chỉ nhận S Pen");return}
+    e.preventDefault();try{cv.setPointerCapture(e.pointerId)}catch(_){}
+    const q=ptOf(e);q[2]=Math.min(q[2],(S.pFull||.38)*.45);
+    const tn=themeName(),col=tn==="dark"?"#82B4FF":tn==="eink"?"#000000":"#184E9E";
+    const w=Math.max(2.4,Math.min(5.5,animState.memGeom.xh*(SCRIPT!=="td"?0.095:0.08)));
+    animState.memLive={tp:SCRIPT==="td"?"fountain":"gel",c:col,w,pr:SCRIPT==="td",ct:"med",na:38,tl:false,pf:S.pFull||.38,p:[q],pid:e.pointerId};
+    drawAnimFrame();
+  });
+  cv.addEventListener("pointermove",e=>{
+    if(!animState.memLive||animState.mode!=="watch"||animState.mem!=="hide"||e.pointerId!==animState.memLive.pid)return;
+    e.preventDefault();
+    let evs=e.getCoalescedEvents?e.getCoalescedEvents():[];if(!evs.length)evs=[e];
+    for(const ev of evs){
+      const raw=ptOf(ev),p=animState.memLive.p[animState.memLive.p.length-1];
+      if(Math.hypot(raw[0]-p[0],raw[1]-p[1])<1.2)continue;
+      animState.memLive.p.push([raw[0],raw[1],Math.round((p[2]*.38+raw[2]*.62)*1000)/1000,raw[3]]);
+    }
+    drawAnimFrame();
+  });
+  const endMem=e=>{
+    if(!animState.memLive||animState.mode!=="watch"||animState.mem!=="hide"||(e&&e.pointerId!==animState.memLive.pid))return;
+    const st=animState.memLive,g=animState.memGeom;animState.memLive=null;
+    if(g&&st.p.length){
+      const norm=Object.assign({},st,{w:st.w/g.xh,p:st.p.map(q=>[(q[0]-g.x0)/g.xh,(q[1]-g.b)/g.xh,q[2],q[3]])});
+      delete norm.pid;animState.memStrokes.push(norm);
+    }
+    drawAnimFrame();
+  };
+  cv.addEventListener("pointerup",endMem);cv.addEventListener("pointercancel",endMem);
 }
 function setAnimMode(mode){
   if(mode!=="watch"&&mode!=="quiz")return;
@@ -140,8 +193,9 @@ function setAnimMode(mode){
   if(animState.ch)initAnim(animState.ch,mode==="watch");
 }
 function initAnim(ch,autoPlay=true){
-  stopAnim();
+  stopAnim();resetAnimMem();
   const cv=document.getElementById("animCv");if(!cv||!DUCTUS[ch])return;
+  bindMemCanvas(cv);
   const built=buildAnimData(ch);
   animState.ch=ch;animState.progress=0;animState.t=0;animState.playing=animState.mode==="watch"&&autoPlay;
   animState.strokes=built.list;animState.bounds=built.bounds;animTimeline();
@@ -238,6 +292,14 @@ function revealGlyphLayer(ctx,cv,d,xh,Tp,src,strokesLim,all){
 function drawAnimFrame(){
   const cv=document.getElementById("animCv");if(!cv||!animState.ch)return;
   if(animState.mode==="quiz"){drawQuizFrame();return}
+  if(animState.mem==="hide"&&animState.playing){
+    resetAnimMem();animState.t=0;animState.progress=0;cv.classList.remove("quizOn");renderAnimCtrl();
+  }
+  if(animState.mem==="watch"&&animState.t>=animState.dur+ANIM_MEM_HOLD){
+    animState.mem="hide";animState.playing=false;ANIM_HOLD=ANIM_HOLD_DEF;
+    if(animRAF){cancelAnimationFrame(animRAF);animRAF=0}
+    bindMemCanvas(cv);cv.classList.add("quizOn");renderAnimCtrl();
+  }
   const Wc=cv.parentElement.clientWidth-2,Hc=animState.big?290:200,d=Math.min(devicePixelRatio||1,3);
   const cwPx=Math.round(Wc*d),chPx=Math.round(Hc*d);
   if(cv.width!==cwPx||cv.height!==chPx){cv.width=cwPx;cv.height=chPx;cv.style.height=Hc+"px"}
@@ -253,6 +315,25 @@ function drawAnimFrame(){
   const b=topBar+((Hc-topBar-10)-(B.maxY-B.minY)*xh)/2+B.maxY*xh;
   const m={xh,fs,asc:fs*F.asc,desc:fs*F.desc,tan,co:thCoBaiDangMo()};
 
+  if(animState.mem==="hide"){
+    const saveT=T,saveL=layout;T=ct;
+    ctx.save();ctx.beginPath();ctx.rect(0,topBar,Wc,Hc-topBar);ctx.clip();
+    layout={padL:12,safeSide:12};guides(ctx,b,m,8,Wc-8);
+    ctx.restore();
+    T=saveT;layout=saveL;
+    ctx.save();ctx.font="700 13.5px 'QS',sans-serif";ctx.textAlign="center";ctx.textBaseline="top";
+    ctx.fillStyle=dark?"#82B4FF":tn==="eink"?"#000000":"#184E9E";
+    ctx.fillText("Tự viết theo trí nhớ",Wc/2,6);
+    ctx.restore();
+    animState.memGeom={x0:Wc/2,b,xh};
+    const col=dark?"#82B4FF":tn==="eink"?"#000000":"#184E9E";
+    for(const s of animState.memStrokes)drawStroke(ctx,Object.assign({},s,{c:col,w:s.w*xh,p:s.p.map(q=>[Wc/2+q[0]*xh,b+q[1]*xh,q[2],q[3]])}));
+    if(animState.memLive)drawStroke(ctx,animState.memLive);
+    const info=document.getElementById("animInfo");
+    if(info){info.className="ok";info.textContent="Giờ bạn tự viết lại chữ này theo trí nhớ nha!"}
+    return;
+  }
+
   const saveT=T,saveL=layout;T=ct;
   ctx.save();ctx.beginPath();ctx.rect(0,topBar,Wc,Hc-topBar);ctx.clip();   /* lưới không tràn lên dòng tiêu đề */
   layout={padL:12,safeSide:12};guides(ctx,b,m,8,midX-8);
@@ -260,13 +341,17 @@ function drawAnimFrame(){
   ctx.restore();
   T=saveT;layout=saveL;
 
+  const total=animState.strokes.length;
+  const doneAll=animState.progress>=total;
+  const memHold=animState.mem==="watch"&&doneAll;
+
   ctx.save();
   ctx.strokeStyle=ct.asc;ctx.lineWidth=1.5;ctx.setLineDash([5,5]);
   ctx.beginPath();ctx.moveTo(midX,8);ctx.lineTo(midX,Hc-8);ctx.stroke();
   ctx.setLineDash([]);
   ctx.font="700 13.5px 'QS',sans-serif";ctx.textAlign="center";ctx.textBaseline="top";
   ctx.fillStyle=ct.hint;ctx.fillText("Chữ mẫu chuẩn",midX/2,6);
-  ctx.fillStyle=dark?"#82B4FF":tn==="eink"?"#000000":"#184E9E";ctx.fillText("Viết chậm",midX+midX/2,6);
+  ctx.fillStyle=dark?"#82B4FF":tn==="eink"?"#000000":"#184E9E";ctx.fillText(memHold?"Ghi nhớ nét chữ":"Viết chậm",midX+midX/2,6);
   ctx.restore();
 
   const ch=animState.ch,centerOff=((B.minX+B.maxX)/2)*xh;
@@ -277,8 +362,6 @@ function drawAnimFrame(){
   if(ch[0]==="~")drawBasic(ctx,ch.slice(1),xL,b,xh,ct.model,tan);
   else text(ctx,ch,xL,b,fs,ct.model,F.fam);
 
-  const total=animState.strokes.length;
-  const doneAll=animState.progress>=total;
   const curIdx=Math.min(total-1,Math.floor(animState.progress));
   const frac=doneAll?1:(animState.progress-curIdx);
   let activeTip=null;
@@ -294,9 +377,13 @@ function drawAnimFrame(){
     for(const run of st.runs){if(lim<=run.startAt)continue;const pts=sliceRun(run,Math.min(run.len,lim-run.startAt));activeTip=TpR(pts[pts.length-1])}
     if(!activeTip)activeTip=TpR(st.runs[0].pts[0]);
   }
-  for(let s=0;s<=curIdx&&s<total;s++){
-    const st=animState.strokes[s];
-    drawStartBadge(ctx,TpR(st.runs[0].pts[0]),s+1,!doneAll&&s===curIdx,dark,ct.paper);
+  if(memHold){
+    drawGuide(ctx,ch,xR,b,xh,dark);
+  }else{
+    for(let s=0;s<=curIdx&&s<total;s++){
+      const st=animState.strokes[s];
+      drawStartBadge(ctx,TpR(st.runs[0].pts[0]),s+1,!doneAll&&s===curIdx,dark,ct.paper);
+    }
   }
   if(activeTip)drawPenTip(ctx,activeTip);
 
@@ -304,7 +391,8 @@ function drawAnimFrame(){
   if(info){
     info.className="";
     const label=charLabel(ch);
-    info.textContent=doneAll?`${label} · Hoàn thành (${total} nét)`:`${label} · Đang viết nét ${curIdx+1}/${total}`;
+    if(memHold){const left=Math.max(1,Math.ceil(animState.dur+ANIM_MEM_HOLD-animState.t));info.textContent=`${label} · Ghi nhớ nét chữ (${left} giây)…`}
+    else info.textContent=doneAll?`${label} · Hoàn thành (${total} nét)`:`${label} · Đang viết nét ${curIdx+1}/${total}`;
   }
 }
 

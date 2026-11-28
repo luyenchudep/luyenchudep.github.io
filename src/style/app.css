@@ -415,8 +415,8 @@ textarea{
 .animChip.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .animCtrl{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
 .animCtrl button{
-  flex:1;min-height:44px;border-radius:12px;border:1.5px solid var(--line);
-  background:var(--paper);color:var(--ink);font-size:15px;font-weight:700;padding:6px 10px;
+  flex:1 1 auto;min-height:44px;border-radius:12px;border:1.5px solid var(--line);
+  background:var(--paper);color:var(--ink);font-size:15px;font-weight:700;padding:6px 10px;white-space:nowrap;
 }
 .animCtrl button.play{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 #animInfo{font-size:14.5px;font-weight:600;color:var(--muted);text-align:center;margin-top:6px;min-height:22px}

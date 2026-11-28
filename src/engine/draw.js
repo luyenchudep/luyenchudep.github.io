@@ -105,7 +105,8 @@ function tagText(ctx,s,b,m){
 }
 function repCopies(ctx,row,b,m,fn){
   const w=mw(row.s,m.fs,m.fam),stp=w+repGap(m.fs),lim=W-layout.padR;let n=0;
-  for(let x=layout.padL;x+w<=lim||n<1;x+=stp,n++)fn(x,n)
+  const toiDa=SCRIPT==="th"&&[...row.s].length===1&&/\p{Lu}/u.test(row.s)?4:Infinity;   /* Sao Mai: dòng một chữ hoa chỉ 4 chữ, viết kỹ cho đỡ mỏi tay */
+  for(let x=layout.padL;(x+w<=lim||n<1)&&n<toiDa;x+=stp,n++)fn(x,n)
 }
 function drawRow(ctx,row,b,m,mode){
   const {padL,padR}=layout,fam=m.fam,dark=themeName()==="dark";
@@ -159,11 +160,21 @@ function drawBgTo(ctx){
     rows.forEach((row,i)=>guides(ctx,padT+i*unit+up*m.fs,m,null,null,{dau:i===0,cuoi:i===rows.length-1}));
     rows.forEach((row,i)=>drawRow(ctx,row,padT+i*unit+up*m.fs,m,cur.mode));
   }else rows.forEach((row,i)=>{const b=padT+i*unit+up*m.fs;guides(ctx,b,m);drawRow(ctx,row,b,m,cur.mode)});
-  if(l.id==="luyen"&&!WEAK.length){
-    ctx.font="600 16px 'QS',sans-serif";ctx.fillStyle=T.hint;
-    const msg="Chưa có chữ nào cần luyện thêm. Ở chế độ ③ Chép hoặc Bài ôn, chạm So sánh rồi chấm “Luyện thêm”.";
-    const lines=wrap(msg,W-padL*2,16,"QS");
-    lines.forEach((ln,idx)=>ctx.fillText(ln,padL,padT+up*m.fs+idx*24));
+  if(l.id==="luyen"&&!(l.rows&&l.rows.length)){
+    ctx.save();
+    const maxW=Math.max(180,Math.min(540,W-padL*2-24));
+    const l1=wrap("Chưa có chữ nào cần luyện thêm.",maxW,18,"QS");
+    const l2=wrap("Ở chế độ ③ Chép hoặc Bài ôn, chạm So sánh rồi chấm “Luyện thêm” ở chữ chưa vừa ý, chữ đó sẽ hiện ở đây.",maxW,15.5,"QS");
+    const lh1=25,lh2=22,gap=6,totH=l1.length*lh1+gap+l2.length*lh2;
+    let bw=0;
+    ctx.font="700 17px 'QS',sans-serif";l1.forEach(s=>{bw=Math.max(bw,ctx.measureText(s).width)});
+    ctx.font="500 15px 'QS',sans-serif";l2.forEach(s=>{bw=Math.max(bw,ctx.measureText(s).width)});
+    const cy=Math.max(padT+totH/2+14,padT+(H-padT)/2),y0=cy-totH/2;
+    ctx.fillStyle=T.paper;ctx.globalAlpha=.92;ctx.fillRect(W/2-bw/2-20,y0-14,bw+40,totH+28);ctx.globalAlpha=1;
+    ctx.fillStyle=T.hint;ctx.textAlign="center";ctx.textBaseline="top";
+    ctx.font="700 17px 'QS',sans-serif";l1.forEach((ln,idx)=>ctx.fillText(ln,W/2,y0+idx*lh1));
+    ctx.font="500 15px 'QS',sans-serif";l2.forEach((ln,idx)=>ctx.fillText(ln,W/2,y0+l1.length*lh1+gap+idx*lh2));
+    ctx.restore();
   }
   if(l.cornell){const xL=W*.3,yS=padT+Math.floor(rows.length*.72)*unit;
     ctx.fillStyle=T.paper;ctx.globalAlpha=.55;ctx.fillRect(0,yS,W,H-yS);ctx.globalAlpha=1;
