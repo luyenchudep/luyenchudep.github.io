@@ -202,7 +202,7 @@ cfg = {
 | `tudo` | Bài tự do |
 | `tugo` | Nội dung tự gõ trong `text` (tối đa 2.000 ký tự), mỗi dòng một dòng tập |
 
-Chưa làm: `ghichep`, `font`, `z`, `gray`, `a5x2`. Trường `links` chưa đọc từ cfg mà theo khổ trang (Samsung Notes tắt). `cfg.script` phải trùng kiểu chữ app đang mở, vì dữ liệu kiểu chữ chỉ nạp một lần lúc khởi động. Bên trong, hàm vẫn tạm đổi vài biến chung của bộ vẽ (khổ trang, giao diện) rồi khôi phục; gỡ hẳn khi viết lại bộ vẽ theo mm. Nút "Tạo và tải file PDF" nay chỉ dựng `cfg` từ màn Xuất PDF rồi gọi `exportPdf(cfg)`.
+Bản 0.15 thêm `scope: "ghichep"` (trang ghi chép; các trường `trang`: `dong` | `cham` | `cornell` | `oly4`, `buoc` tính bằng mm, `soTrang` 1–100, `dauTrang`), `scope: "kiemtra"` (trang kiểm tra: thước 50 mm, 5 mức xám, dấu tiếng Việt, mẫu 4 ô li) và `a5x2` (chỉ với khổ A5: ghép từng cặp trang lên tờ A4 nằm ngang theo thứ tự, bỏ link). Phần vẽ nằm ở `src/engine/trang-ghi-chep.js` (`veTrangGhiChep`, `veTrangKiemTra`, vẽ theo mm thật); phần ghép tờ ở `assembleVectorPdf`. Chưa làm: `font`, `z`, `gray`. Trường `links` chưa đọc từ cfg mà theo khổ trang (Samsung Notes tắt). `cfg.script` phải trùng kiểu chữ app đang mở, vì dữ liệu kiểu chữ chỉ nạp một lần lúc khởi động. Bên trong, hàm vẫn tạm đổi vài biến chung của bộ vẽ (khổ trang, giao diện) rồi khôi phục; gỡ hẳn khi viết lại bộ vẽ theo mm. Nút "Tạo và tải file PDF" nay chỉ dựng `cfg` từ màn Xuất PDF rồi gọi `exportPdf(cfg)`.
 
 **Đường link:** `…/index.html#cfg=<JSON nén, mã base64url>`. Phần nằm sau dấu `#` không được trình duyệt gửi lên máy chủ, nên nội dung người dùng tự gõ không lọt ra ngoài.
 

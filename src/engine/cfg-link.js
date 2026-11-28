@@ -73,9 +73,10 @@ async function apDungCfgTuLink() {
   if ((c.scope === "bai" || c.scope === "phan") && i >= 0 && i !== cur.li) openLesson(i);
   Object.assign(pdfOpt, {
     preset: c.preset, wMm: c.wMm, hMm: c.hMm, mode: c.mode, grid: c.grid, arrows: c.arrows, barSide: c.barSide,
-    scope: c.scope === "bai" && c.lessons.length > 1 ? "pick" : { bai: "cur", phan: "part", tatca: "all", luyenthem: "weak", tudo: "free", tugo: "type" }[c.scope],
-    lessons: c.lessons.slice(), text: c.text || "",
+    scope: c.scope === "bai" && c.lessons.length > 1 ? "pick" : { bai: "cur", phan: "part", tatca: "all", luyenthem: "weak", tudo: "free", tugo: "type", ghichep: "note", kiemtra: "test" }[c.scope],
+    lessons: c.lessons.slice(), text: c.text || "", a5x2: !!c.a5x2,
   });
+  if (c.scope === "ghichep") { pdfOpt.trang = c.trang; if (c.trang !== "oly4") pdfOpt.buoc[c.trang] = c.buoc; pdfOpt.soTrang = c.soTrang; pdfOpt.dauTrang = c.dauTrang; }
   openPdfModal();if(typeof datTrang==="function"){datTrang("gen");datKhu("pdf")}   /* mở thành trang Tập viết PDF */
   toast("Đã mở cấu hình vở từ đường link");
 }

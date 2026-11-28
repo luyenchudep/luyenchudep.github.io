@@ -3,7 +3,7 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-TPezWyTYOQiBT3ZbDiPSTVFBqnwUjkcGkmTscXc2k34='; style-src 'unsafe-inline'; font-src data:; img-src data: blob:; manifest-src data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; worker-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-tKNcsJup7rLHjL8EHziaEiYc/Cj/NPr9F0fzZT9pqAA='; style-src 'unsafe-inline'; font-src data:; img-src data: blob:; manifest-src data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; worker-src 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -10385,7 +10385,7 @@ function khoTuNhap(wMm, hMm) {
   if (!(w >= 40 && w <= 500 && h >= 40 && h <= 500)) throw new Error("Khổ tự nhập phải từ 40 tới 500 mm mỗi chiều");
   return khoPdf({ ten: `Khổ ${w}×${h} mm`, wMm: w, hMm: h, pxW: Math.round(w * PX_MOI_MM), pxH: Math.round(h * PX_MOI_MM), barPx: 68, mono: false, links: true, moTa: `${w}×${h} mm · khổ tự nhập` });
 }
-const pdfOpt={preset:"rm2",wMm:null,hMm:null,scope:"cur",lessons:[],text:"",mode:"to",grid:null,barSide:"left",arrows:true,busy:false};
+const pdfOpt={preset:"rm2",wMm:null,hMm:null,scope:"cur",lessons:[],text:"",mode:"to",grid:null,barSide:"left",arrows:true,busy:false,trang:"dong",buoc:{dong:7,cham:5,cornell:7},soTrang:20,dauTrang:true,a5x2:false};
 /* Khổ đang chọn ở màn Tạo tập viết PDF (kể cả khổ tự nhập) */
 function khoDangChon(){return pdfOpt.preset==="tunhap"?khoTuNhap(pdfOpt.wMm,pdfOpt.hMm):PDF_PRESETS[pdfOpt.preset]}
 
@@ -10411,21 +10411,31 @@ function openPdfModal(keepScroll=false){
     :nd==="all"?`Cả giáo trình <b>${escHtml(SC.name)}</b>, kèm trang mục lục (nhiều trang, chờ lâu hơn).`
     :nd==="weak"?`Các chữ trong Luyện thêm (${WEAK.length||"chưa có, sẽ lấy Bài ôn"}).`
     :nd==="free"?"Nội dung Bài tự do hoặc Tên riêng đã lưu."
+    :nd==="note"?"Trang trống để ghi chép, kẻ theo mm thật: in ra hay mở trên máy đọc sách đều đúng cỡ."
+    :nd==="test"?"Một trang có thước 50 mm, 5 mức xám, chữ có dấu khó và mẫu 4 ô li, để kiểm máy in và màn hình trước khi in cả tập."
     :"Gõ hoặc dán nội dung cần tập, mỗi dòng một dòng tập.";
+  const laBai=nd!=="note"&&nd!=="test";
+  /* Trang ghi chép: kiểu trang, khoảng cách, số trang, đầu trang */
+  const BUOC={dong:[6,7,8,10],cham:[4,5,6],cornell:[6,7,8,10]};
+  const oGhiChep=nd!=="note"?"":`<div class="row"><span>Kiểu trang</span><div class="seg">${nutChon([["dong","Kẻ dòng"],["cham","Kẻ chấm"],["cornell","Cornell"],["oly4","4 ô li trống"]],pdfOpt.trang,"pdfKieuTrang")}</div></div>`+
+    (pdfOpt.trang==="oly4"?"":`<div class="row"><span>${pdfOpt.trang==="cham"?"Khoảng cách giữa hai chấm":"Khoảng cách giữa hai dòng"}</span><div class="seg">${nutChon(BUOC[pdfOpt.trang].map(v=>[String(v),v+" mm"]),String(pdfOpt.buoc[pdfOpt.trang]),"pdfBuoc")}</div></div>`)+
+    `<div class="row"><span>Số trang</span><input type="number" min="1" max="${GHI_CHEP_TOI_DA}" step="1" value="${pdfOpt.soTrang}" data-nhap="pdfSoTrang" aria-label="Số trang" style="width:90px;padding:8px 10px;border-radius:10px;border:1px solid currentColor;background:transparent;color:inherit;font:inherit"></div>`+
+    `<div class="row"><span>Dòng ngày và số trang ở đầu trang</span><div class="seg">${nutChon([[true,"Bật"],[false,"Tắt"]],pdfOpt.dauTrang,"pdfDauTrang")}</div></div>`;
+  const oA5=pdfOpt.preset!=="a5"?"":`<div class="row"><span>In 2 trang trên 1 tờ A4</span><div class="seg">${nutChon([[true,"Bật"],[false,"Tắt"]],pdfOpt.a5x2,"pdfA5x2")}</div></div><div class="prog" style="margin:4px 0 8px">${pdfOpt.a5x2?"File ra là A4 nằm ngang, 2 trang A5 đặt cạnh nhau theo thứ tự. In ở tỷ lệ 100% rồi cắt theo đường nét đứt ở giữa. Mục lục không bấm chuyển trang được.":"Bật để in trên giấy A4 rồi cắt đôi thành trang A5."}</div>`;
   const dsBai=nd!=="pick"?"":`<div class="pdfDsBai">${COURSE.map(p=>`<details${p.lessons.some(l=>pdfOpt.lessons.includes(l.id))?" open":""}><summary>${escHtml(p.part)}</summary>${p.lessons.map(l=>`<label class="pdfBai"><input type="checkbox" ${pdfOpt.lessons.includes(l.id)?"checked":""} data-doi="pdfChonBai" data-id="${escHtml(l.id)}"> ${escHtml(l.t)}</label>`).join("")}</details>`).join("")}</div>`;
   const oTuGo=nd!=="type"?"":`<textarea id="pdfText" class="pdfText" maxlength="${TU_GO_TOI_DA}" placeholder="VD: Học ăn, học nói, học gói, học mở." data-nhap="pdfTuGo">${escHtml(pdfOpt.text)}</textarea><div class="prog" id="pdfSoChu" style="text-align:right">${pdfOpt.text.length}/${TU_GO_TOI_DA} ký tự</div>`;
   const oKho=pdfOpt.preset!=="tunhap"?"":`<div class="row"><span>Khổ tự nhập (mm)</span><div class="pdfKhoNhap"><input type="number" min="40" max="500" step="0.1" value="${pdfOpt.wMm}" data-nhap="pdfKhoTuNhap" data-truong="wMm" aria-label="Rộng (mm)"> × <input type="number" min="40" max="500" step="0.1" value="${pdfOpt.hMm}" data-nhap="pdfKhoTuNhap" data-truong="hMm" aria-label="Cao (mm)"></div></div>`;
   document.getElementById("genBox").innerHTML=`<h3>${ic("download")} Tạo tập viết PDF</h3>
   <div class="prog">Tạo tập viết PDF ngay trên máy, không cần mạng. Chọn nội dung và khổ giấy, rồi tạo file hoặc chép đường link để gửi cho người khác.</div>
   <aside class="pdfXem" aria-label="Xem trước trang đầu"><div class="pdfXemKhung"><canvas id="pdfXemCv"></canvas></div><div class="prog" id="pdfXemTxt">Đang dựng trang xem trước…</div></aside>
-  <div class="row"><span>Nội dung</span><div class="seg">${nutChon([["cur","Bài này"],["pick","Chọn bài"],["part","Cả phần"],["all","Cả giáo trình"],["weak","Luyện thêm"],["free","Bài tự do"],["type","Tự gõ"]],nd,"pdfNoiDung")}</div></div>
-  <div class="prog" style="margin:4px 0 8px">${moTaNd}</div>${dsBai}${oTuGo}
+  <div class="row"><span>Nội dung</span><div class="seg">${nutChon([["cur","Bài này"],["pick","Chọn bài"],["part","Cả phần"],["all","Cả giáo trình"],["weak","Luyện thêm"],["free","Bài tự do"],["type","Tự gõ"],["note","Trang ghi chép"],["test","Trang kiểm tra"]],nd,"pdfNoiDung")}</div></div>
+  <div class="prog" style="margin:4px 0 8px">${moTaNd}</div>${dsBai}${oTuGo}${oGhiChep}
   <div class="row"><span>Khổ giấy hoặc máy</span><select aria-label="Khổ giấy hoặc máy" style="flex:1;min-width:0;max-width:100%;padding:10px 12px;border-radius:12px;border:1px solid currentColor;background:transparent;color:inherit;font:inherit" data-doi="pdfKhoGiay">${nhomKho().map(([ten,ds])=>`<optgroup label="${ten}">${ds.map(v=>`<option value="${v}"${pdfOpt.preset===v?" selected":""}>${escHtml(KHO_TRANG[v].ten)}</option>`).join("")}</optgroup>`).join("")}<optgroup label="Khác"><option value="tunhap"${pdfOpt.preset==="tunhap"?" selected":""}>Tự nhập kích thước (mm)</option></optgroup></select></div>
-  ${oKho}<div class="prog" id="pdfKhoMoTa" style="margin:4px 0 8px">${pr?`<b>${escHtml(pr.name)}:</b> ${escHtml(pr.desc)}`:escHtml(loiKho)}</div>
-  <div class="row"><span>Cách tập trên dòng</span><div class="seg">${nutChon([["to","② Tô"],["nho","③ Chép"]],pdfOpt.mode,"pdfCachTap")}</div></div>
-  ${SCRIPT==="th"?"":`<div class="row"><span>Kiểu dòng kẻ</span><div class="seg">${nutChon([["french","Lưới xiên Pháp"],["oly4","4 ô li Việt Nam"]],pdfOpt.grid,"pdfDongKe")}</div></div>`}
+  ${oKho}<div class="prog" id="pdfKhoMoTa" style="margin:4px 0 8px">${pr?`<b>${escHtml(pr.name)}:</b> ${escHtml(pr.desc)}`:escHtml(loiKho)}</div>${oA5}
+  ${!laBai?"":`<div class="row"><span>Cách tập trên dòng</span><div class="seg">${nutChon([["to","② Tô"],["nho","③ Chép"]],pdfOpt.mode,"pdfCachTap")}</div></div>`}
+  ${SCRIPT==="th"||!laBai?"":`<div class="row"><span>Kiểu dòng kẻ</span><div class="seg">${nutChon([["french","Lưới xiên Pháp"],["oly4","4 ô li Việt Nam"]],pdfOpt.grid,"pdfDongKe")}</div></div>`}
   <div class="row"><span>Chừa lề thanh công cụ</span><div class="seg">${nutChon([["left","Lề trái (tay phải)"],["right","Lề phải (tay trái)"]],pdfOpt.barSide,"pdfLeCongCu")}</div></div>
-  <div class="row"><span>Mũi tên thứ tự nét ở chữ mẫu</span><div class="seg">${nutChon([[true,"Bật"],[false,"Tắt"]],pdfOpt.arrows,"pdfMuiTen")}</div></div>
+  ${!laBai?"":`<div class="row"><span>Mũi tên thứ tự nét ở chữ mẫu</span><div class="seg">${nutChon([[true,"Bật"],[false,"Tắt"]],pdfOpt.arrows,"pdfMuiTen")}</div></div>`}
   <div id="pdfProg" class="prog" style="display:none;color:var(--accent);font-weight:700;margin-top:8px"></div>
   <button class="btn primary" id="pdfGoBtn" data-action="taoPdf">${ic("download")}Tạo và tải file PDF</button>
   <button class="btn ghost" data-action="chepLinkPdf">Chép đường link cấu hình này</button>
@@ -10440,6 +10450,12 @@ HANH_DONG.pdfDongKe=el=>{pdfOpt.grid=el.dataset.gt;openPdfModal(true)};
 HANH_DONG.pdfLeCongCu=el=>{pdfOpt.barSide=el.dataset.gt;openPdfModal(true)};
 HANH_DONG.pdfMuiTen=el=>{pdfOpt.arrows=el.dataset.gt==="1";openPdfModal(true)};
 HANH_DONG.pdfChonBai=el=>chonBaiPdfUi(el.dataset.id,el.checked);
+/* Trang ghi chép và in 2 trang A5 trên 1 tờ A4 */
+HANH_DONG.pdfKieuTrang=el=>{pdfOpt.trang=el.dataset.gt;openPdfModal(true)};
+HANH_DONG.pdfBuoc=el=>{pdfOpt.buoc[pdfOpt.trang]=Number(el.dataset.gt);openPdfModal(true)};
+HANH_DONG.pdfSoTrang=el=>{const n=Math.round(Number(el.value));if(n>=1&&n<=GHI_CHEP_TOI_DA){pdfOpt.soTrang=n;veXemTruocPdf()}};
+HANH_DONG.pdfDauTrang=el=>{pdfOpt.dauTrang=el.dataset.gt==="1";openPdfModal(true)};
+HANH_DONG.pdfA5x2=el=>{pdfOpt.a5x2=el.dataset.gt==="1";openPdfModal(true)};
 HANH_DONG.pdfTuGo=el=>datChuTuGo(el.value);
 HANH_DONG.pdfKhoTuNhap=el=>datKhoTuNhap(el.dataset.truong,el.value);
 HANH_DONG.pdfKhoGiay=el=>{if(el.value==="tunhap")chonKhoTuNhap();else pdfOpt.preset=el.value;openPdfModal(true)};
@@ -10451,7 +10467,7 @@ async function veXemTruocPdf(){
   const lan=++_xemPdfLan,cv=document.getElementById("pdfXemCv"),txt=document.getElementById("pdfXemTxt");if(!cv)return;
   await new Promise(r=>setTimeout(r,220));if(lan!==_xemPdfLan)return;   /* chờ ngừng gõ; đang tạo PDF thì exportPdf tự xếp hàng chạy sau */
   try{const r=await exportPdf(pdfCfgTuManHinh(),{xemTruoc:(w,h)=>{cv.width=w;cv.height=h;return cv.getContext("2d")}});
-    if(lan===_xemPdfLan&&txt)txt.textContent=!r||!r.xemTruoc?"":r.soBai>1?`${r.tenKho} · trang đầu của bài 1 trong ${r.soBai} bài (trang 1 là mục lục)`:`${r.tenKho} · trang đầu trong ${r.soTrang} trang`;}
+    if(lan===_xemPdfLan&&txt)txt.textContent=!r||!r.xemTruoc?"":r.soBai>1?`${r.tenKho} · trang đầu của bài 1 trong ${r.soBai} bài (trang 1 là mục lục)`:`${r.tenKho} · trang đầu trong ${r.soTrang} trang${r.soTo?`, in trên ${r.soTo} tờ A4`:""}`;}
   catch(e){if(lan===_xemPdfLan&&txt)txt.textContent="Chưa xem trước được: "+e.message}
 }
 const PDFF = {
@@ -10656,7 +10672,14 @@ async function pdfDeflate(u8){
 function pdfUtf16Hex(s){let h="";for(let i=0;i<s.length;i++)h+=s.charCodeAt(i).toString(16).padStart(4,"0").toUpperCase();return h}
 function pdfB64(b64){const bin=atob(b64),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return a}
 /* Đóng gói PDF 1.4: phông TrueType nhúng (Type0/Identity-H, có bảng ToUnicode để chọn và tìm được chữ), độ trong suốt, liên kết mục lục */
-async function assembleVectorPdf(doc,pages,ptW,ptH,W,H,title){
+async function assembleVectorPdf(doc,pages,ptW,ptH,W,H,title,a5x2){
+  /* In 2 trang A5 trên 1 tờ A4 nằm ngang: gộp từng cặp trang (1-2, 3-4…) thành một tờ; bỏ link (giấy in không bấm được) */
+  if(a5x2){const A4W=297*MM_SANG_PT,A4H=210*MM_SANG_PT,ox=(A4W-2*ptW)/2,oy=(A4H-ptH)/2,sx=ptW/W,sy=ptH/H,to=[];
+    const dat=(c,x)=>`q ${pdfN4(sx)} 0 0 ${pdfN4(-sy)} ${pdfN4(x)} ${pdfN4(oy+ptH)} cm\n${c}\nQ`;
+    for(let i=0;i<pages.length;i+=2){
+      const cat=`q 0.6 G 0.4 w [3 3] 0 d ${pdfN4(A4W/2)} 0 m ${pdfN4(A4W/2)} ${pdfN4(A4H)} l S Q`;
+      to.push({content:dat(pages[i].content,ox)+"\n"+(pages[i+1]?dat(pages[i+1].content,ox+ptW):"")+"\n"+cat,links:[],tho:true})}
+    pages=to;ptW=A4W;ptH=A4H}
   const te=new TextEncoder(),chunks=[],offsets=[];let byteLen=0,nextId=1;
   const push=u=>{chunks.push(u);byteLen+=u.length};
   const pushStr=s=>push(te.encode(s));
@@ -10700,7 +10723,7 @@ async function assembleVectorPdf(doc,pages,ptW,ptH,W,H,title){
   for(let i=0;i<pages.length;i++){const pg=pages[i],cId=alloc(),ann=[];
     for(const lk of (pg.links||[])){const aid=alloc();
       obj(aid,`<< /Type /Annot /Subtype /Link /Rect [${lk.rect.map(v=>v.toFixed(1)).join(" ")}] /Border [0 0 0] /Dest [${pageIds[lk.targetPage]} 0 R /Fit] >>`);ann.push(`${aid} 0 R`)}
-    await stream(cId,"",te.encode(`q ${pdfN4(sx)} 0 0 ${pdfN4(-sy)} 0 ${pdfN4(ptH)} cm\n${pg.content}\nQ`));
+    await stream(cId,"",te.encode(pg.tho?pg.content:`q ${pdfN4(sx)} 0 0 ${pdfN4(-sy)} 0 ${pdfN4(ptH)} cm\n${pg.content}\nQ`));
     obj(pageIds[i],`<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 ${ptW.toFixed(2)} ${ptH.toFixed(2)}] /Resources ${resId} 0 R /Contents ${cId} 0 R${ann.length?` /Annots [${ann.join(" ")}]`:""} >>`);
   }
   obj(pagesId,`<< /Type /Pages /Count ${pages.length} /Kids [${pageIds.map(id=>id+" 0 R").join(" ")}] >>`);
@@ -10715,10 +10738,13 @@ async function assembleVectorPdf(doc,pages,ptW,ptH,W,H,title){
 /* Nút "Tạo và tải file PDF": dựng cfg từ màn Xuất PDF (pdfOpt) và bài đang mở, gọi exportPdf(cfg) rồi tải file về */
 function pdfCfgTuManHinh(){
   const l=LESSONS[cur.li];
-  const scope={cur:"bai",pick:"bai",part:"phan",all:"tatca",weak:"luyenthem",free:"tudo",type:"tugo"}[pdfOpt.scope];
+  const scope={cur:"bai",pick:"bai",part:"phan",all:"tatca",weak:"luyenthem",free:"tudo",type:"tugo",note:"ghichep",test:"kiemtra"}[pdfOpt.scope];
   const c={v:1,script:SCRIPT,scope,lessons:pdfOpt.scope==="pick"?pdfOpt.lessons.slice():[l.id],mode:pdfOpt.mode,grid:pdfOpt.grid||S.gridStyle||"french",arrows:pdfOpt.arrows,preset:pdfOpt.preset,barSide:pdfOpt.barSide};
   if(pdfOpt.preset==="tunhap"){c.wMm=pdfOpt.wMm;c.hMm=pdfOpt.hMm}
   if(pdfOpt.scope==="type")c.text=pdfOpt.text;
+  if(pdfOpt.scope==="note"||pdfOpt.scope==="test"){c.lessons=[];delete c.mode;delete c.arrows}
+  if(pdfOpt.scope==="note"){c.trang=pdfOpt.trang;if(pdfOpt.trang!=="oly4")c.buoc=pdfOpt.buoc[pdfOpt.trang];c.soTrang=pdfOpt.soTrang;c.dauTrang=pdfOpt.dauTrang}
+  if(pdfOpt.preset==="a5"&&pdfOpt.a5x2)c.a5x2=true;
   return c;
 }
 async function generateWorkbookPdf(){
@@ -10765,6 +10791,424 @@ if(mq&&mq.addEventListener)mq.addEventListener("change",()=>{if(S.theme==="auto"
 let tT=0;function toast(m){const t=document.getElementById("toast");t.textContent=m;placeToast(t);t.style.opacity=1;clearTimeout(tT);tT=setTimeout(()=>t.style.opacity=0,2200)}
 
 
+/* ================== VẼ TRANG GHI CHÉP VÀ TRANG KIỂM TRA CHO TẬP VIẾT PDF ==================
+   Chứa hai hàm vẽ độc lập (không đọc biến chung của ứng dụng):
+   - veTrangGhiChep(ctx, W, H, mm, o): vẽ trang kẻ dòng, kẻ chấm, Cornell hoặc 4 ô li trống.
+   - veTrangKiemTra(ctx, W, H, mm, o): vẽ trang kiểm máy in và màn hình máy đọc sách.
+   Mọi số đo trong file đều quy đổi qua tham số mm (số điểm ảnh ứng với 1 mm trên trang). */
+
+/* Tạo chuỗi phông chữ 'QS' theo độ đậm và cỡ chữ tính bằng mm */
+function tinhFontQS(dam, coMm, mm) {
+  return `${dam} ${coMm * mm}px 'QS',sans-serif`;
+}
+
+/* Đổi số đo mm sang chuỗi tiếng Việt: số nguyên bỏ phần lẻ, số lẻ dùng dấu phẩy */
+function tinhSoMm(so) {
+  const n = Math.round(Number(so) * 100) / 100;
+  return isFinite(n) ? String(n).replace(".", ",") : "";
+}
+
+/* Tách chuỗi thành nhiều dòng vừa trong bề rộng tối đa (tách theo khoảng trắng) */
+function tinhDongChu(ctx, chu, rongToiDa) {
+  const s = String(chu || "");
+  if (!s || !(rongToiDa > 0)) return s ? [s] : [];
+  if (ctx.measureText(s).width <= rongToiDa) return [s];
+  const tu = s.split(" ");
+  const dong = [];
+  let hienTai = "";
+  for (let i = 0; i < tu.length; i++) {
+    const thu = hienTai ? `${hienTai} ${tu[i]}` : tu[i];
+    if (hienTai && ctx.measureText(thu).width > rongToiDa) {
+      dong.push(hienTai);
+      hienTai = tu[i];
+    } else {
+      hienTai = thu;
+    }
+  }
+  if (hienTai) dong.push(hienTai);
+  return dong;
+}
+
+/* Vẽ chữ tự xuống dòng từ đường chân y; trả về đường chân của dòng cuối cùng */
+function veChuXuongDong(ctx, chu, x, y, rongToiDa, buocDong) {
+  const dong = tinhDongChu(ctx, chu, rongToiDa);
+  if (!dong.length) return y;
+  for (let i = 0; i < dong.length; i++) {
+    ctx.fillText(dong[i], x, y + i * buocDong);
+  }
+  return y + (dong.length - 1) * buocDong;
+}
+
+/* Vẽ dòng đầu trang ghi chép: ngày tháng bên trái và số trang bên phải */
+function veDauTrangGhiChep(ctx, W, mm, le, so, tong) {
+  const y = le.t + 6 * mm;
+  ctx.fillStyle = "#777777";
+  ctx.font = tinhFontQS(500, 3.4, mm);
+  ctx.textBaseline = "alphabetic";
+  ctx.textAlign = "left";
+  ctx.fillText("Ngày ...... / ...... / ............", le.l, y);
+  if (so != null && tong != null) {
+    ctx.textAlign = "right";
+    ctx.fillText(`Trang ${so}/${tong}`, W - le.r, y);
+    ctx.textAlign = "left";
+  }
+}
+
+/* Vẽ các đường kẻ ngang song song từ x0 tới x1, bắt đầu ở yDau, không vượt yCuoi */
+function veKeDong(ctx, x0, yDau, x1, yCuoi, buocPx, mm) {
+  if (!(x1 > x0) || !(buocPx > 0) || yDau > yCuoi) return;
+  ctx.strokeStyle = "#A8A8A8";
+  ctx.lineWidth = 0.2 * mm;
+  ctx.lineCap = "butt";
+  ctx.beginPath();
+  for (let i = 0; ; i++) {
+    const y = yDau + i * buocPx;
+    if (y > yCuoi) break;
+    ctx.moveTo(x0, y);
+    ctx.lineTo(x1, y);
+  }
+  ctx.stroke();
+}
+
+/* Vẽ lưới chấm tròn đường kính 0,5 mm, canh giữa đều hai bên và trên dưới trong vùng kẻ */
+function veKeCham(ctx, x0, y0, x1, y1, buocPx, mm) {
+  if (!(x1 > x0) || !(y1 > y0) || !(buocPx > 0)) return;
+  const r = 0.25 * mm;
+  const soKhoangX = Math.floor((x1 - x0) / buocPx);
+  const soKhoangY = Math.floor((y1 - y0) / buocPx);
+  const sx = x0 + (x1 - x0 - soKhoangX * buocPx) / 2;
+  const sy = y0 + (y1 - y0 - soKhoangY * buocPx) / 2;
+  const tron = Math.PI * 2;
+  ctx.fillStyle = "#888888";
+  ctx.beginPath();
+  for (let j = 0; j <= soKhoangY; j++) {
+    const y = sy + j * buocPx;
+    for (let i = 0; i <= soKhoangX; i++) {
+      const x = sx + i * buocPx;
+      ctx.moveTo(x + r, y);
+      ctx.arc(x, y, r, 0, tron);
+    }
+  }
+  ctx.fill();
+}
+
+/* Vẽ trang ghi chép kiểu Cornell: 3 ô Câu hỏi, Ghi chép, Tóm tắt có dòng kẻ bên trong */
+function veCornell(ctx, x0, y0, x1, y1, buocPx, mm) {
+  if (!(x1 > x0) || !(y1 > y0)) return;
+  const xC = x0 + 0.30 * (x1 - x0);
+  const yS = y1 - 0.22 * (y1 - y0);
+  const leTrong = 1.5 * mm;
+  const cachTren = Math.max(buocPx, 8 * mm);
+  const saiSo = 1e-6 * mm;
+
+  /* Kẻ dòng bên trong cả 3 ô trước khi vẽ khung để đường khung đậm nằm trên cùng */
+  veKeDong(ctx, x0 + leTrong, y0 + cachTren, xC - leTrong, yS - saiSo, buocPx, mm);
+  veKeDong(ctx, xC + leTrong, y0 + cachTren, x1 - leTrong, yS - saiSo, buocPx, mm);
+  veKeDong(ctx, x0 + leTrong, yS + cachTren, x1 - leTrong, y1 - saiSo, buocPx, mm);
+
+  /* Nhãn góc trên trái từng ô */
+  ctx.fillStyle = "#777777";
+  ctx.font = tinhFontQS(600, 3, mm);
+  ctx.textAlign = "left";
+  ctx.textBaseline = "alphabetic";
+  ctx.fillText("Câu hỏi", x0 + 2 * mm, y0 + 5 * mm);
+  ctx.fillText("Ghi chép", xC + 2 * mm, y0 + 5 * mm);
+  ctx.fillText("Tóm tắt", x0 + 2 * mm, yS + 5 * mm);
+
+  /* Khung ngoài và hai đường chia ô */
+  ctx.strokeStyle = "#555555";
+  ctx.lineWidth = 0.35 * mm;
+  ctx.lineCap = "butt";
+  ctx.beginPath();
+  ctx.rect(x0, y0, x1 - x0, y1 - y0);
+  ctx.moveTo(xC, y0);
+  ctx.lineTo(xC, yS);
+  ctx.moveTo(x0, yS);
+  ctx.lineTo(x1, yS);
+  ctx.stroke();
+}
+
+/* Vẽ lưới 4 ô li (1 ô li = 2 mm), phủ số nguyên ô lớn 8 mm từ góc trên trái (x0, y0) */
+function veLuoiOLi(ctx, x0, y0, rong, cao, mm) {
+  const li = 2 * mm;
+  const oLon = 8 * mm;
+  const soCotLon = Math.floor((rong + 1e-6 * mm) / oLon);
+  const soHangLon = Math.floor((cao + 1e-6 * mm) / oLon);
+  if (soCotLon <= 0 || soHangLon <= 0) return;
+
+  const nCot = soCotLon * 4;
+  const nHang = soHangLon * 4;
+  const x1 = x0 + soCotLon * oLon;
+  const y1 = y0 + soHangLon * oLon;
+
+  ctx.lineCap = "butt";
+
+  /* Đường li mảnh (bỏ qua vị trí trùng đường đậm mỗi 4 ô li) */
+  ctx.strokeStyle = "#CFCFCF";
+  ctx.lineWidth = 0.15 * mm;
+  ctx.beginPath();
+  for (let i = 1; i < nCot; i++) {
+    if (i % 4 === 0) continue;
+    const x = x0 + i * li;
+    ctx.moveTo(x, y0);
+    ctx.lineTo(x, y1);
+  }
+  for (let j = 1; j < nHang; j++) {
+    if (j % 4 === 0) continue;
+    const y = y0 + j * li;
+    ctx.moveTo(x0, y);
+    ctx.lineTo(x1, y);
+  }
+  ctx.stroke();
+
+  /* Đường đậm mỗi 4 ô li (8 mm), bao gồm cả 4 cạnh ngoài của lưới */
+  ctx.strokeStyle = "#8C8C8C";
+  ctx.lineWidth = 0.25 * mm;
+  ctx.beginPath();
+  for (let i = 0; i <= soCotLon; i++) {
+    const x = x0 + i * oLon;
+    ctx.moveTo(x, y0);
+    ctx.lineTo(x, y1);
+  }
+  for (let j = 0; j <= soHangLon; j++) {
+    const y = y0 + j * oLon;
+    ctx.moveTo(x0, y);
+    ctx.lineTo(x1, y);
+  }
+  ctx.stroke();
+}
+
+/* Vẽ thước ngang dài đúng 50 mm, vạch hướng xuống và số 0..5 cm bên dưới vạch 10 mm */
+function veThuocNgang(ctx, x0, y0, mm) {
+  ctx.strokeStyle = "#000000";
+  ctx.lineCap = "butt";
+
+  /* Đường thước chính */
+  ctx.lineWidth = 0.3 * mm;
+  ctx.beginPath();
+  ctx.moveTo(x0, y0);
+  ctx.lineTo(x0 + 50 * mm, y0);
+  ctx.stroke();
+
+  /* Vạch chia từng 1 mm, 5 mm, 10 mm */
+  ctx.lineWidth = 0.2 * mm;
+  ctx.beginPath();
+  for (let i = 0; i <= 50; i++) {
+    const x = x0 + i * mm;
+    const dai = (i % 10 === 0 ? 5 : i % 5 === 0 ? 3.5 : 2) * mm;
+    ctx.moveTo(x, y0);
+    ctx.lineTo(x, y0 + dai);
+  }
+  ctx.stroke();
+
+  /* Số cm canh giữa dưới vạch 10 mm */
+  ctx.fillStyle = "#000000";
+  ctx.font = tinhFontQS(500, 3, mm);
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
+  const ySo = y0 + 8.8 * mm;
+  for (let cm = 0; cm <= 5; cm++) {
+    ctx.fillText(String(cm), x0 + cm * 10 * mm, ySo);
+  }
+}
+
+/* Vẽ thước dọc dài đúng 50 mm, vạch hướng qua trái và số 0..5 cm bên trái vạch 10 mm */
+function veThuocDoc(ctx, x0, y0, mm) {
+  ctx.strokeStyle = "#000000";
+  ctx.lineCap = "butt";
+
+  /* Đường thước chính */
+  ctx.lineWidth = 0.3 * mm;
+  ctx.beginPath();
+  ctx.moveTo(x0, y0);
+  ctx.lineTo(x0, y0 + 50 * mm);
+  ctx.stroke();
+
+  /* Vạch chia từng 1 mm, 5 mm, 10 mm hướng sang trái */
+  ctx.lineWidth = 0.2 * mm;
+  ctx.beginPath();
+  for (let i = 0; i <= 50; i++) {
+    const y = y0 + i * mm;
+    const dai = (i % 10 === 0 ? 5 : i % 5 === 0 ? 3.5 : 2) * mm;
+    ctx.moveTo(x0, y);
+    ctx.lineTo(x0 - dai, y);
+  }
+  ctx.stroke();
+
+  /* Số cm nằm bên trái vạch 10 mm, canh giữa theo chiều dọc với vạch */
+  ctx.fillStyle = "#000000";
+  ctx.font = tinhFontQS(500, 3, mm);
+  ctx.textAlign = "right";
+  ctx.textBaseline = "alphabetic";
+  const xSo = x0 - 6.2 * mm;
+  const lechGiua = 1.05 * mm;
+  for (let cm = 0; cm <= 5; cm++) {
+    ctx.fillText(String(cm), xSo, y0 + cm * 10 * mm + lechGiua);
+  }
+}
+
+/* Vẽ một trang ghi chép (kẻ dòng, kẻ chấm, Cornell, 4 ô li trống); nền trang đã tô sẵn */
+function veTrangGhiChep(ctx, W, H, mm, o) {
+  if (!(mm > 0)) return;
+  const tuy = o || {};
+  const le = tuy.le || { l: 0, r: 0, t: 0, b: 0 };
+
+  ctx.save();
+  ctx.setLineDash([]);
+  ctx.globalAlpha = 1;
+
+  if (tuy.dauTrang) {
+    veDauTrangGhiChep(ctx, W, mm, le, tuy.so, tuy.tong);
+  }
+
+  const x0 = le.l;
+  const x1 = W - le.r;
+  const y0 = tuy.dauTrang ? le.t + 10 * mm : le.t;
+  const y1 = H - le.b;
+  const buocMm = tuy.buoc > 0 ? tuy.buoc : (tuy.kieu === "cham" ? 5 : 8);
+  const buocPx = buocMm * mm;
+
+  if (x1 > x0 && y1 > y0) {
+    if (tuy.kieu === "dong") {
+      veKeDong(ctx, x0, y0 + buocPx, x1, y1 + 1e-6 * mm, buocPx, mm);
+    } else if (tuy.kieu === "cham") {
+      veKeCham(ctx, x0, y0, x1, y1, buocPx, mm);
+    } else if (tuy.kieu === "cornell") {
+      veCornell(ctx, x0, y0, x1, y1, buocPx, mm);
+    } else if (tuy.kieu === "oly4") {
+      veLuoiOLi(ctx, x0, y0, x1 - x0, y1 - y0, mm);
+    }
+  }
+
+  ctx.restore();
+}
+
+/* Vẽ trang kiểm tra tỷ lệ in, mức xám, dấu tiếng Việt và mẫu lưới 4 ô li */
+function veTrangKiemTra(ctx, W, H, mm, o) {
+  if (!(mm > 0)) return;
+  const tuy = o || {};
+  const le = tuy.le || { l: 0, r: 0, t: 0, b: 0 };
+  const x0 = le.l;
+  const x1 = W - le.r;
+  const rong = x1 - x0;
+
+  ctx.save();
+  ctx.setLineDash([]);
+  ctx.globalAlpha = 1;
+  ctx.textBaseline = "alphabetic";
+  ctx.textAlign = "left";
+
+  /* 1. Tiêu đề và thông số khổ trang */
+  const yTieuDe = le.t + 8 * mm;
+  ctx.fillStyle = "#000000";
+  ctx.font = tinhFontQS(700, 6, mm);
+  ctx.fillText("Trang kiểm tra", x0, yTieuDe);
+
+  ctx.fillStyle = "#444444";
+  ctx.font = tinhFontQS(500, 3.4, mm);
+  const tenKho = tuy.tenKho || "";
+  const dongKho = `${tenKho} · ${tinhSoMm(tuy.wMm)} × ${tinhSoMm(tuy.hMm)} mm`;
+  const yCuoiKho = veChuXuongDong(ctx, dongKho, x0, yTieuDe + 5.5 * mm, rong, 4.8 * mm);
+
+  /* 2 & 3. Thước ngang 50 mm và thước dọc 50 mm sát lề phải */
+  const yThuoc = yCuoiKho + 12 * mm;
+  const xDoc = x1 - 10 * mm;
+  const xTruocDoc = xDoc - 11 * mm;
+  veThuocNgang(ctx, x0, yThuoc, mm);
+  veThuocDoc(ctx, xDoc, yThuoc, mm);
+
+  ctx.fillStyle = "#000000";
+  ctx.font = tinhFontQS(500, 3.4, mm);
+  ctx.textAlign = "left";
+  const xChuThuoc = x0 + 56 * mm;
+  const chuThuoc = "Thước này phải dài đúng 50 mm.";
+  let yCuoiChuThuoc = yThuoc + 8.8 * mm;
+  if (xTruocDoc - xChuThuoc >= 22 * mm) {
+    yCuoiChuThuoc = veChuXuongDong(ctx, chuThuoc, xChuThuoc, yThuoc + 3.2 * mm, xTruocDoc - xChuThuoc, 4.8 * mm);
+  } else {
+    yCuoiChuThuoc = veChuXuongDong(ctx, chuThuoc, x0, yThuoc + 14 * mm, Math.max(20 * mm, xTruocDoc - x0), 4.8 * mm);
+  }
+
+  ctx.fillStyle = "#444444";
+  ctx.font = tinhFontQS(500, 3, mm);
+  const yGhiChuThuoc = Math.max(yThuoc + 14.5 * mm, yCuoiChuThuoc + 5.5 * mm);
+  const ghiChuThuoc = 'In ở tỷ lệ 100% (kích thước thật), không chọn "Vừa trang". Lệch quá 0,5 mm là máy in hoặc trình xem đã co giãn trang.';
+  const yCuoiThuoc = veChuXuongDong(ctx, ghiChuThuoc, x0, yGhiChuThuoc, Math.max(20 * mm, xTruocDoc - x0), 4.4 * mm);
+
+  /* 4. Mức xám: 5 ô vuông 14 × 14 mm cách nhau 4 mm */
+  const rongXam = (5 * 14 + 4 * 4) * mm;
+  let yXam = yCuoiThuoc + 14 * mm;
+  if (x0 + rongXam > xTruocDoc && yXam < yThuoc + 58 * mm) {
+    yXam = yThuoc + 58 * mm;
+  }
+  ctx.fillStyle = "#000000";
+  ctx.font = tinhFontQS(600, 3.4, mm);
+  ctx.textAlign = "left";
+  ctx.fillText("Mức xám", x0, yXam);
+
+  const mauXam = ["#E6E6E6", "#BFBFBF", "#999999", "#666666", "#333333"];
+  const nhanXam = ["10%", "25%", "40%", "60%", "80%"];
+  const yO = yXam + 3 * mm;
+  const canhO = 14 * mm;
+  const buocO = 18 * mm;
+  ctx.lineWidth = 0.2 * mm;
+  ctx.lineCap = "butt";
+  ctx.strokeStyle = "#000000";
+  ctx.font = tinhFontQS(500, 3, mm);
+  ctx.textAlign = "center";
+  for (let i = 0; i < mauXam.length; i++) {
+    const ox = x0 + i * buocO;
+    ctx.fillStyle = mauXam[i];
+    ctx.fillRect(ox, yO, canhO, canhO);
+    ctx.strokeRect(ox, yO, canhO, canhO);
+    ctx.fillStyle = "#000000";
+    ctx.fillText(nhanXam[i], ox + canhO / 2, yO + canhO + 4.2 * mm);
+  }
+
+  ctx.textAlign = "left";
+  ctx.fillStyle = "#444444";
+  ctx.font = tinhFontQS(500, 3, mm);
+  const yChuXam = yO + canhO + 9.2 * mm;
+  const rongChuXam = yChuXam < yThuoc + 52 * mm ? Math.max(20 * mm, xTruocDoc - x0) : rong;
+  const yCuoiXam = veChuXuongDong(ctx, "Máy đọc sách tốt thấy rõ cả 5 ô khác nhau.", x0, yChuXam, rongChuXam, 4.4 * mm);
+
+  /* 5. Dấu tiếng Việt ở ba cỡ 4 mm, 6 mm, 8 mm */
+  const yDau = yCuoiXam + 12 * mm;
+  ctx.fillStyle = "#000000";
+  ctx.font = tinhFontQS(600, 3.4, mm);
+  ctx.fillText("Dấu tiếng Việt", x0, yDau);
+
+  const mauDau = "ữ ỷ ặ ộ ờ ẫ ẳ ỹ Ở Ữ Ặ Ẫ";
+  const coDau = [4, 6, 8];
+  let yDongDau = yDau;
+  for (let i = 0; i < coDau.length; i++) {
+    const co = coDau[i];
+    const buocDong = (co + 4) * mm;
+    yDongDau += buocDong;
+    ctx.font = tinhFontQS(500, co, mm);
+    yDongDau = veChuXuongDong(ctx, mauDau, x0, yDongDau, rong, buocDong);
+  }
+
+  /* 6. Mẫu lưới 4 ô li (rộng 64 mm, cao 16 mm) */
+  const yOLi = yDongDau + 10 * mm;
+  ctx.fillStyle = "#000000";
+  ctx.font = tinhFontQS(600, 3.4, mm);
+  ctx.fillText("4 ô li (1 ô li = 2 mm)", x0, yOLi);
+  veLuoiOLi(ctx, x0, yOLi + 3 * mm, Math.min(64 * mm, rong), 16 * mm, mm);
+
+  /* 7. Chân trang */
+  ctx.fillStyle = "#777777";
+  ctx.font = tinhFontQS(500, 3, mm);
+  ctx.textAlign = "left";
+  const dongChan = tinhDongChu(ctx, "Dùng trang này để kiểm máy in và màn hình trước khi in cả tập.", rong);
+  const buocChan = 4.2 * mm;
+  const yChanCuoi = H - le.b - 4 * mm;
+  for (let i = 0; i < dongChan.length; i++) {
+    ctx.fillText(dongChan[i], x0, yChanCuoi - (dongChan.length - 1 - i) * buocChan);
+  }
+
+  ctx.restore();
+}
 /* ================== exportPdf(cfg): XUẤT VỞ PDF TỪ MỘT GÓI CẤU HÌNH ==================
    Nhận một gói cấu hình cfg (docs/KIEN_TRUC.md mục 5.3), trả về file PDF. Không đọc bài đang mở,
    không đọc pdfOpt, không đụng giao diện: màn Xuất PDF, đường link cấu hình và GitHub Actions
@@ -10781,7 +11225,10 @@ const TU_GO_TOI_DA = 2000;   // số ký tự tối đa của nội dung tự g�
 const PDF_CFG_MAC_DINH = { v: 1, scope: "bai", lessons: [], mode: "to", grid: "french", arrows: true, preset: "rm2", barSide: "left" };
 
 /* Kiểm và điền giá trị mặc định. Sai thì báo lỗi bằng lời dễ hiểu. */
-const PDF_CFG_KHOA = ["v", "script", "scope", "lessons", "mode", "grid", "arrows", "preset", "barSide", "wMm", "hMm", "text"];
+const PDF_CFG_KHOA = ["v", "script", "scope", "lessons", "mode", "grid", "arrows", "preset", "barSide", "wMm", "hMm", "text", "trang", "buoc", "soTrang", "dauTrang", "a5x2"];
+/* Trang ghi chép (bản 0.15): kiểu trang, khoảng cách (mm) cho phép và mặc định */
+const KIEU_GHI_CHEP = { dong: { ten: "Kẻ dòng", min: 5, max: 15, md: 7 }, cham: { ten: "Kẻ chấm", min: 3, max: 10, md: 5 }, cornell: { ten: "Cornell", min: 5, max: 15, md: 7 }, oly4: { ten: "4 ô li trống", min: 2, max: 2, md: 2 } };
+const GHI_CHEP_TOI_DA = 100;   // số trang ghi chép tối đa một file
 function chuanHoaPdfCfg(cfg) {
   /* Bảo mật: cfg có thể đến từ đường link người khác gửi; chỉ chép các trường đã biết (bỏ __proto__, constructor…) */
   const vao = cfg && typeof cfg === "object" && !Array.isArray(cfg) ? cfg : {}, c = Object.assign({}, PDF_CFG_MAC_DINH);
@@ -10797,8 +11244,21 @@ function chuanHoaPdfCfg(cfg) {
   if (!["to", "nho"].includes(c.mode)) throw new Error(`Cách tập không hợp lệ: "${c.mode}"`);
   if (!["french", "oly4"].includes(c.grid)) throw new Error(`Kiểu dòng kẻ không hợp lệ: "${c.grid}"`);
   if (!["left", "right"].includes(c.barSide)) throw new Error(`Lề thanh công cụ không hợp lệ: "${c.barSide}"`);
-  if (!["bai", "phan", "tatca", "luyenthem", "tudo", "tugo"].includes(c.scope))
-    throw new Error(`Chưa hỗ trợ phạm vi "${c.scope}" (có: bai, phan, tatca, luyenthem, tudo, tugo)`);
+  if (!["bai", "phan", "tatca", "luyenthem", "tudo", "tugo", "ghichep", "kiemtra"].includes(c.scope))
+    throw new Error(`Chưa hỗ trợ phạm vi "${String(c.scope).slice(0, 20)}" (có: bai, phan, tatca, luyenthem, tudo, tugo, ghichep, kiemtra)`);
+  if (c.scope === "ghichep") {
+    if (!Object.prototype.hasOwnProperty.call(KIEU_GHI_CHEP, c.trang ?? "dong")) throw new Error(`Kiểu trang ghi chép không hợp lệ: "${String(c.trang).slice(0, 20)}"`);
+    c.trang = c.trang ?? "dong";
+    const g = KIEU_GHI_CHEP[c.trang], b = c.buoc == null ? g.md : Number(c.buoc);
+    if (!(b >= g.min && b <= g.max)) throw new Error(`Khoảng cách của ${g.ten} phải từ ${g.min} tới ${g.max} mm`);
+    c.buoc = Math.round(b * 10) / 10;
+    const n = c.soTrang == null ? 20 : Number(c.soTrang);
+    if (!(Number.isInteger(n) && n >= 1 && n <= GHI_CHEP_TOI_DA)) throw new Error(`Số trang ghi chép phải từ 1 tới ${GHI_CHEP_TOI_DA}`);
+    c.soTrang = n; c.dauTrang = c.dauTrang !== false;
+  } else { delete c.trang; delete c.buoc; delete c.soTrang; delete c.dauTrang; }
+  if (c.scope === "ghichep" || c.scope === "kiemtra") { c.lessons = []; delete c.text; }
+  /* In 2 trang A5 trên 1 tờ A4 nằm ngang: chỉ có ở khổ A5 */
+  if (c.a5x2 === true && c.preset === "a5") c.a5x2 = true; else delete c.a5x2;
   if (c.scope !== "tugo") delete c.text;
   if (c.scope === "tugo") {
     c.text = typeof c.text === "string" ? c.text : "";
@@ -10856,10 +11316,11 @@ async function exportPdfMot(cfg, tuyChon = {}) {
   const saveLR = luyenRounds, saveFL = frozenLuyen, saveFR = frozenReview, saveLRows = LUYEN.rows, saveRRows = REVIEW.rows;
   const saveTheme = S.theme, saveW = W, saveH = H, saveLayout = layout, saveT = T, saveSGrid = S.gridStyle, saveSArrows = S.rowArrows, saveSXBand = S.xBand, saveScale = S.scale, saveSTrace = S.trace;
   try {
-    const pr = c.preset === "tunhap" ? khoTuNhap(c.wMm, c.hMm) : PDF_PRESETS[c.preset];
+    const pr0 = c.preset === "tunhap" ? khoTuNhap(c.wMm, c.hMm) : PDF_PRESETS[c.preset];
+    const pr = c.a5x2 ? Object.assign({}, pr0, { links: false }) : pr0;   // giấy in ra không bấm được: bỏ link mục lục
     /* Trang nhỏ hơn A5 (dưới 1240 điểm ảnh ngang): thu nhỏ chữ tiêu đề và lề theo tỷ lệ; các khổ cũ giữ nguyên (k = 1) */
     const k = Math.min(1, pr.pxW / 1240), px = v => v * k;
-    const targetLessons = chonBaiPdf(c);
+    const targetLessons = c.scope === "ghichep" || c.scope === "kiemtra" ? [] : chonBaiPdf(c);
 
     const mctx = document.createElement("canvas").getContext("2d"), doc = new PdfDoc(); let ctx = null;
     const pdfTheme = pr.mono ? THEMES.eink : THEMES.light;
@@ -10872,6 +11333,7 @@ async function exportPdfMot(cfg, tuyChon = {}) {
     const padL = c.barSide === "left" ? pr.bar : px(68);
     const padR = c.barSide === "right" ? pr.bar : px(68);
     const padT = px(138), padB = px(86);
+    if (c.scope === "ghichep" || c.scope === "kiemtra") return await xuatTrangKhongBai(c, pr, doc, mctx, { padL, padR }, tuyChon, baoTienDo);
 
     /* Tạo trước danh sách trang cho từng bài học */
     const lessonJobs = [];
@@ -11001,7 +11463,7 @@ async function exportPdfMot(cfg, tuyChon = {}) {
           ctx.fillText("Gợi ý: " + job.lesson.note, padL, H - px(36));
         }
         /* Nút bấm góc trên phải để quay về Trang 1 Mục lục trên reMarkable */
-        if (tuyChon.xemTruoc) return { xemTruoc: true, soTrang: xemGon ? 0 : totalContentPages + tocOffset, soBai: targetLessons.length, coMucLuc: needToc, tenKho: pr.name };
+        if (tuyChon.xemTruoc) return { xemTruoc: true, soTrang: xemGon ? 0 : totalContentPages + tocOffset, soTo: c.a5x2 && !xemGon ? Math.ceil((totalContentPages + tocOffset) / 2) : 0, soBai: targetLessons.length, coMucLuc: needToc, tenKho: pr.name };
         const backLinks = needToc && pr.links ? [{ rect: [((W - padR - 220) / W) * pr.ptW, pr.ptH - (95 / H) * pr.ptH, ((W - padR) / W) * pr.ptW, pr.ptH - (25 / H) * pr.ptH], targetPage: 0 }] : [];
         pdfPages.push({ content: ctx.out.join("\n"), links: backLinks });
       }
@@ -11010,8 +11472,8 @@ async function exportPdfMot(cfg, tuyChon = {}) {
     baoTienDo("Đang tạo file PDF…");
     await new Promise(r => setTimeout(r, 10));
     const tieuDe = `Tập viết · ${SC.name} · ${lessonJobs.length > 1 ? tenNhom : lessonJobs[0].lesson.t}`;
-    const blob = await assembleVectorPdf(doc, pdfPages, pr.ptW, pr.ptH, W, H, tieuDe);
-    return { blob, soTrang: pdfPages.length, tieuDe, cfg: c };
+    const blob = await assembleVectorPdf(doc, pdfPages, pr.ptW, pr.ptH, W, H, tieuDe, c.a5x2);
+    return { blob, soTrang: c.a5x2 ? Math.ceil(pdfPages.length / 2) : pdfPages.length, tieuDe, cfg: c };
   } finally {
     S.theme = saveTheme; W = saveW; H = saveH; layout = saveLayout; T = saveT; S.gridStyle = saveSGrid; S.rowArrows = saveSArrows; S.xBand = saveSXBand; S.scale = saveScale; S.trace = saveSTrace;
     luyenRounds = saveLR; frozenLuyen = saveFL; frozenReview = saveFR; LUYEN.rows = saveLRows; REVIEW.rows = saveRRows;
@@ -11019,6 +11481,30 @@ async function exportPdfMot(cfg, tuyChon = {}) {
     /* Xem trước không đổi trang viết: chỉ dựng lại khi cửa sổ vừa đổi cỡ trong lúc chạy */
     if (!tuyChon.xemTruoc || pendingResize) { pendingResize = false; resize(); }
   }
+}
+
+/* Trang ghi chép, trang kiểm tra: vẽ bằng engine/trang-ghi-chep.js theo mm thật (1 mm = pr.pxW / pr.wMm điểm ảnh).
+   Gọi từ exportPdfMot khi W, H đã gán theo khổ; biến chung được khôi phục ở khối finally của hàm gọi. */
+async function xuatTrangKhongBai(c, pr, doc, mctx, le, tuyChon, baoTienDo) {
+  const mm = pr.pxW / pr.wMm, ghiChep = c.scope === "ghichep", n = ghiChep ? c.soTrang : 1;
+  const vung = { l: le.padL, r: le.padR, t: 10 * mm, b: 10 * mm };
+  const pdfPages = [];
+  for (let i = 0; i < n; i++) {
+    if (n > 1) { baoTienDo(`Đang vẽ trang ${i + 1}/${n}…`); if (i % 10 === 0) await new Promise(r => setTimeout(r, 0)); }
+    let ctx;
+    if (tuyChon.xemTruoc) { const kx = Math.min(1, 900 / Math.max(W, H)); ctx = tuyChon.xemTruoc(Math.round(W * kx), Math.round(H * kx)); ctx.setTransform(kx, 0, 0, kx, 0, 0); }
+    else ctx = new PdfCtx(doc, mctx);
+    ctx.fillStyle = "#FFFFFF"; ctx.fillRect(0, 0, W, H);
+    if (ghiChep) veTrangGhiChep(ctx, W, H, mm, { kieu: c.trang, buoc: c.buoc, le: vung, dauTrang: c.dauTrang, so: i + 1, tong: n });
+    else veTrangKiemTra(ctx, W, H, mm, { le: vung, tenKho: pr.name, wMm: pr.wMm, hMm: pr.hMm });
+    if (tuyChon.xemTruoc) return { xemTruoc: true, soTrang: n, soTo: c.a5x2 ? Math.ceil(n / 2) : 0, soBai: 0, coMucLuc: false, tenKho: pr.name };
+    pdfPages.push({ content: ctx.out.join("\n"), links: [] });
+  }
+  baoTienDo("Đang tạo file PDF…");
+  await new Promise(r => setTimeout(r, 10));
+  const tieuDe = ghiChep ? `Trang ghi chép · ${KIEU_GHI_CHEP[c.trang].ten}${c.trang === "oly4" ? "" : " " + String(c.buoc).replace(".", ",") + " mm"}` : `Trang kiểm tra · ${pr.name}`;
+  const blob = await assembleVectorPdf(doc, pdfPages, pr.ptW, pr.ptH, W, H, tieuDe, c.a5x2);
+  return { blob, soTrang: c.a5x2 ? Math.ceil(pdfPages.length / 2) : pdfPages.length, tieuDe, cfg: c };
 }
 /* ================== CẤU HÌNH VỞ TRONG ĐƯỜNG LINK ==================
    Dạng link: …/index.html#cfg=<mã>. Phần sau dấu # không được trình duyệt gửi lên máy chủ.
@@ -11095,9 +11581,10 @@ async function apDungCfgTuLink() {
   if ((c.scope === "bai" || c.scope === "phan") && i >= 0 && i !== cur.li) openLesson(i);
   Object.assign(pdfOpt, {
     preset: c.preset, wMm: c.wMm, hMm: c.hMm, mode: c.mode, grid: c.grid, arrows: c.arrows, barSide: c.barSide,
-    scope: c.scope === "bai" && c.lessons.length > 1 ? "pick" : { bai: "cur", phan: "part", tatca: "all", luyenthem: "weak", tudo: "free", tugo: "type" }[c.scope],
-    lessons: c.lessons.slice(), text: c.text || "",
+    scope: c.scope === "bai" && c.lessons.length > 1 ? "pick" : { bai: "cur", phan: "part", tatca: "all", luyenthem: "weak", tudo: "free", tugo: "type", ghichep: "note", kiemtra: "test" }[c.scope],
+    lessons: c.lessons.slice(), text: c.text || "", a5x2: !!c.a5x2,
   });
+  if (c.scope === "ghichep") { pdfOpt.trang = c.trang; if (c.trang !== "oly4") pdfOpt.buoc[c.trang] = c.buoc; pdfOpt.soTrang = c.soTrang; pdfOpt.dauTrang = c.dauTrang; }
   openPdfModal();if(typeof datTrang==="function"){datTrang("gen");datKhu("pdf")}   /* mở thành trang Tập viết PDF */
   toast("Đã mở cấu hình vở từ đường link");
 }
